@@ -7,152 +7,155 @@
 <meta name="theme-color" content="#1976d2">
 
 <style>
-* { box-sizing: border-box; font-family: Arial, sans-serif; }
-body { margin: 0; background: #f4f6f8; }
+*{box-sizing:border-box;font-family:Arial,sans-serif}
+body{margin:0;background:#f4f6f8}
 
-header {
-  background: #1976d2;
-  color: #fff;
-  padding: 15px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+header{
+background:#1976d2;
+color:#fff;
+padding:15px;
+display:flex;
+justify-content:space-between;
+align-items:center
 }
 
-.cards { display: flex; gap: 10px; padding: 10px; }
+.cards{display:flex;gap:10px;padding:10px}
 
-.card {
-  flex: 1;
-  background: #fff;
-  padding: 12px;
-  border-radius: 10px;
-  text-align: center;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+.card{
+flex:1;
+background:#fff;
+padding:12px;
+border-radius:10px;
+text-align:center;
+box-shadow:0 2px 6px rgba(0,0,0,.1)
 }
 
-.card h4 { margin: 0; font-size: 14px; color: #666; }
-.card .main { font-size: 18px; font-weight: bold; margin-top: 6px; }
-.card .sub { font-size: 13px; color: #777; }
+.card h4{margin:0;font-size:14px;color:#666}
+.card .main{font-size:18px;font-weight:bold;margin-top:6px}
+.card .sub{font-size:13px;color:#777}
 
-.saldo { border-top: 4px solid #1976d2; }
-.receita { border-top: 4px solid #2e7d32; }
-.despesa { border-top: 4px solid #c62828; }
+.saldo{border-top:4px solid #1976d2}
+.receita{border-top:4px solid #2e7d32}
+.despesa{border-top:4px solid #c62828}
 
-.list { padding: 10px; }
+.list{padding:10px}
 
-.row {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 10px;
+.row{
+display:flex;
+gap:8px;
+margin-bottom:10px
 }
 
-.date-card {
-  width: 70px;
-  background: #fff;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  font-weight: bold;
-  color: #888;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+.date-card{
+width:56px;
+background:#fff;
+border-radius:10px;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:15px;
+font-weight:bold;
+color:#888;
+box-shadow:0 1px 4px rgba(0,0,0,.1);
+height:82px
 }
 
-.item {
-  flex: 1;
-  background: #fff;
-  padding: 12px;
-  border-radius: 10px;
-  border-left: 5px solid #2196f3;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+.item{
+flex:1;
+background:#fff;
+padding:12px;
+border-radius:10px;
+border-left:5px solid #2196f3;
+box-shadow:0 1px 4px rgba(0,0,0,.1);
+height:82px;
+display:flex;
+flex-direction:column;
+justify-content:center
 }
 
-.item-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.item-top{
+display:flex;
+justify-content:space-between;
+align-items:flex-start
 }
 
-.item-name { font-weight: bold; }
+.item-name{font-weight:bold}
 
-.item-value {
-  font-size: 18px;
-  font-weight: bold;
+.item-value{
+font-size:18px;
+font-weight:bold;
+text-align:right
 }
 
-.income { color: #2e7d32; }
-.expense { color: #c62828; }
+.income{color:#2e7d32}
+.expense{color:#c62828}
 
-.item-sub {
-  font-size: 13px;
-  color: #666;
-  margin-top: 2px;
+.item-sub{
+font-size:13px;
+color:#666;
+margin-top:2px
 }
 
-.badge {
-  display: inline-block;
-  margin-top: 6px;
-  padding: 4px 10px;
-  font-size: 12px;
-  border-radius: 20px;
-  color: #fff;
+.badge{
+margin-top:4px;
+align-self:flex-end;
+padding:4px 10px;
+font-size:11px;
+border-radius:20px;
+color:#fff
 }
 
-.green { background: #2e7d32; }
-.red { background: #c62828; }
+.green{background:#2e7d32}
+.red{background:#c62828}
 
-.fab {
-  position: fixed;
-  right: 20px;
-  bottom: 20px;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  font-size: 26px;
-  background: #1976d2;
-  color: #fff;
-  border: none;
+.fab{
+position:fixed;
+right:20px;
+bottom:20px;
+width:56px;
+height:56px;
+border-radius:50%;
+font-size:26px;
+background:#1976d2;
+color:#fff;
+border:none
 }
 
-.modal {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.5);
-  justify-content: center;
-  align-items: center;
+.modal{
+display:none;
+position:fixed;
+inset:0;
+background:rgba(0,0,0,.5);
+justify-content:center;
+align-items:center
 }
 
-.modal-content {
-  background: #fff;
-  width: 90%;
-  max-width: 320px;
-  padding: 20px;
-  border-radius: 12px;
+.modal-content{
+background:#fff;
+width:90%;
+max-width:320px;
+padding:20px;
+border-radius:12px
 }
 
 .modal-content input,
 .modal-content select,
-.modal-content button {
-  width: 100%;
-  margin-top: 10px;
-  padding: 10px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
+.modal-content button{
+width:100%;
+margin-top:10px;
+padding:10px;
+border-radius:8px;
+border:1px solid #ccc
 }
 
-.modal-content button {
-  background: #1976d2;
-  color: #fff;
-  border: none;
+.modal-content button{
+background:#1976d2;
+color:#fff;
+border:none
 }
 
-.delete {
-  background: #c62828 !important;
-}
-
-.cancel { background: #aaa !important; }
+.delete{background:#c62828!important}
+.cancel{background:#aaa!important}
 </style>
 </head>
 
@@ -189,7 +192,7 @@ header {
 
 <div class="modal" id="modal">
 <div class="modal-content">
-<input id="name" placeholder="Nome" required>
+<input id="name" placeholder="Nome">
 <input id="value" type="number" placeholder="Valor">
 <input id="category" placeholder="Categoria">
 <input id="date" type="date">
@@ -211,12 +214,12 @@ header {
 </div>
 
 <script>
-const monthInput = document.getElementById("month");
-monthInput.value = new Date().toISOString().slice(0,7);
-let editIndex = null;
+const monthInput=document.getElementById("month");
+monthInput.value=new Date().toISOString().slice(0,7);
+let editIndex=null;
 
-function getData(){ return JSON.parse(localStorage.getItem("finance")) || {}; }
-function saveData(d){ localStorage.setItem("finance", JSON.stringify(d)); }
+function getData(){return JSON.parse(localStorage.getItem("finance"))||{}}
+function saveData(d){localStorage.setItem("finance",JSON.stringify(d))}
 
 function formatDate(d){
 const [y,m,day]=d.split("-");
@@ -226,19 +229,22 @@ return `${day}/${m}`;
 function render(){
 const data=getData();
 const m=monthInput.value;
-const list=data[m]||[];
+let list=data[m]||[];
+
+list=list.sort((a,b)=>new Date(b.date)-new Date(a.date));
+
 let rPago=0,rPrev=0,dPago=0,dPrev=0;
 const container=document.getElementById("list");
 container.innerHTML="";
 
 list.forEach((t,i)=>{
 if(t.type==="income"){
-t.paid ? rPago+=t.value : rPrev+=t.value;
+t.paid?rPago+=t.value:rPrev+=t.value;
 }else{
-t.paid ? dPago+=t.value : dPrev+=t.value;
+t.paid?dPago+=t.value:dPrev+=t.value;
 }
 
-const late=!t.paid && new Date(t.date)<new Date();
+const late=!t.paid&&new Date(t.date)<new Date();
 
 const row=document.createElement("div");
 row.className="row";
@@ -248,12 +254,16 @@ row.innerHTML=`
 <div class="date-card">${formatDate(t.date)}</div>
 <div class="item">
 <div class="item-top">
-<span class="item-name">${t.name}</span>
-<span class="item-value ${t.type}">R$ ${t.value.toFixed(2)}</span>
-</div>
+<div>
+<div class="item-name">${t.name}</div>
 <div class="item-sub">${t.category}</div>
-${t.paid ? `<div class="badge green">${t.type==="income"?"Recebido":"Pago"}</div>` :
-late ? `<div class="badge red">Atrasado</div>` : ""}
+</div>
+<div>
+<div class="item-value ${t.type}">R$ ${t.value.toFixed(2)}</div>
+${t.paid?`<div class="badge green">${t.type==="income"?"Recebido":"Pago"}</div>`:
+late?`<div class="badge red">Atrasado</div>`:""}
+</div>
+</div>
 </div>`;
 container.appendChild(row);
 });
@@ -267,11 +277,11 @@ saldoPrev.innerText=`R$ ${((rPago+rPrev)-(dPago+dPrev)).toFixed(2)}`;
 }
 
 function save(){
-if(!name.value.trim()) return alert("Informe o nome");
+if(!name.value.trim())return alert("Informe o nome");
 
 const data=getData();
 const m=monthInput.value;
-if(!data[m]) data[m]=[];
+if(!data[m])data[m]=[];
 
 const item={
 name:name.value.trim(),
@@ -282,45 +292,60 @@ type:type.value,
 paid:paid.value==="true"
 };
 
-if(editIndex!==null) data[m][editIndex]=item;
-else data[m].push(item);
-
+editIndex!==null?data[m][editIndex]=item:data[m].push(item);
 saveData(data);
 closeModal();
 render();
 }
 
 function edit(i){
-const t=getData()[monthInput.value][i];
-name.value=t.name;
-value.value=t.value;
-category.value=t.category;
-date.value=t.date;
-type.value=t.type;
-paid.value=String(t.paid);
-editIndex=i;
-deleteBtn.style.display="block";
-openModal();
+  const data = getData();
+  const t = data[monthInput.value][i];
+
+  name.value = t.name;
+  value.value = t.value;
+  category.value = t.category;
+  date.value = t.date;
+  type.value = t.type;
+  paid.value = String(t.paid);
+
+  editIndex = i;
+  deleteBtn.style.display = "block";
+  openModal();
 }
 
 function remove(){
-const d=getData();
-d[monthInput.value].splice(editIndex,1);
-saveData(d);
-closeModal();
-render();
+  const data = getData();
+  const m = monthInput.value;
+
+  if(editIndex !== null){
+    data[m].splice(editIndex, 1);
+    saveData(data);
+  }
+
+  closeModal();
+  render();
 }
 
 function openModal(){
-modal.style.display="flex";
-deleteBtn.style.display=editIndex!==null?"block":"none";
+  modal.style.display = "flex";
+  if(editIndex === null){
+    name.value = "";
+    value.value = "";
+    category.value = "";
+    date.value = "";
+    type.value = "income";
+    paid.value = "false";
+    deleteBtn.style.display = "none";
+  }
 }
 
 function closeModal(){
-modal.style.display="none";
-editIndex=null;
+  modal.style.display = "none";
+  editIndex = null;
 }
-monthInput.addEventListener("change",render);
+
+monthInput.addEventListener("change", render);
 render();
 </script>
 
