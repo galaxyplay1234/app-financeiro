@@ -43,7 +43,8 @@ box-shadow:0 2px 6px rgba(0,0,0,.1)
 .row{
 display:flex;
 gap:8px;
-margin-bottom:10px
+margin-bottom:8px;
+cursor:pointer
 }
 
 .date-card{
@@ -53,21 +54,21 @@ border-radius:10px;
 display:flex;
 align-items:center;
 justify-content:center;
-font-size:15px;
+font-size:14px;
 font-weight:bold;
 color:#888;
 box-shadow:0 1px 4px rgba(0,0,0,.1);
-height:82px
+height:64px
 }
 
 .item{
 flex:1;
 background:#fff;
-padding:12px;
+padding:10px;
 border-radius:10px;
 border-left:5px solid #2196f3;
 box-shadow:0 1px 4px rgba(0,0,0,.1);
-height:82px;
+height:64px;
 display:flex;
 flex-direction:column;
 justify-content:center
@@ -79,10 +80,10 @@ justify-content:space-between;
 align-items:flex-start
 }
 
-.item-name{font-weight:bold}
+.item-name{font-weight:bold;font-size:14px}
 
 .item-value{
-font-size:18px;
+font-size:16px;
 font-weight:bold;
 text-align:right
 }
@@ -90,19 +91,24 @@ text-align:right
 .income{color:#2e7d32}
 .expense{color:#c62828}
 
-.item-sub{
-font-size:13px;
-color:#666;
+.item-bottom{
+display:flex;
+justify-content:space-between;
+align-items:center;
 margin-top:2px
 }
 
+.item-sub{
+font-size:12px;
+color:#666
+}
+
 .badge{
-margin-top:4px;
-align-self:flex-end;
-padding:4px 10px;
-font-size:11px;
-border-radius:20px;
-color:#fff
+padding:2px 8px;
+font-size:12px;
+border-radius:12px;
+color:#fff;
+white-space:nowrap
 }
 
 .green{background:#2e7d32}
@@ -215,6 +221,9 @@ border:none
 
 <script>
 const monthInput=document.getElementById("month");
+const modal=document.getElementById("modal");
+const deleteBtn=document.getElementById("deleteBtn");
+
 monthInput.value=new Date().toISOString().slice(0,7);
 let editIndex=null;
 
@@ -231,7 +240,7 @@ const data=getData();
 const m=monthInput.value;
 let list=data[m]||[];
 
-list=list.sort((a,b)=>new Date(b.date)-new Date(a.date));
+list.sort((a,b)=>new Date(b.date)-new Date(a.date));
 
 let rPago=0,rPrev=0,dPago=0,dPrev=0;
 const container=document.getElementById("list");
@@ -254,15 +263,16 @@ row.innerHTML=`
 <div class="date-card">${formatDate(t.date)}</div>
 <div class="item">
 <div class="item-top">
-<div>
 <div class="item-name">${t.name}</div>
-<div class="item-sub">${t.category}</div>
-</div>
-<div>
 <div class="item-value ${t.type}">R$ ${t.value.toFixed(2)}</div>
-${t.paid?`<div class="badge green">${t.type==="income"?"Recebido":"Pago"}</div>`:
-late?`<div class="badge red">Atrasado</div>`:""}
 </div>
+<div class="item-bottom">
+<div class="item-sub">${t.category}</div>
+${t.paid
+?`<div class="badge green">${t.type==="income"?"Recebido":"Pago"}</div>`
+:late
+?`<div class="badge red">Atrasado</div>`
+:""}
 </div>
 </div>`;
 container.appendChild(row);
@@ -299,53 +309,51 @@ render();
 }
 
 function edit(i){
-  const data = getData();
-  const t = data[monthInput.value][i];
+const data=getData();
+const t=data[monthInput.value][i];
 
-  name.value = t.name;
-  value.value = t.value;
-  category.value = t.category;
-  date.value = t.date;
-  type.value = t.type;
-  paid.value = String(t.paid);
+name.value=t.name;
+value.value=t.value;
+category.value=t.category;
+date.value=t.date;
+type.value=t.type;
+paid.value=String(t.paid);
 
-  editIndex = i;
-  deleteBtn.style.display = "block";
-  openModal();
+editIndex=i;
+deleteBtn.style.display="block";
+openModal();
 }
 
 function remove(){
-  const data = getData();
-  const m = monthInput.value;
-
-  if(editIndex !== null){
-    data[m].splice(editIndex, 1);
-    saveData(data);
-  }
-
-  closeModal();
-  render();
+const data=getData();
+const m=monthInput.value;
+if(editIndex!==null){
+data[m].splice(editIndex,1);
+saveData(data);
+}
+closeModal();
+render();
 }
 
 function openModal(){
-  modal.style.display = "flex";
-  if(editIndex === null){
-    name.value = "";
-    value.value = "";
-    category.value = "";
-    date.value = "";
-    type.value = "income";
-    paid.value = "false";
-    deleteBtn.style.display = "none";
-  }
+modal.style.display="flex";
+if(editIndex===null){
+name.value="";
+value.value="";
+category.value="";
+date.value="";
+type.value="income";
+paid.value="false";
+deleteBtn.style.display="none";
+}
 }
 
 function closeModal(){
-  modal.style.display = "none";
-  editIndex = null;
+modal.style.display="none";
+editIndex=null;
 }
 
-monthInput.addEventListener("change", render);
+monthInput.addEventListener("change",render);
 render();
 </script>
 
