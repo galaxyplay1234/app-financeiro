@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Controle Financeiro</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#1976d2">
+
+  <!-- Estilo -->
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      height: 100vh;
+      background: linear-gradient(135deg, #1976d2, #2196f3);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .login-card {
+      background: #ffffff;
+      width: 90%;
+      max-width: 350px;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      text-align: center;
+    }
+
+    .login-card h1 {
+      margin: 0;
+      color: #1976d2;
+    }
+
+    .login-card p {
+      color: #666;
+      margin-bottom: 25px;
+    }
+
+    .login-card input {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      outline: none;
+      margin-bottom: 15px;
+    }
+
+    .login-card input:focus {
+      border-color: #1976d2;
+    }
+
+    .login-card button {
+      width: 100%;
+      padding: 12px;
+      background: #1976d2;
+      color: #fff;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .login-card button:hover {
+      background: #1565c0;
+    }
+
+    .error {
+      color: #c62828;
+      margin-top: 10px;
+      min-height: 18px;
+    }
+
+    .footer {
+      margin-top: 20px;
+      font-size: 12px;
+      color: #999;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="login-card">
+    <h1>💰 Finanças</h1>
+    <p>Acesso ao controle financeiro</p>
+
+    <input
+      type="password"
+      id="code"
+      placeholder="Código de acesso"
+      inputmode="numeric"
+    >
+
+    <button onclick="login()">Entrar</button>
+
+    <div class="error" id="error"></div>
+
+    <div class="footer">
+      App pessoal
+    </div>
+  </div>
+
+<script>
+  // Se já estiver logado, pula o login
+  if (localStorage.getItem("logged") === "true") {
+    window.location.href = "app.html";
+  }
+
+  const ACCESS_CODE = "12345";
+
+  function login() {
+    const code = document.getElementById("code").value;
+    const error = document.getElementById("error");
+
+    if (code === ACCESS_CODE) {
+      localStorage.setItem("logged", "true");
+      window.location.href = "app.html";
+    } else {
+      error.innerText = "Código inválido";
+    }
+  }
+
+  // Enter para entrar
+  document.getElementById("code").addEventListener("keypress", function(e) {
+    if (e.key === "Enter") {
+      login();
+    }
+  });
+</script>
+
+</body>
+</html>
