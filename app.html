@@ -19,9 +19,6 @@ header {
   align-items: center;
 }
 
-header h2 { margin: 0; font-size: 18px; }
-header input { border-radius: 6px; border: none; padding: 6px; }
-
 .cards { display: flex; gap: 10px; padding: 10px; }
 
 .card {
@@ -47,23 +44,64 @@ header input { border-radius: 6px; border: none; padding: 6px; }
 .list li {
   background: #fff;
   margin-bottom: 8px;
-  padding: 10px;
+  padding: 12px;
   border-radius: 8px;
   border-left: 5px solid #2196f3;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+}
+
+.item-top {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.paid { border-left-color: #2e7d32; }
-.late { border-left-color: #c62828; }
+.item-name { font-weight: bold; }
+
+.item-value {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.income { color: #2e7d32; }
+.expense { color: #c62828; }
+
+.item-sub {
+  margin-top: 4px;
+  font-size: 13px;
+  color: #666;
+}
+
+.badge {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 4px 10px;
+  font-size: 12px;
+  border-radius: 20px;
+  border: 1px solid;
+}
+
+.badge.green {
+  color: #2e7d32;
+  border-color: #2e7d32;
+}
+
+.badge.red {
+  color: #c62828;
+  border-color: #c62828;
+}
+
+.actions {
+  margin-top: 6px;
+  text-align: right;
+}
 
 .actions button {
   background: none;
   border: none;
   font-size: 18px;
   cursor: pointer;
-  margin-left: 5px;
+  margin-left: 6px;
 }
 
 .fab {
@@ -118,10 +156,6 @@ header input { border-radius: 6px; border: none; padding: 6px; }
 
 <body>
 
-<script>
-if (localStorage.getItem("logged") !== "true") location.href = "index.html";
-</script>
-
 <header>
 <h2>💰 Minhas Finanças</h2>
 <input type="month" id="month">
@@ -131,19 +165,19 @@ if (localStorage.getItem("logged") !== "true") location.href = "index.html";
 <div class="card saldo">
 <h4>Saldo</h4>
 <div class="main" id="saldoPago">R$ 0,00</div>
-<div class="sub" id="saldoPrevisto">Previsto: R$ 0,00</div>
+<div class="sub" id="saldoPrev">R$ 0,00</div>
 </div>
 
 <div class="card receita">
 <h4>Receitas</h4>
-<div class="main" id="receitaPago">R$ 0,00</div>
-<div class="sub" id="receitaPrev">Previsto: R$ 0,00</div>
+<div class="main" id="recPago">R$ 0,00</div>
+<div class="sub" id="recPrev">R$ 0,00</div>
 </div>
 
 <div class="card despesa">
 <h4>Despesas</h4>
-<div class="main" id="despesaPago">R$ 0,00</div>
-<div class="sub" id="despesaPrev">Previsto: R$ 0,00</div>
+<div class="main" id="despPago">R$ 0,00</div>
+<div class="sub" id="despPrev">R$ 0,00</div>
 </div>
 </section>
 
@@ -155,8 +189,6 @@ if (localStorage.getItem("logged") !== "true") location.href = "index.html";
 
 <div class="modal" id="modal">
 <div class="modal-content">
-<h3>Novo lançamento</h3>
-
 <input id="name" placeholder="Nome">
 <input id="value" type="number" placeholder="Valor">
 <input id="category" placeholder="Categoria">
@@ -167,9 +199,9 @@ if (localStorage.getItem("logged") !== "true") location.href = "index.html";
 <option value="expense">Despesa</option>
 </select>
 
-<select id="status">
-<option value="true">Pago / Recebido</option>
+<select id="paid">
 <option value="false">Previsto</option>
+<option value="true">Pago / Recebido</option>
 </select>
 
 <button onclick="save()">Salvar</button>
@@ -185,13 +217,18 @@ let editIndex = null;
 function getData(){ return JSON.parse(localStorage.getItem("finance")) || {}; }
 function saveData(d){ localStorage.setItem("finance", JSON.stringify(d)); }
 
+function formatDate(d){
+const [y,m,day]=d.split("-");
+return `${day}/${m}`;
+}
+
 function render(){
-const data = getData();
-const m = monthInput.value;
-const list = data[m] || [];
+const data=getData();
+const m=monthInput.value;
+const list=data[m]||[];
 
 let rPago=0,rPrev=0,dPago=0,dPrev=0;
-const ul = document.getElementById("list");
+const ul=document.getElementById("list");
 ul.innerHTML="";
 
 list.forEach((t,i)=>{
@@ -201,54 +238,47 @@ t.paid ? rPago+=t.value : rPrev+=t.value;
 t.paid ? dPago+=t.value : dPrev+=t.value;
 }
 
-const late = !t.paid && new Date(t.date) < new Date();
-const li = document.createElement("li");
-li.className = t.paid ? "paid" : late ? "late" : "";
+const isLate=!t.paid && new Date(t.date)<new Date();
 
-li.innerHTML = `
-<div>
-<strong>${t.name}</strong><br>
-<small>${t.category} • ${t.date}</small>
+const li=document.createElement("li");
+li.innerHTML=`
+<div class="item-top">
+<span class="item-name">${t.name}</span>
+<span class="item-value ${t.type}">R$ ${t.value.toFixed(2)}</span>
 </div>
-<div>
-R$ ${t.value.toFixed(2)}
-<span class="actions">
+<div class="item-sub">${t.category} • ${formatDate(t.date)}</div>
+${t.paid ? `<span class="badge green">${t.type==="income"?"Recebido":"Pago"}</span>` : isLate ? `<span class="badge red">Atrasado</span>` : ""}
+<div class="actions">
 <button onclick="edit(${i})">✏️</button>
 <button onclick="remove(${i})">🗑️</button>
-</span>
 </div>`;
 ul.appendChild(li);
 });
 
-document.getElementById("receitaPago").innerText=`R$ ${rPago.toFixed(2)}`;
-document.getElementById("receitaPrev").innerText=`Previsto: R$ ${(rPago+rPrev).toFixed(2)}`;
-document.getElementById("despesaPago").innerText=`R$ ${dPago.toFixed(2)}`;
-document.getElementById("despesaPrev").innerText=`Previsto: R$ ${(dPago+dPrev).toFixed(2)}`;
-
-document.getElementById("saldoPago").innerText=`R$ ${(rPago-dPago).toFixed(2)}`;
-document.getElementById("saldoPrevisto").innerText=`Previsto: R$ ${((rPago+rPrev)-(dPago+dPrev)).toFixed(2)}`;
+recPago.innerText=`R$ ${rPago.toFixed(2)}`;
+recPrev.innerText=`R$ ${(rPago+rPrev).toFixed(2)}`;
+despPago.innerText=`R$ ${dPago.toFixed(2)}`;
+despPrev.innerText=`R$ ${(dPago+dPrev).toFixed(2)}`;
+saldoPago.innerText=`R$ ${(rPago-dPago).toFixed(2)}`;
+saldoPrev.innerText=`R$ ${((rPago+rPrev)-(dPago+dPrev)).toFixed(2)}`;
 }
 
 function save(){
-const data = getData();
-const m = monthInput.value;
+const data=getData();
+const m=monthInput.value;
 if(!data[m]) data[m]=[];
 
-const item = {
+const item={
 name:name.value,
 value:Number(value.value),
 category:category.value,
 date:date.value,
 type:type.value,
-paid:status.value==="true"
+paid:paid.value==="true"
 };
 
-if(editIndex!==null){
-data[m][editIndex]=item;
-editIndex=null;
-}else{
-data[m].push(item);
-}
+if(editIndex!==null){ data[m][editIndex]=item; editIndex=null; }
+else data[m].push(item);
 
 saveData(data);
 closeModal();
@@ -256,28 +286,28 @@ render();
 }
 
 function edit(i){
-const t = getData()[monthInput.value][i];
+const t=getData()[monthInput.value][i];
 name.value=t.name;
 value.value=t.value;
 category.value=t.category;
 date.value=t.date;
 type.value=t.type;
-status.value=String(t.paid);
+paid.value=String(t.paid);
 editIndex=i;
 openModal();
 }
 
 function remove(i){
-const data=getData();
-data[monthInput.value].splice(i,1);
-saveData(data);
+const d=getData();
+d[monthInput.value].splice(i,1);
+saveData(d);
 render();
 }
 
-function openModal(){ document.getElementById("modal").style.display="flex"; }
-function closeModal(){ document.getElementById("modal").style.display="none"; }
+function openModal(){ modal.style.display="flex"; }
+function closeModal(){ modal.style.display="none"; }
 
-monthInput.addEventListener("change", render);
+monthInput.addEventListener("change",render);
 render();
 </script>
 
