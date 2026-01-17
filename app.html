@@ -1,1 +1,335 @@
-k
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Minhas Finanças</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#1976d2">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background: #f4f6f8;
+    }
+
+    header {
+      background: #1976d2;
+      color: #fff;
+      padding: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header h2 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    header input {
+      border-radius: 6px;
+      border: none;
+      padding: 6px;
+    }
+
+    .cards {
+      display: flex;
+      gap: 10px;
+      padding: 10px;
+    }
+
+    .card {
+      flex: 1;
+      background: #fff;
+      padding: 12px;
+      border-radius: 10px;
+      text-align: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .card h4 {
+      margin: 0;
+      font-size: 14px;
+      color: #666;
+    }
+
+    .card span {
+      display: block;
+      margin-top: 6px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .saldo { border-top: 4px solid #1976d2; }
+    .receita { border-top: 4px solid #2e7d32; }
+    .despesa { border-top: 4px solid #c62828; }
+
+    .list {
+      padding: 10px;
+    }
+
+    .list h3 {
+      margin-top: 0;
+    }
+
+    .list ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .list li {
+      background: #fff;
+      margin-bottom: 8px;
+      padding: 10px;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    }
+
+    .list small {
+      color: #666;
+    }
+
+    .delete {
+      background: none;
+      border: none;
+      color: #c62828;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    .fab {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      font-size: 26px;
+      background: #1976d2;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background: #fff;
+      width: 90%;
+      max-width: 320px;
+      padding: 20px;
+      border-radius: 12px;
+    }
+
+    .modal-content h3 {
+      margin-top: 0;
+      text-align: center;
+    }
+
+    .modal-content input,
+    .modal-content select,
+    .modal-content button {
+      width: 100%;
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    .modal-content button {
+      background: #1976d2;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+    }
+
+    .cancel {
+      background: #aaa !important;
+    }
+
+    .logout {
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 14px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+
+<script>
+  if (localStorage.getItem("logged") !== "true") {
+    window.location.href = "index.html";
+  }
+</script>
+
+<header>
+  <h2>💰 Minhas Finanças</h2>
+  <div>
+    <input type="month" id="month">
+    <button class="logout" onclick="logout()">Sair</button>
+  </div>
+</header>
+
+<section class="cards">
+  <div class="card saldo">
+    <h4>Saldo</h4>
+    <span id="saldo">R$ 0,00</span>
+  </div>
+  <div class="card receita">
+    <h4>Receitas</h4>
+    <span id="receitas">R$ 0,00</span>
+  </div>
+  <div class="card despesa">
+    <h4>Despesas</h4>
+    <span id="despesas">R$ 0,00</span>
+  </div>
+</section>
+
+<section class="list">
+  <h3>Lançamentos</h3>
+  <ul id="list"></ul>
+</section>
+
+<button class="fab" onclick="openModal()">+</button>
+
+<div class="modal" id="modal">
+  <div class="modal-content">
+    <h3>Novo lançamento</h3>
+
+    <select id="type">
+      <option value="income">Receita</option>
+      <option value="expense">Despesa</option>
+    </select>
+
+    <input type="number" id="value" placeholder="Valor">
+
+    <input type="text" id="category" placeholder="Categoria">
+
+    <input type="date" id="date">
+
+    <button onclick="add()">Salvar</button>
+    <button class="cancel" onclick="closeModal()">Cancelar</button>
+  </div>
+</div>
+
+<script>
+  const monthInput = document.getElementById("month");
+  const today = new Date();
+  monthInput.value = today.toISOString().slice(0, 7);
+
+  function getData() {
+    return JSON.parse(localStorage.getItem("finance")) || {};
+  }
+
+  function saveData(data) {
+    localStorage.setItem("finance", JSON.stringify(data));
+  }
+
+  function render() {
+    const data = getData();
+    const month = monthInput.value;
+    const list = data[month] || [];
+
+    let income = 0;
+    let expense = 0;
+
+    const ul = document.getElementById("list");
+    ul.innerHTML = "";
+
+    list.forEach((t, index) => {
+      if (t.type === "income") income += t.value;
+      else expense += t.value;
+
+      const li = document.createElement("li");
+      li.innerHTML = `
+        <div>
+          <strong>${t.category}</strong><br>
+          <small>${t.date}</small>
+        </div>
+        <div>
+          R$ ${t.value.toFixed(2)}
+          <button class="delete" onclick="remove(${index})">🗑️</button>
+        </div>
+      `;
+      ul.appendChild(li);
+    });
+
+    document.getElementById("receitas").innerText = `R$ ${income.toFixed(2)}`;
+    document.getElementById("despesas").innerText = `R$ ${expense.toFixed(2)}`;
+    document.getElementById("saldo").innerText = `R$ ${(income - expense).toFixed(2)}`;
+  }
+
+  function add() {
+    const type = document.getElementById("type").value;
+    const value = Number(document.getElementById("value").value);
+    const category = document.getElementById("category").value;
+    const date = document.getElementById("date").value;
+    const month = monthInput.value;
+
+    if (!value || !category || !date) {
+      alert("Preencha todos os campos");
+      return;
+    }
+
+    const data = getData();
+    if (!data[month]) data[month] = [];
+
+    data[month].push({ type, value, category, date });
+    saveData(data);
+
+    closeModal();
+    render();
+  }
+
+  function remove(index) {
+    const data = getData();
+    const month = monthInput.value;
+
+    data[month].splice(index, 1);
+    saveData(data);
+    render();
+  }
+
+  function openModal() {
+    document.getElementById("modal").style.display = "flex";
+  }
+
+  function closeModal() {
+    document.getElementById("modal").style.display = "none";
+  }
+
+  function logout() {
+    localStorage.removeItem("logged");
+    window.location.href = "index.html";
+  }
+
+  monthInput.addEventListener("change", render);
+
+  render();
+</script>
+
+</body>
+</html>
