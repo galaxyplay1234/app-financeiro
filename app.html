@@ -198,7 +198,7 @@ border:none
 
 <div class="modal" id="modal">
 <div class="modal-content">
-<input id="name" placeholder="Nome">
+<input id="title" placeholder="Nome">
 <input id="value" type="number" placeholder="Valor">
 <input id="category" placeholder="Categoria">
 <input id="date" type="date">
@@ -287,14 +287,14 @@ saldoPrev.innerText=`R$ ${((rPago+rPrev)-(dPago+dPrev)).toFixed(2)}`;
 }
 
 function save(){
-if(!name.value.trim())return alert("Informe o nome");
+if(!title.value.trim())return alert("Informe o nome");
 
 const data=getData();
 const m=monthInput.value;
 if(!data[m])data[m]=[];
 
 const item={
-name:name.value.trim(),
+name:title.value.trim(),
 value:Number(value.value),
 category:category.value,
 date:date.value,
@@ -312,7 +312,7 @@ function edit(i){
 const data=getData();
 const t=data[monthInput.value][i];
 
-name.value=t.name;
+title.value=t.name;
 value.value=t.value;
 category.value=t.category;
 date.value=t.date;
@@ -338,7 +338,7 @@ render();
 function openModal(){
 modal.style.display="flex";
 if(editIndex===null){
-name.value="";
+title.value="";
 value.value="";
 category.value="";
 date.value="";
