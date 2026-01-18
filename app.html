@@ -270,6 +270,22 @@ input:checked + .slider:before{transform:translateX(20px)}
 </div>
 </div>
 
+<div class="modal" id="categoryModal">
+  <div class="modal-content">
+
+    <h3 style="margin:0 0 10px 0">Categorias</h3>
+
+    <input id="categoryName" placeholder="Nome da categoria">
+
+    <button onclick="saveCategory()">Salvar</button>
+
+    <div id="categoryList" style="margin-top:12px"></div>
+
+    <button class="cancel" onclick="closeCategoryModal()">Fechar</button>
+
+  </div>
+</div>
+
 <script>
 let currentMonth = new Date();
 let editIndex = null;
