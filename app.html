@@ -11,17 +11,20 @@
 body{
   margin:0;
   background:#f4f6f8;
-  padding-top:72px;
+  
 }
 
 /* HEADER */
 header{
+  position:sticky;
+  top:0;
   background:#1976d2;
   color:#fff;
-  padding:20px 12px;        /* ↓ diminui altura */
+  padding:12px;
   display:flex;
-  justify-content:space-between;
-  align-items:center;
+  flex-direction:column;
+  align-items:flex-start;
+  z-index:10;
 }
 
 header h2{
