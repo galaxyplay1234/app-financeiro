@@ -523,7 +523,9 @@ function deleteCategory(name){
 function renderCategories(){
   const container=document.getElementById("categoryList");
   container.innerHTML="";
-  getCategories().forEach(c=>{
+  getCategories()
+  .sort((a,b)=>a.localeCompare(b,'pt-BR'))
+  .forEach(c=>{
     const div=document.createElement("div");
     div.className="category-item";
     div.innerHTML=`<span>${c}</span><button onclick="deleteCategory('${c}')">✕</button>`;
