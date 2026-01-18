@@ -402,7 +402,7 @@ function render(){
 
   const row = document.createElement("div");
   row.className = "row";
-  row.onclick = () => edit(realIndex);
+  row.onclick = () => editById(t.id);
 
   row.innerHTML = `
     <div class="date-card">${formatDate(t.date)}</div>
@@ -443,14 +443,15 @@ function save(){
 
   const val=Number(valueInput.value.replace(/\./g,"").replace(",","."));
 
-  const item={
-    name:title.value.trim(),
-    value:val,
-    category:category.value,
-    date:date.value,
-    type:currentType,
-    paid:paid.checked
-  };
+  const item = {
+  id: Date.now(), // 👈 ID único
+  name: title.value.trim(),
+  value: val,
+  category: category.value,
+  date: date.value,
+  type: currentType,
+  paid: paid.checked
+};
 
   editIndex!==null?data[m][editIndex]=item:data[m].push(item);
   saveData(data);
@@ -471,6 +472,16 @@ function edit(i){
   editIndex=i;
   deleteBtn.style.display="block";
   openModal();
+}
+
+function editById(id){
+  const m = getMonthKey();
+  const data = getData();
+
+  const index = data[m].findIndex(item => item.id === id);
+  if(index === -1) return;
+
+  edit(index);
 }
 
 function remove(){
