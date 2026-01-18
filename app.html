@@ -335,7 +335,7 @@ input:checked + .slider:before{transform:translateX(20px)}
 
 <script>
 let currentMonth = new Date();
-let editIndex = null;
+let editId = null;
 let currentType = "income";
 
 const monthLabel = document.getElementById("monthLabel");
@@ -343,10 +343,13 @@ const modal = document.getElementById("modal");
 const deleteBtn = document.getElementById("deleteBtn");
 const valueInput = document.getElementById("value");
 
+/* =========================
+   UTIL
+========================= */
 valueInput.addEventListener("input",()=>{
-  let v=valueInput.value.replace(/\D/g,"");
-  v=(Number(v)/100).toLocaleString("pt-BR",{minimumFractionDigits:2});
-  valueInput.value=v;
+  let v = valueInput.value.replace(/\D/g,"");
+  v = (Number(v)/100).toLocaleString("pt-BR",{minimumFractionDigits:2});
+  valueInput.value = v;
 });
 
 function updateMonthLabel(){
@@ -358,168 +361,177 @@ function getMonthKey(){
   return `${currentMonth.getFullYear()}-${String(currentMonth.getMonth()+1).padStart(2,"0")}`;
 }
 
+function formatDate(d){
+  const [y,m,day]=d.split("-");
+  return `${day}/${m}`;
+}
+
+/* =========================
+   FIREBASE REFS
+========================= */
+function monthRef(){
+  return firebase.database().ref("finance/meses/"+getMonthKey());
+}
+
+function categoriesRef(){
+  return firebase.database().ref("finance/categorias");
+}
+
+/* =========================
+   MÊS
+========================= */
 function changeMonth(step){
   currentMonth.setMonth(currentMonth.getMonth()+step);
   updateMonthLabel();
   render();
 }
 
+/* =========================
+   TYPE
+========================= */
 function setType(t){
   currentType=t;
   document.querySelectorAll(".type-btn").forEach(b=>b.classList.remove("active"));
   document.querySelector(`.type-btn.${t}`).classList.add("active");
 }
 
-function getData(){return JSON.parse(localStorage.getItem("finance"))||{}}
-function saveData(d){localStorage.setItem("finance",JSON.stringify(d))}
-
-function formatDate(d){
-  const [y,m,day]=d.split("-");
-  return `${day}/${m}`;
-}
-
+/* =========================
+   RENDER
+========================= */
 function render(){
-  const m=getMonthKey();
-  const data=getData();
-  const list=data[m]||[];
-  const container=document.getElementById("list");
-  container.innerHTML="";
+  const container = document.getElementById("list");
+  container.innerHTML = "";
 
   let rPago=0,rPrev=0,dPago=0,dPrev=0;
 
-  list.sort((a,b)=>new Date(b.date)-new Date(a.date));
+  monthRef().once("value", snap=>{
+    const data = snap.val() || {};
+    const list = Object.values(data).sort((a,b)=>new Date(b.date)-new Date(a.date));
 
-  list.forEach(t=>{
-  const realIndex = data[m].indexOf(t);
+    list.forEach(t=>{
+      if(t.type==="income"){
+        t.paid ? rPago+=t.value : rPrev+=t.value;
+      }else{
+        t.paid ? dPago+=t.value : dPrev+=t.value;
+      }
 
-  if(t.type==="income"){
-    t.paid ? rPago+=t.value : rPrev+=t.value;
-  }else{
-    t.paid ? dPago+=t.value : dPrev+=t.value;
-  }
+      const late = !t.paid && new Date(t.date) < new Date();
 
-  const late = !t.paid && new Date(t.date) < new Date();
+      const row = document.createElement("div");
+      row.className = "row";
+      row.onclick = () => editById(t.id);
 
-  const row = document.createElement("div");
-  row.className = "row";
-  row.onclick = () => editById(t.id);
-
-  row.innerHTML = `
-    <div class="date-card">${formatDate(t.date)}</div>
-    <div class="item">
-      <div class="item-top">
-        <div class="item-name">${t.name}</div>
-        <div class="item-value ${t.type}">
-          R$ ${t.value.toLocaleString("pt-BR",{minimumFractionDigits:2})}
+      row.innerHTML = `
+        <div class="date-card">${formatDate(t.date)}</div>
+        <div class="item">
+          <div class="item-top">
+            <div class="item-name">${t.name}</div>
+            <div class="item-value ${t.type}">
+              R$ ${t.value.toLocaleString("pt-BR",{minimumFractionDigits:2})}
+            </div>
+          </div>
+          <div class="item-bottom">
+            <div class="item-sub">${t.category}</div>
+            ${
+              t.paid
+              ? `<div class="badge green">${t.type==="income"?"Recebido":"Pago"}</div>`
+              : late ? `<div class="badge red">Atrasado</div>` : ""
+            }
+          </div>
         </div>
-      </div>
-      <div class="item-bottom">
-        <div class="item-sub">${t.category}</div>
-        ${
-          t.paid
-            ? `<div class="badge green">${t.type==="income"?"Recebido":"Pago"}</div>`
-            : late
-              ? `<div class="badge red">Atrasado</div>`
-              : ""
-        }
-      </div>
-    </div>
-  `;
-  container.appendChild(row);
-});
+      `;
+      container.appendChild(row);
+    });
 
-  recPago.innerText=`R$ ${rPago.toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
-  recPrev.innerText=`R$ ${(rPago+rPrev).toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
-  despPago.innerText=`R$ ${dPago.toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
-  despPrev.innerText=`R$ ${(dPago+dPrev).toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
-  saldoPago.innerText=`R$ ${(rPago-dPago).toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
-  saldoPrev.innerText=`R$ ${((rPago+rPrev)-(dPago+dPrev)).toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
+    recPago.innerText=`R$ ${rPago.toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
+    recPrev.innerText=`R$ ${(rPago+rPrev).toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
+    despPago.innerText=`R$ ${dPago.toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
+    despPrev.innerText=`R$ ${(dPago+dPrev).toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
+    saldoPago.innerText=`R$ ${(rPago-dPago).toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
+    saldoPrev.innerText=`R$ ${((rPago+rPrev)-(dPago+dPrev)).toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
+  });
 }
 
+/* =========================
+   SAVE
+========================= */
 function save(){
-  const m=getMonthKey();
-  const data=getData();
-  if(!data[m])data[m]=[];
-
-  const val=Number(valueInput.value.replace(/\./g,"").replace(",","."));
+  const id = editId || Date.now().toString();
+  const val = Number(valueInput.value.replace(/\./g,"").replace(",","."));
 
   const item = {
-  id: editIndex !== null ? getData()[m][editIndex].id : Date.now(),
-  name: title.value.trim(),
-  value: val,
-  category: category.value,
-  date: date.value,
-  type: currentType,
-  paid: paid.checked
-};
+    id,
+    name: title.value.trim(),
+    value: val,
+    category: category.value,
+    date: date.value,
+    type: currentType,
+    paid: paid.checked
+  };
 
-  editIndex!==null?data[m][editIndex]=item:data[m].push(item);
-  saveData(data);
+  monthRef().child(id).set(item);
   closeModal();
   render();
 }
 
-function edit(i){
-  const m=getMonthKey();
-  const t=getData()[m][i];
-  title.value=t.name;
-  valueInput.value=t.value.toLocaleString("pt-BR",{minimumFractionDigits:2});
-  category.value=t.category;
-  date.value=t.date;
-  currentType=t.type;
-  paid.checked=t.paid;
-  setType(currentType);
-  editIndex=i;
-  deleteBtn.style.display="block";
-  openModal();
-}
-
+/* =========================
+   EDIT
+========================= */
 function editById(id){
-  const m = getMonthKey();
-  const data = getData();
+  monthRef().child(id).once("value", snap=>{
+    const t = snap.val();
+    if(!t) return;
 
-  const index = data[m].findIndex(item => item.id === id);
-  if(index === -1) return;
+    title.value = t.name;
+    valueInput.value = t.value.toLocaleString("pt-BR",{minimumFractionDigits:2});
+    category.value = t.category;
+    date.value = t.date;
+    paid.checked = t.paid;
+    currentType = t.type;
 
-  edit(index);
+    setType(currentType);
+    editId = id;
+    deleteBtn.style.display="block";
+    openModal();
+  });
 }
 
+/* =========================
+   DELETE
+========================= */
 function remove(){
-  const m=getMonthKey();
-  const data=getData();
-  data[m].splice(editIndex,1);
-  saveData(data);
+  if(!editId) return;
+  monthRef().child(editId).remove();
   closeModal();
   render();
 }
 
+/* =========================
+   MODAL
+========================= */
 function openModal(){
   modal.style.display="flex";
-  if(editIndex===null){
+  if(editId===null){
     title.value="";
     valueInput.value="";
-    category.value="Geral";
-    const hoje=new Date();
-    date.value=`${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2,"0")}-${String(hoje.getDate()).padStart(2,"0")}`;
+    category.value="";
     paid.checked=false;
     setType("income");
+
+    const hoje=new Date();
+    date.value=`${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2,"0")}-${String(hoje.getDate()).padStart(2,"0")}`;
     deleteBtn.style.display="none";
   }
 }
 
 function closeModal(){
   modal.style.display="none";
-  editIndex=null;
+  editId=null;
 }
 
-function getCategories(){
-  return JSON.parse(localStorage.getItem("categories")) || [];
-}
-
-function saveCategories(list){
-  localStorage.setItem("categories", JSON.stringify(list));
-}
-
+/* =========================
+   CATEGORIAS
+========================= */
 function openCategoryModal(){
   document.getElementById("categoryModal").style.display="flex";
   renderCategories();
@@ -534,19 +546,14 @@ function saveCategory(){
   const name=input.value.trim();
   if(!name) return;
 
-  const list=getCategories();
-  if(list.includes(name)) return;
-
-  list.push(name);
-  saveCategories(list);
+  categoriesRef().child(name).set(true);
   input.value="";
   renderCategories();
   updateCategorySelect();
 }
 
 function deleteCategory(name){
-  let list=getCategories().filter(c=>c!==name);
-  saveCategories(list);
+  categoriesRef().child(name).remove();
   renderCategories();
   updateCategorySelect();
 }
@@ -554,46 +561,41 @@ function deleteCategory(name){
 function renderCategories(){
   const container=document.getElementById("categoryList");
   container.innerHTML="";
-  getCategories()
-  .sort((a,b)=>a.localeCompare(b,'pt-BR'))
-  .forEach(c=>{
-    const div=document.createElement("div");
-    div.className="category-item";
-    div.innerHTML=`<span>${c}</span><button onclick="deleteCategory('${c}')">✕</button>`;
-    container.appendChild(div);
+
+  categoriesRef().once("value", snap=>{
+    const data = snap.val() || {};
+    Object.keys(data)
+      .sort((a,b)=>a.localeCompare(b,'pt-BR'))
+      .forEach(c=>{
+        const div=document.createElement("div");
+        div.className="category-item";
+        div.innerHTML=`<span>${c}</span><button onclick="deleteCategory('${c}')">✕</button>`;
+        container.appendChild(div);
+      });
   });
 }
-
 
 function updateCategorySelect(){
   const select = document.getElementById("category");
-  const categorias = getCategories();
+  select.innerHTML="";
 
-  const valorAtual = select.value;
-
-  select.innerHTML = "";
-
-  categorias.forEach(c=>{
-    const opt = document.createElement("option");
-    opt.value = c;
-    opt.innerText = c;
-    select.appendChild(opt);
+  categoriesRef().once("value", snap=>{
+    const data = snap.val() || {};
+    Object.keys(data).forEach(c=>{
+      const opt=document.createElement("option");
+      opt.value=c;
+      opt.innerText=c;
+      select.appendChild(opt);
+    });
   });
-
-  if(categorias.includes(valorAtual)){
-    select.value = valorAtual;
-  }
 }
 
-
-function goReports(){
-  window.location.href = "relatorios.html";
-}
-
+/* =========================
+   INIT
+========================= */
 updateMonthLabel();
 render();
 updateCategorySelect();
-
 </script>
 
 <!-- Firebase -->
