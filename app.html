@@ -389,37 +389,44 @@ function render(){
 
   list.sort((a,b)=>new Date(b.date)-new Date(a.date));
 
-  list.forEach((t,i)=>{
-    if(t.type==="income"){t.paid?rPago+=t.value:rPrev+=t.value;}
-    else{t.paid?dPago+=t.value:dPrev+=t.value;}
+  list.forEach(t=>{
+  const realIndex = data[m].indexOf(t);
 
-    const late=!t.paid&&new Date(t.date)<new Date();
+  if(t.type==="income"){
+    t.paid ? rPago+=t.value : rPrev+=t.value;
+  }else{
+    t.paid ? dPago+=t.value : dPrev+=t.value;
+  }
 
-    const row=document.createElement("div");
-    row.className="row";
-    row.onclick=()=>edit(i);
+  const late = !t.paid && new Date(t.date) < new Date();
 
-    row.innerHTML=`
-      <div class="date-card">${formatDate(t.date)}</div>
-      <div class="item">
-        <div class="item-top">
-          <div class="item-name">${t.name}</div>
-          <div class="item-value ${t.type}">
-            R$ ${t.value.toLocaleString("pt-BR",{minimumFractionDigits:2})}
-          </div>
+  const row = document.createElement("div");
+  row.className = "row";
+  row.onclick = () => edit(realIndex);
+
+  row.innerHTML = `
+    <div class="date-card">${formatDate(t.date)}</div>
+    <div class="item">
+      <div class="item-top">
+        <div class="item-name">${t.name}</div>
+        <div class="item-value ${t.type}">
+          R$ ${t.value.toLocaleString("pt-BR",{minimumFractionDigits:2})}
         </div>
-        <div class="item-bottom">
-          <div class="item-sub">${t.category}</div>
-          ${t.paid
-            ?`<div class="badge green">${t.type==="income"?"Recebido":"Pago"}</div>`
-            :late
-            ?`<div class="badge red">Atrasado</div>`
-            :""
-          }
-        </div>
-      </div>`;
-    container.appendChild(row);
-  });
+      </div>
+      <div class="item-bottom">
+        <div class="item-sub">${t.category}</div>
+        ${
+          t.paid
+            ? `<div class="badge green">${t.type==="income"?"Recebido":"Pago"}</div>`
+            : late
+              ? `<div class="badge red">Atrasado</div>`
+              : ""
+        }
+      </div>
+    </div>
+  `;
+  container.appendChild(row);
+});
 
   recPago.innerText=`R$ ${rPago.toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
   recPrev.innerText=`R$ ${(rPago+rPrev).toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
