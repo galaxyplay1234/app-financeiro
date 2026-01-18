@@ -404,9 +404,15 @@ function render(){
 
   let rPago=0,rPrev=0,dPago=0,dPrev=0;
 
-  monthRef().once("value", snap=>{
+  // 🔥 IMPORTANTE
+  monthRef().off();
+
+  monthRef().on("value", snap=>{
     const data = snap.val() || {};
-    const list = Object.values(data).sort((a,b)=>new Date(b.date)-new Date(a.date));
+    const list = Object.values(data)
+      .sort((a,b)=>new Date(b.date)-new Date(a.date));
+
+    container.innerHTML = "";
 
     list.forEach(t=>{
       if(t.type==="income"){
@@ -434,8 +440,8 @@ function render(){
             <div class="item-sub">${t.category}</div>
             ${
               t.paid
-              ? `<div class="badge green">${t.type==="income"?"Recebido":"Pago"}</div>`
-              : late ? `<div class="badge red">Atrasado</div>` : ""
+                ? `<div class="badge green">${t.type==="income"?"Recebido":"Pago"}</div>`
+                : late ? `<div class="badge red">Atrasado</div>` : ""
             }
           </div>
         </div>
