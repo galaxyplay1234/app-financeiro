@@ -596,6 +596,27 @@ updateCategorySelect();
 
 </script>
 
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyAd-ttfpK460D4fyfoNZY6DJRhzuItpHe0",
+    authDomain: "box-financeiro.firebaseapp.com",
+    databaseURL: "https://box-financeiro-default-rtdb.firebaseio.com",
+    projectId: "box-financeiro",
+    storageBucket: "box-financeiro.firebasestorage.app",
+    messagingSenderId: "249966609723",
+    appId: "1:249966609723:web:12339b100df393031ea31e"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+</script>
+
+
+
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
