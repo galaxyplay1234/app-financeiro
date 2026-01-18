@@ -326,7 +326,7 @@ function openModal(){
 modal.style.display="flex";
 if(editIndex===null){
 title.value="";valueInput.value="";category.value="";
-date.value="";paid.checked=false;setType("income");
+date.value = new Date().toISOString().split("T")[0];
 deleteBtn.style.display="none";
 }
 }
