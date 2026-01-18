@@ -590,12 +590,18 @@ function updateCategorySelect(){
   });
 }
 
+
+function goReports(){
+  window.location.href = "relatorios.html";
+}
+
 /* =========================
    INIT
 ========================= */
 updateMonthLabel();
 render();
 updateCategorySelect();
+
 </script>
 
 <!-- Firebase -->
@@ -617,9 +623,7 @@ updateCategorySelect();
   const db = firebase.database();
 </script>
 
-function goReports(){
-  window.location.href = "relatorios.html";
-}
+
 
 
 </body>
