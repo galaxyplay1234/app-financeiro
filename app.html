@@ -323,12 +323,23 @@ render();
 }
 
 function openModal(){
-modal.style.display="flex";
-if(editIndex===null){
-title.value="";valueInput.value="";category.value="";
-date.value = new Date().toISOString().split("T")[0];
-deleteBtn.style.display="none";
-}
+  modal.style.display = "flex";
+
+  if(editIndex === null){
+    title.value = "";
+    valueInput.value = "";
+    category.value = "Geral";
+
+    const hoje = new Date();
+    const yyyy = hoje.getFullYear();
+    const mm = String(hoje.getMonth() + 1).padStart(2, "0");
+    const dd = String(hoje.getDate()).padStart(2, "0");
+    date.value = `${yyyy}-${mm}-${dd}`;
+
+    paid.checked = false;
+    setType("income");
+    deleteBtn.style.display = "none";
+  }
 }
 
 function closeModal(){
