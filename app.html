@@ -191,6 +191,30 @@ input:checked + .slider:before{transform:translateX(20px)}
 .modal-content button{background:#1976d2;color:#fff;border:none}
 .modal-content button.cancel{background:#9e9e9e}
 .modal-content button.delete{background:#c62828}
+
+.category-item{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  background:#f4f6f8;
+  padding:8px 10px;
+  border-radius:8px;
+  margin-top:6px;
+  font-size:14px;
+}
+
+.category-item button{
+  background:#c62828;
+  border:none;
+  color:#fff;
+  border-radius:50%;
+  width:22px;
+  height:22px;
+  font-size:14px;
+  cursor:pointer;
+}
+
+
 </style>
 </head>
 
@@ -447,8 +471,84 @@ function closeModal(){
   editIndex=null;
 }
 
+function getCategories(){
+  return JSON.parse(localStorage.getItem("categories")) || [];
+}
+
+function saveCategories(list){
+  localStorage.setItem("categories", JSON.stringify(list));
+}
+
+function openCategoryModal(){
+  document.getElementById("categoryModal").style.display="flex";
+  renderCategories();
+}
+
+function closeCategoryModal(){
+  document.getElementById("categoryModal").style.display="none";
+}
+
+function saveCategory(){
+  const input=document.getElementById("categoryName");
+  const name=input.value.trim();
+  if(!name) return;
+
+  const list=getCategories();
+  if(list.includes(name)) return;
+
+  list.push(name);
+  saveCategories(list);
+  input.value="";
+  renderCategories();
+  updateCategorySelect();
+}
+
+function deleteCategory(name){
+  let list=getCategories().filter(c=>c!==name);
+  saveCategories(list);
+  renderCategories();
+  updateCategorySelect();
+}
+
+function renderCategories(){
+  const container=document.getElementById("categoryList");
+  container.innerHTML="";
+  getCategories().forEach(c=>{
+    const div=document.createElement("div");
+    div.className="category-item";
+    div.innerHTML=`<span>${c}</span><button onclick="deleteCategory('${c}')">✕</button>`;
+    container.appendChild(div);
+  });
+}
+
+
+function updateCategorySelect(){
+  const select = document.getElementById("category");
+  const categorias = getCategories();
+
+  const valorAtual = select.value;
+
+  select.innerHTML = "";
+
+  categorias.forEach(c=>{
+    const opt = document.createElement("option");
+    opt.value = c;
+    opt.innerText = c;
+    select.appendChild(opt);
+  });
+
+  if(categorias.includes(valorAtual)){
+    select.value = valorAtual;
+  }
+}
+
 updateMonthLabel();
 render();
+updateCategorySelect();
+
+
+
+
 </script>
 
 </body>
