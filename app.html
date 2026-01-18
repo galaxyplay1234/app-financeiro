@@ -44,7 +44,8 @@ box-shadow:0 1px 4px rgba(0,0,0,.1)
 }
 .item{
 flex:1;background:#fff;padding:10px;border-radius:10px;
-border-left:5px solid #2196f3;box-shadow:0 1px 4px rgba(0,0,0,.1);
+border-left:5px solid #2196f3;
+box-shadow:0 1px 4px rgba(0,0,0,.1);
 height:64px;display:flex;flex-direction:column;justify-content:center
 }
 .item-top{display:flex;justify-content:space-between}
@@ -55,7 +56,8 @@ height:64px;display:flex;flex-direction:column;justify-content:center
 .item-bottom{display:flex;justify-content:space-between;align-items:center}
 .item-sub{font-size:12px;color:#666}
 .badge{
-padding:2px 8px;font-size:12px;border-radius:12px;color:#fff
+padding:2px 8px;font-size:12px;border-radius:12px;
+color:#fff;white-space:nowrap
 }
 .green{background:#2e7d32}
 .red{background:#c62828}
@@ -75,7 +77,8 @@ justify-content:center;align-items:center
 }
 .modal-content{
 background:#fff;width:90%;max-width:320px;
-padding:16px;border-radius:12px
+padding:16px;border-radius:12px;
+font-size:16px
 }
 
 /* TYPE BUTTONS */
@@ -89,9 +92,15 @@ border:1px solid #ccc;background:#f0f0f0;font-weight:bold
 
 /* INPUTS */
 .modal-content input,
-.modal-content select{
+.modal-content select,
+.modal-content button{
 width:100%;margin-top:8px;padding:10px;
-border-radius:8px;border:1px solid #ccc
+border-radius:8px;border:1px solid #ccc;
+font-size:16px
+}
+
+.modal-content input[type="date"]{
+max-width:100%;
 }
 
 /* SWITCH */
@@ -99,12 +108,10 @@ border-radius:8px;border:1px solid #ccc
 display:flex;justify-content:space-between;
 align-items:center;margin-top:10px
 }
-.switch{
-position:relative;width:46px;height:26px
-}
+.switch{position:relative;width:46px;height:26px}
 .switch input{display:none}
 .slider{
-position:absolute;cursor:pointer;inset:0;
+position:absolute;inset:0;cursor:pointer;
 background:#ccc;border-radius:26px;transition:.3s
 }
 .slider:before{
@@ -117,11 +124,10 @@ input:checked + .slider:before{transform:translateX(20px)}
 
 /* BUTTONS */
 .modal-content button{
-width:100%;margin-top:10px;padding:10px;
-border-radius:8px;border:none;background:#1976d2;color:#fff
+background:#1976d2;color:#fff;border:none
 }
 .delete{background:#c62828}
-.cancel{background:#aaa}
+.cancel{background:#9e9e9e}
 </style>
 </head>
 
@@ -133,9 +139,21 @@ border-radius:8px;border:none;background:#1976d2;color:#fff
 </header>
 
 <section class="cards">
-<div class="card saldo"><h4>Saldo</h4><div class="main" id="saldoPago"></div><div class="sub" id="saldoPrev"></div></div>
-<div class="card receita"><h4>Receitas</h4><div class="main" id="recPago"></div><div class="sub" id="recPrev"></div></div>
-<div class="card despesa"><h4>Despesas</h4><div class="main" id="despPago"></div><div class="sub" id="despPrev"></div></div>
+<div class="card saldo">
+<h4>Saldo</h4>
+<div class="main" id="saldoPago">R$ 0,00</div>
+<div class="sub" id="saldoPrev">R$ 0,00</div>
+</div>
+<div class="card receita">
+<h4>Receitas</h4>
+<div class="main" id="recPago">R$ 0,00</div>
+<div class="sub" id="recPrev">R$ 0,00</div>
+</div>
+<div class="card despesa">
+<h4>Despesas</h4>
+<div class="main" id="despPago">R$ 0,00</div>
+<div class="sub" id="despPrev">R$ 0,00</div>
+</div>
 </section>
 
 <section class="list" id="list"></section>
@@ -201,6 +219,61 @@ document.querySelector(`.type-btn.${t}`).classList.add("active");
 function getData(){return JSON.parse(localStorage.getItem("finance"))||{}}
 function saveData(d){localStorage.setItem("finance",JSON.stringify(d))}
 
+function formatDate(d){
+const [y,m,day]=d.split("-");
+return `${day}/${m}`;
+}
+
+function render(){
+const data=getData();
+const m=monthInput.value;
+let list=data[m]||[];
+
+list.sort((a,b)=>new Date(b.date)-new Date(a.date));
+
+let rPago=0,rPrev=0,dPago=0,dPrev=0;
+const container=document.getElementById("list");
+container.innerHTML="";
+
+list.forEach((t,i)=>{
+if(t.type==="income"){t.paid?rPago+=t.value:rPrev+=t.value;}
+else{t.paid?dPago+=t.value:dPrev+=t.value;}
+
+const late=!t.paid&&new Date(t.date)<new Date();
+
+const row=document.createElement("div");
+row.className="row";
+row.onclick=()=>edit(i);
+
+row.innerHTML=`
+<div class="date-card">${formatDate(t.date)}</div>
+<div class="item">
+<div class="item-top">
+<div class="item-name">${t.name}</div>
+<div class="item-value ${t.type}">
+R$ ${t.value.toLocaleString("pt-BR",{minimumFractionDigits:2})}
+</div>
+</div>
+<div class="item-bottom">
+<div class="item-sub">${t.category}</div>
+${t.paid
+?`<div class="badge green">${t.type==="income"?"Recebido":"Pago"}</div>`
+:late
+?`<div class="badge red">Atrasado</div>`
+:""}
+</div>
+</div>`;
+container.appendChild(row);
+});
+
+recPago.innerText=`R$ ${rPago.toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
+recPrev.innerText=`R$ ${(rPago+rPrev).toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
+despPago.innerText=`R$ ${dPago.toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
+despPrev.innerText=`R$ ${(dPago+dPrev).toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
+saldoPago.innerText=`R$ ${(rPago-dPago).toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
+saldoPrev.innerText=`R$ ${((rPago+rPrev)-(dPago+dPrev)).toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
+}
+
 function save(){
 const data=getData();
 const m=monthInput.value;
@@ -209,7 +282,7 @@ if(!data[m])data[m]=[];
 const val=Number(valueInput.value.replace(/\./g,"").replace(",","."));
 
 const item={
-name:title.value,
+name:title.value.trim(),
 value:val,
 category:category.value,
 date:date.value,
@@ -223,14 +296,18 @@ closeModal();
 render();
 }
 
-function openModal(){
-modal.style.display="flex";
-deleteBtn.style.display=editIndex===null?"none":"block";
-}
-
-function closeModal(){
-modal.style.display="none";
-editIndex=null;
+function edit(i){
+const t=getData()[monthInput.value][i];
+title.value=t.name;
+valueInput.value=t.value.toLocaleString("pt-BR",{minimumFractionDigits:2});
+category.value=t.category;
+date.value=t.date;
+currentType=t.type;
+paid.checked=t.paid;
+setType(currentType);
+editIndex=i;
+deleteBtn.style.display="block";
+openModal();
 }
 
 function remove(){
@@ -241,7 +318,21 @@ closeModal();
 render();
 }
 
-function render(){ /* permanece igual ao seu */ }
+function openModal(){
+modal.style.display="flex";
+if(editIndex===null){
+title.value="";valueInput.value="";category.value="";
+date.value="";paid.checked=false;setType("income");
+deleteBtn.style.display="none";
+}
+}
+
+function closeModal(){
+modal.style.display="none";
+editIndex=null;
+}
+
+monthInput.addEventListener("change",render);
 render();
 </script>
 
