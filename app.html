@@ -189,7 +189,11 @@ input:checked + .slider:before{transform:translateX(20px)}
 <div class="top-fixed">
 
   <header>
-    <h2>💰 Minhas Finanças</h2>
+    <div style="width:100%;display:flex;justify-content:space-between;align-items:center">
+  <h2>💰 Minhas Finanças</h2>
+
+  <button class="cat-btn" onclick="openCategoryModal()">☰</button>
+</div>
     <div class="month-tabs">
       <button class="month-btn" onclick="changeMonth(-1)">&#10094;</button>
       <span id="monthLabel"></span>
