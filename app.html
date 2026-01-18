@@ -444,7 +444,7 @@ function save(){
   const val=Number(valueInput.value.replace(/\./g,"").replace(",","."));
 
   const item = {
-  id: Date.now(), // 👈 ID único
+  id: editIndex !== null ? getData()[m][editIndex].id : Date.now(),
   name: title.value.trim(),
   value: val,
   category: category.value,
