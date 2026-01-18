@@ -601,12 +601,7 @@ function goReports(){
   window.location.href = "relatorios.html";
 }
 
-/* =========================
-   INIT
-========================= */
-updateMonthLabel();
-render();
-updateCategorySelect();
+
 
 </script>
 
@@ -627,6 +622,13 @@ updateCategorySelect();
 
   firebase.initializeApp(firebaseConfig);
   const db = firebase.database();
+  
+  /* =========================
+   INIT
+========================= */
+updateMonthLabel();
+render();
+updateCategorySelect();
 </script>
 
 
