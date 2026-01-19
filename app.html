@@ -283,6 +283,33 @@ input:checked + .slider:before{transform:translateX(20px)}
   max-height:260px;
 }
 
+
+/* itens agrupados por dia */
+.item{
+  border-radius:0;
+  margin:0;
+}
+
+/* primeiro item do dia */
+.item.first-of-day{
+  border-top-left-radius:10px;
+  border-top-right-radius:10px;
+}
+
+/* último item do dia */
+.item.last-of-day{
+  border-bottom-left-radius:10px;
+  border-bottom-right-radius:10px;
+}
+
+/* remove espaço entre itens do mesmo dia */
+.day-items{
+  display:flex;
+  flex-direction:column;
+  gap:0;
+}
+
+
 </style>
 </head>
 
