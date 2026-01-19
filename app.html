@@ -531,7 +531,14 @@ itemsWrap.style.flex = "1";
           const late = !t.paid && new Date(t.date) < new Date();
 
           const item = document.createElement("div");
-          item.className = "item";
+item.className = "item";
+
+if(index === 0){
+  item.classList.add("first-of-day");
+}
+if(index === groupedByDate[date].length - 1){
+  item.classList.add("last-of-day");
+}
           item.onclick = () => editById(t.id);
 
           item.innerHTML = `
