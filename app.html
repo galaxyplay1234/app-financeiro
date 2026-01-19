@@ -463,6 +463,7 @@ let currentMonth = new Date();
 let editId = null;
 let editMonthKey = null;
 let currentType = "income";
+let editingParcelData = null;
 
 const monthLabel = document.getElementById("monthLabel");
 const modal = document.getElementById("modal");
@@ -686,15 +687,19 @@ function save(){
     const id = editId || Date.now().toString();
 
     const item = {
-      id,
-      name: title.value.trim(),
-      value: valTotal,
-      category: category.value,
-      date: baseDateStr,
-      type: currentType,
-      paid: paid.checked,
-      parcel: false
-    };
+  id,
+  name: title.value.trim(),
+  value: valTotal,
+  category: category.value,
+  date: baseDateStr,
+  type: currentType,
+  paid: paid.checked,
+
+  parcel: !!editingParcelData,
+  parcelIndex: editingParcelData?.parcelIndex,
+  parcelTotal: editingParcelData?.parcelTotal,
+  parcelGroupId: editingParcelData?.parcelGroupId
+};
 
     const newMonthKey = getMonthKeyFromDate(item.date);
 
@@ -767,27 +772,35 @@ function save(){
    EDIT
 ========================= */
 function editById(id){
-  const originalMonthKey = getMonthKey(); // mês da aba atual
+  const originalMonthKey = getMonthKey();
+
   firebase
     .database()
     .ref("finance/meses/" + originalMonthKey + "/" + id)
     .once("value", snap=>{
-    const t = snap.val();
-    if(!t) return;
+      const t = snap.val();
+      if(!t) return;
 
-    title.value = t.name;
-    valueInput.value = t.value.toLocaleString("pt-BR",{minimumFractionDigits:2});
-    category.value = t.category;
-    date.value = t.date;
-    paid.checked = t.paid;
-    currentType = t.type;
+      title.value = t.name;
+      valueInput.value = t.value.toLocaleString("pt-BR",{minimumFractionDigits:2});
+      category.value = t.category;
+      date.value = t.date;
+      paid.checked = t.paid;
+      currentType = t.type;
 
-    setType(currentType);
-    editId = id;
-    deleteBtn.style.display="block";
-    editMonthKey = originalMonthKey;
-    openModal();
-  });
+      // 🔑 GUARDA PARCELAMENTO (se existir)
+      editingParcelData = t.parcel ? {
+        parcelIndex: t.parcelIndex,
+        parcelTotal: t.parcelTotal,
+        parcelGroupId: t.parcelGroupId
+      } : null;
+
+      setType(currentType);
+      editId = id;
+      editMonthKey = originalMonthKey;
+      deleteBtn.style.display = "block";
+      openModal();
+    });
 }
 
 /* =========================
