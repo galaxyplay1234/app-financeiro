@@ -158,14 +158,18 @@ function render(){
     });
 
     const categorias = Object.keys(grouped).map(cat=>{
-      const total = grouped[cat].reduce((s,i)=>s+i.value,0);
-      return {
-        name: cat,
-        total,
-        percent: Math.round((total/totalGeral)*100),
-        items: grouped[cat]
-      };
-    });
+  const total = grouped[cat].reduce((s,i)=>s+i.value,0);
+
+  const itemsOrdenados = grouped[cat]
+    .sort((a,b)=>new Date(a.date) - new Date(b.date)); // 👈 MENOR → MAIOR
+
+  return {
+    name: cat,
+    total,
+    percent: Math.round((total/totalGeral)*100),
+    items: itemsOrdenados
+  };
+});
 
     categorias
       .sort((a,b)=>b.percent-a.percent)
