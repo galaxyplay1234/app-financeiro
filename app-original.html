@@ -611,7 +611,15 @@ function save(){
     paid: paid.checked
   };
 
-  monthRef().child(id).set(item);
+  // 🔥 mês baseado na DATA escolhida
+  const monthKey = getMonthKeyFromDate(item.date);
+
+  firebase
+    .database()
+    .ref("finance/meses/" + monthKey)
+    .child(id)
+    .set(item);
+
   closeModal();
   render();
 }
@@ -735,6 +743,12 @@ function updateCategorySelect(){
 
 function goReports(){
   window.location.href = "relatorios.html";
+}
+
+
+function getMonthKeyFromDate(dateStr){
+  const [year, month] = dateStr.split("-");
+  return `${year}-${month}`;
 }
 
 
