@@ -250,20 +250,21 @@ input:checked + .slider:before{transform:translateX(20px)}
   align-items:center;
 }
 
+/* 🔧 CORREÇÃO BOTÃO PARCELADO */
 .parcel-btn{
-  padding:10px;
-  border-radius:8px;
-  background:#fff;
-  border:1px solid #ccc;
-  color:#777;
-  font-weight:bold;
+  width:auto !important;            /* NÃO ocupa tudo */
+  background:#fff !important;       /* fundo branco */
+  color:#777 !important;            /* texto cinza */
+  border:1px solid #ccc !important; /* borda cinza */
 }
 
 /* ATIVO */
 .parcel-btn.active{
-  border-color:#1976d2; /* azul do tema */
-  color:#1976d2;
+  border-color:#1976d2 !important;
+  color:#1976d2 !important;
 }
+
+
 
 
 .category-item{
