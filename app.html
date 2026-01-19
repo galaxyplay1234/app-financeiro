@@ -824,7 +824,18 @@ document.getElementById("parcelCount").value = "";
 }
 
 function closeModal(){
-  modal.style.display="none";
+  modal.style.display = "none";
+
+  // 🔑 RESET TOTAL DO PARCELAMENTO
+  isParcel = false;
+
+  const btn = document.getElementById("btnParcel");
+  const input = document.getElementById("parcelCount");
+
+  btn.classList.remove("active");
+  input.style.display = "none";
+  input.value = "";
+
   editId = null;
   editMonthKey = null;
 }
