@@ -479,7 +479,7 @@ function render(){
 
   let rPago = 0, rPrev = 0, dPago = 0, dPrev = 0;
 
-  // 🔥 remove listener anterior para não duplicar
+  // remove listener antigo
   monthRef().off();
 
   monthRef().on("value", snap=>{
@@ -511,19 +511,19 @@ function render(){
         const row = document.createElement("div");
         row.className = "row";
 
-        // CARD DA DATA (UMA VEZ)
+        // card da data
         const dateCard = document.createElement("div");
         dateCard.className = "date-card";
         dateCard.innerText = formatDate(date);
 
-        // CONTAINER DOS ITENS DO DIA
+        // container dos itens do dia
         const itemsWrap = document.createElement("div");
-itemsWrap.className = "day-items";
-itemsWrap.style.flex = "1";
+        itemsWrap.className = "day-items";
+        itemsWrap.style.flex = "1";
 
-groupedByDate[date].forEach((t, index) => {
-  
-        groupedByDate[date].forEach(t=>{
+        groupedByDate[date].forEach((t, index) => {
+
+          // totais
           if(t.type==="income"){
             t.paid ? rPago+=t.value : rPrev+=t.value;
           }else{
@@ -533,14 +533,16 @@ groupedByDate[date].forEach((t, index) => {
           const late = !t.paid && new Date(t.date) < new Date();
 
           const item = document.createElement("div");
-item.className = "item";
+          item.className = "item";
 
-if(index === 0){
-  item.classList.add("first-of-day");
-}
-if(index === groupedByDate[date].length - 1){
-  item.classList.add("last-of-day");
-}
+          // bordas corretas
+          if(index === 0){
+            item.classList.add("first-of-day");
+          }
+          if(index === groupedByDate[date].length - 1){
+            item.classList.add("last-of-day");
+          }
+
           item.onclick = () => editById(t.id);
 
           item.innerHTML = `
@@ -573,18 +575,12 @@ if(index === groupedByDate[date].length - 1){
     // ==========================
     // ATUALIZA TOTAIS
     // ==========================
-    recPago.innerText =
-      `R$ ${rPago.toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
-    recPrev.innerText =
-      `R$ ${(rPago+rPrev).toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
-    despPago.innerText =
-      `R$ ${dPago.toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
-    despPrev.innerText =
-      `R$ ${(dPago+dPrev).toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
-    saldoPago.innerText =
-      `R$ ${(rPago-dPago).toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
-    saldoPrev.innerText =
-      `R$ ${((rPago+rPrev)-(dPago+dPrev)).toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
+    recPago.innerText = `R$ ${rPago.toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
+    recPrev.innerText = `R$ ${(rPago+rPrev).toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
+    despPago.innerText = `R$ ${dPago.toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
+    despPrev.innerText = `R$ ${(dPago+dPrev).toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
+    saldoPago.innerText = `R$ ${(rPago-dPago).toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
+    saldoPrev.innerText = `R$ ${((rPago+rPrev)-(dPago+dPrev)).toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
   });
 }
 
