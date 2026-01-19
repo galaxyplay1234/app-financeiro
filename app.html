@@ -802,6 +802,11 @@ function openModal(){
     category.value="";
     paid.checked=false;
     setType("income");
+    
+    isParcel = false;
+document.getElementById("btnParcel").classList.remove("active");
+document.getElementById("parcelCount").style.display = "none";
+document.getElementById("parcelCount").value = "";
 
     const hoje=new Date();
     date.value=`${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2,"0")}-${String(hoje.getDate()).padStart(2,"0")}`;
