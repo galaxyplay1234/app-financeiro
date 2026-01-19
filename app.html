@@ -310,6 +310,12 @@ input:checked + .slider:before{transform:translateX(20px)}
 }
 
 
+/* ITEM ATRASADO */
+.late-item{
+  background: #fdecea; /* vermelho bem clarinho */
+  border-left-color: #c62828; /* mantém coerência com despesa */
+}
+
 </style>
 </head>
 
@@ -533,7 +539,11 @@ function render(){
           const late = !t.paid && new Date(t.date) < new Date();
 
           const item = document.createElement("div");
-          item.className = "item";
+item.className = "item";
+
+if(late){
+  item.classList.add("late-item");
+}
 
           // bordas corretas
           if(index === 0){
