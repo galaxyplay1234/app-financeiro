@@ -521,6 +521,8 @@ function render(){
 itemsWrap.className = "day-items";
 itemsWrap.style.flex = "1";
 
+groupedByDate[date].forEach((t, index) => {
+  
         groupedByDate[date].forEach(t=>{
           if(t.type==="income"){
             t.paid ? rPago+=t.value : rPrev+=t.value;
