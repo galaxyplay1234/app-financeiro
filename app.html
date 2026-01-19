@@ -518,10 +518,8 @@ function render(){
 
         // CONTAINER DOS ITENS DO DIA
         const itemsWrap = document.createElement("div");
-        itemsWrap.style.flex = "1";
-        itemsWrap.style.display = "flex";
-        itemsWrap.style.flexDirection = "column";
-        itemsWrap.style.gap = "6px";
+itemsWrap.className = "day-items";
+itemsWrap.style.flex = "1";
 
         groupedByDate[date].forEach(t=>{
           if(t.type==="income"){
