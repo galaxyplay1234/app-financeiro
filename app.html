@@ -450,9 +450,9 @@ function render(){
   const container = document.getElementById("list");
   container.innerHTML = "";
 
-  let rPago=0,rPrev=0,dPago=0,dPrev=0;
+  let rPago = 0, rPrev = 0, dPago = 0, dPrev = 0;
 
-  // 🔥 IMPORTANTE
+  // 🔥 remove listener anterior para não duplicar
   monthRef().off();
 
   monthRef().on("value", snap=>{
@@ -462,47 +462,95 @@ function render(){
 
     container.innerHTML = "";
 
+    // ==========================
+    // AGRUPA POR DATA
+    // ==========================
+    const groupedByDate = {};
+
     list.forEach(t=>{
-      if(t.type==="income"){
-        t.paid ? rPago+=t.value : rPrev+=t.value;
-      }else{
-        t.paid ? dPago+=t.value : dPrev+=t.value;
+      if(!groupedByDate[t.date]){
+        groupedByDate[t.date] = [];
       }
-
-      const late = !t.paid && new Date(t.date) < new Date();
-
-      const row = document.createElement("div");
-      row.className = "row";
-      row.onclick = () => editById(t.id);
-
-      row.innerHTML = `
-        <div class="date-card">${formatDate(t.date)}</div>
-        <div class="item">
-          <div class="item-top">
-            <div class="item-name">${t.name}</div>
-            <div class="item-value ${t.type}">
-              R$ ${t.value.toLocaleString("pt-BR",{minimumFractionDigits:2})}
-            </div>
-          </div>
-          <div class="item-bottom">
-            <div class="item-sub">${t.category}</div>
-            ${
-              t.paid
-                ? `<div class="badge green">${t.type==="income"?"Recebido":"Pago"}</div>`
-                : late ? `<div class="badge red">Atrasado</div>` : ""
-            }
-          </div>
-        </div>
-      `;
-      container.appendChild(row);
+      groupedByDate[t.date].push(t);
     });
 
-    recPago.innerText=`R$ ${rPago.toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
-    recPrev.innerText=`R$ ${(rPago+rPrev).toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
-    despPago.innerText=`R$ ${dPago.toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
-    despPrev.innerText=`R$ ${(dPago+dPrev).toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
-    saldoPago.innerText=`R$ ${(rPago-dPago).toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
-    saldoPrev.innerText=`R$ ${((rPago+rPrev)-(dPago+dPrev)).toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
+    // ==========================
+    // RENDERIZA POR DIA
+    // ==========================
+    Object.keys(groupedByDate)
+      .sort((a,b)=>new Date(b)-new Date(a))
+      .forEach(date=>{
+
+        const row = document.createElement("div");
+        row.className = "row";
+
+        // CARD DA DATA (UMA VEZ)
+        const dateCard = document.createElement("div");
+        dateCard.className = "date-card";
+        dateCard.innerText = formatDate(date);
+
+        // CONTAINER DOS ITENS DO DIA
+        const itemsWrap = document.createElement("div");
+        itemsWrap.style.flex = "1";
+        itemsWrap.style.display = "flex";
+        itemsWrap.style.flexDirection = "column";
+        itemsWrap.style.gap = "6px";
+
+        groupedByDate[date].forEach(t=>{
+          if(t.type==="income"){
+            t.paid ? rPago+=t.value : rPrev+=t.value;
+          }else{
+            t.paid ? dPago+=t.value : dPrev+=t.value;
+          }
+
+          const late = !t.paid && new Date(t.date) < new Date();
+
+          const item = document.createElement("div");
+          item.className = "item";
+          item.onclick = () => editById(t.id);
+
+          item.innerHTML = `
+            <div class="item-top">
+              <div class="item-name">${t.name}</div>
+              <div class="item-value ${t.type}">
+                R$ ${t.value.toLocaleString("pt-BR",{minimumFractionDigits:2})}
+              </div>
+            </div>
+            <div class="item-bottom">
+              <div class="item-sub">${t.category}</div>
+              ${
+                t.paid
+                  ? `<div class="badge green">${t.type==="income"?"Recebido":"Pago"}</div>`
+                  : late
+                    ? `<div class="badge red">Atrasado</div>`
+                    : ""
+              }
+            </div>
+          `;
+
+          itemsWrap.appendChild(item);
+        });
+
+        row.appendChild(dateCard);
+        row.appendChild(itemsWrap);
+        container.appendChild(row);
+      });
+
+    // ==========================
+    // ATUALIZA TOTAIS
+    // ==========================
+    recPago.innerText =
+      `R$ ${rPago.toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
+    recPrev.innerText =
+      `R$ ${(rPago+rPrev).toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
+    despPago.innerText =
+      `R$ ${dPago.toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
+    despPrev.innerText =
+      `R$ ${(dPago+dPrev).toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
+    saldoPago.innerText =
+      `R$ ${(rPago-dPago).toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
+    saldoPrev.innerText =
+      `R$ ${((rPago+rPrev)-(dPago+dPrev)).toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
   });
 }
 
