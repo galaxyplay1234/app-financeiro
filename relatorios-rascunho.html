@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Relatórios</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#1976d2">
+
+<style>
+*{box-sizing:border-box;font-family:Arial,sans-serif}
+body{margin:0;background:#f4f6f8}
+
+/* TOPO */
+.top-fixed{position:sticky;top:0;z-index:10;background:#f4f6f8}
+header{background:#1976d2;color:#fff;padding:12px}
+.header-row{display:flex;justify-content:space-between;align-items:center}
+header h2{margin:0;font-size:18px}
+
+.icon-btn{
+  background:none;border:none;color:#fff;
+  font-size:22px;cursor:pointer
+}
+
+/* MESES */
+.month-tabs{
+  display:flex;justify-content:center;align-items:center;
+  gap:14px;margin-top:6px
+}
+.month-btn{background:none;border:none;color:#fff;font-size:22px;cursor:pointer}
+#monthLabel{font-size:14px;min-width:140px;text-align:center}
+
+/* LISTA */
+.list{padding:10px}
+
+/* CARD */
+.report-card{
+  background:#fff;border-radius:10px;padding:12px;
+  margin-bottom:10px;box-shadow:0 2px 6px rgba(0,0,0,.1);
+  cursor:pointer
+}
+.report-top{display:flex;justify-content:space-between}
+.report-name{font-weight:bold}
+.report-total{font-size:16px;font-weight:bold}
+.report-percent{font-size:12px;color:#666}
+
+.report-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+}
+
+.report-top > div:last-child{
+  text-align:right;
+}
+
+/* DETALHES */
+.details{margin-top:10px;border-top:1px solid #eee;padding-top:8px;display:none}
+.detail-item{display:flex;justify-content:space-between;margin-bottom:6px}
+.detail-left{font-size:13px}
+.detail-date{font-size:12px;color:#777}
+.detail-value{font-size:13px;color:#c62828}
+</style>
+</head>
+
+<body>
+
+<div class="top-fixed">
+  <header>
+    <div class="header-row">
+      <h2>📊 Relatórios</h2>
+      <button class="icon-btn" onclick="window.location.href='index.html'">💰</button>
+    </div>
+
+    <div class="month-tabs">
+      <button class="month-btn" onclick="changeMonth(-1)">&#10094;</button>
+      <span id="monthLabel"></span>
+      <button class="month-btn" onclick="changeMonth(1)">&#10095;</button>
+    </div>
+  </header>
+</div>
+
+<section class="list" id="list"></section>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+<script>
+/* ================= FIREBASE ================= */
+const firebaseConfig = {
+  apiKey: "AIzaSyAd-ttfpK460D4fyfoNZY6DJRhzuItpHe0",
+  authDomain: "box-financeiro.firebaseapp.com",
+  databaseURL: "https://box-financeiro-default-rtdb.firebaseio.com",
+  projectId: "box-financeiro",
+  storageBucket: "box-financeiro.firebasestorage.app",
+  messagingSenderId: "249966609723",
+  appId: "1:249966609723:web:12339b100df393031ea31e"
+};
+firebase.initializeApp(firebaseConfig);
+
+/* ================= UTIL ================= */
+let currentMonth = new Date();
+let openIndex = null;
+
+const monthLabel = document.getElementById("monthLabel");
+
+function updateMonthLabel(){
+  const meses=["Janeiro","Fevereiro","Março","Abril","Maio","Junho",
+               "Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
+  monthLabel.innerText =
+    `${meses[currentMonth.getMonth()]} ${currentMonth.getFullYear()}`;
+}
+
+function getMonthKey(){
+  return `${currentMonth.getFullYear()}-${String(currentMonth.getMonth()+1).padStart(2,"0")}`;
+}
+
+function formatDate(d){
+  const [y,m,day]=d.split("-");
+  return `${day}/${m}`;
+}
+
+function monthRef(){
+  return firebase.database().ref("finance/meses/" + getMonthKey());
+}
+
+/* ================= MÊS ================= */
+function changeMonth(step){
+  currentMonth.setMonth(currentMonth.getMonth()+step);
+  openIndex = null;
+  updateMonthLabel();
+  render();
+}
+
+/* ================= RENDER ================= */
+function render(){
+  const container=document.getElementById("list");
+  container.innerHTML="";
+
+  monthRef().once("value", snap=>{
+    const data = snap.val() || {};
+    const list = Object.values(data);
+
+    const despesas = list.filter(i=>i.type==="expense");
+
+    if(despesas.length===0){
+      container.innerHTML =
+        "<p style='text-align:center;color:#666'>Sem despesas neste mês</p>";
+      return;
+    }
+
+    const totalGeral = despesas.reduce((s,i)=>s+i.value,0);
+
+    const grouped = {};
+    despesas.forEach(i=>{
+      if(!grouped[i.category]) grouped[i.category]=[];
+      grouped[i.category].push(i);
+    });
+
+    const categorias = Object.keys(grouped).map(cat=>{
+      const total = grouped[cat].reduce((s,i)=>s+i.value,0);
+      return {
+        name: cat,
+        total,
+        percent: Math.round((total/totalGeral)*100),
+        items: grouped[cat]
+      };
+    });
+
+    categorias
+      .sort((a,b)=>b.percent-a.percent)
+      .forEach((cat,idx)=>{
+        const card=document.createElement("div");
+        card.className="report-card";
+
+        card.innerHTML=`
+          <div class="report-top">
+            <div class="report-name">${cat.name}</div>
+            <div>
+              <div class="report-total">
+                R$ ${cat.total.toLocaleString("pt-BR",{minimumFractionDigits:2})}
+              </div>
+              <div class="report-percent">${cat.percent}%</div>
+            </div>
+          </div>
+
+          <div class="details" ${openIndex===idx?"style='display:block'":""}>
+            ${cat.items.map(i=>`
+              <div class="detail-item">
+                <div>
+                  <div class="detail-left">${i.name}</div>
+                  <div class="detail-date">${formatDate(i.date)}</div>
+                </div>
+                <div class="detail-value">
+                  R$ -${i.value.toLocaleString("pt-BR",{minimumFractionDigits:2})}
+                </div>
+              </div>
+            `).join("")}
+          </div>
+        `;
+
+        card.onclick=()=>{
+          openIndex = openIndex===idx ? null : idx;
+          render();
+        };
+
+        container.appendChild(card);
+      });
+  });
+}
+
+/* ================= INIT ================= */
+updateMonthLabel();
+render();
+</script>
+
+</body>
+</html>
