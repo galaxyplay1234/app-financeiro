@@ -247,10 +247,10 @@ input:checked + .slider:before{transform:translateX(20px)}
   display:flex;
   gap:8px;
   margin-top:8px;
+  align-items:center;
 }
 
 .parcel-btn{
-  flex:1;
   padding:10px;
   border-radius:8px;
   background:#fff;
@@ -259,15 +259,10 @@ input:checked + .slider:before{transform:translateX(20px)}
   font-weight:bold;
 }
 
-/* NÃO REPETIR (PADRÃO) */
+/* ATIVO */
 .parcel-btn.active{
   border-color:#1976d2; /* azul do tema */
   color:#1976d2;
-}
-
-/* INPUT PARCELAS */
-#parcelCountWrap input{
-  margin-top:8px;
 }
 
 
@@ -414,14 +409,19 @@ input:checked + .slider:before{transform:translateX(20px)}
 </select>
 <input id="date" type="date">
   
-  <!-- PARCELAMENTO -->
+<!-- PARCELAMENTO -->
 <div class="parcel-buttons">
-  <button id="btnSingle" class="parcel-btn active" onclick="setParcel(false)">
-    Não repetir
-  </button>
-  <button id="btnParcel" class="parcel-btn" onclick="setParcel(true)">
+  <button id="btnParcel" class="parcel-btn" onclick="toggleParcel()">
     Parcelado
   </button>
+
+  <input
+    id="parcelCount"
+    type="number"
+    min="2"
+    placeholder="Meses"
+    style="display:none; width:110px"
+  >
 </div>
 
 <!-- QUANTIDADE DE PARCELAS -->
