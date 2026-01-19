@@ -695,10 +695,10 @@ function save(){
   type: currentType,
   paid: paid.checked,
 
-  parcel: !!editingParcelData,
-  parcelIndex: editingParcelData?.parcelIndex,
-  parcelTotal: editingParcelData?.parcelTotal,
-  parcelGroupId: editingParcelData?.parcelGroupId
+  parcel: editingParcelData ? true : false,
+parcelIndex: editingParcelData ? editingParcelData.parcelIndex : null,
+parcelTotal: editingParcelData ? editingParcelData.parcelTotal : null,
+parcelGroupId: editingParcelData ? editingParcelData.parcelGroupId : null
 };
 
     const newMonthKey = getMonthKeyFromDate(item.date);
@@ -839,8 +839,8 @@ document.getElementById("parcelCount").value = "";
 function closeModal(){
   modal.style.display = "none";
 
-  // 🔑 RESET TOTAL DO PARCELAMENTO
   isParcel = false;
+  editingParcelData = null; // 🔥 ESSENCIAL
 
   const btn = document.getElementById("btnParcel");
   const input = document.getElementById("parcelCount");
