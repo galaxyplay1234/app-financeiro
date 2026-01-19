@@ -612,13 +612,21 @@ function save(){
     paid: paid.checked
   };
 
-  // 🔥 mês baseado na DATA escolhida
-  const monthKey = getMonthKeyFromDate(item.date);
+  // 🔑 mês baseado na data escolhida
+  const newMonthKey = getMonthKeyFromDate(item.date);
 
+  // 🔥 SE ESTIVER EDITANDO E O MÊS MUDOU → REMOVE DO ANTIGO
+  if(editId && editMonthKey && editMonthKey !== newMonthKey){
+    firebase
+      .database()
+      .ref("finance/meses/" + editMonthKey + "/" + id)
+      .remove();
+  }
+
+  // ✅ salva apenas no mês correto
   firebase
     .database()
-    .ref("finance/meses/" + monthKey)
-    .child(id)
+    .ref("finance/meses/" + newMonthKey + "/" + id)
     .set(item);
 
   closeModal();
@@ -629,7 +637,11 @@ function save(){
    EDIT
 ========================= */
 function editById(id){
-  monthRef().child(id).once("value", snap=>{
+  const originalMonthKey = getMonthKey(); // mês da aba atual
+  firebase
+    .database()
+    .ref("finance/meses/" + originalMonthKey + "/" + id)
+    .once("value", snap=>{
     const t = snap.val();
     if(!t) return;
 
@@ -643,6 +655,7 @@ function editById(id){
     setType(currentType);
     editId = id;
     deleteBtn.style.display="block";
+    editMonthKey = originalMonthKey;
     openModal();
   });
 }
