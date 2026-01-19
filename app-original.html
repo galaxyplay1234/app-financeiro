@@ -145,12 +145,33 @@ header h2{
 
 /* TYPE BUTTONS */
 .type-buttons{display:flex;gap:8px;margin-bottom:8px}
+/* BOTÃO PADRÃO (NÃO SELECIONADO) */
 .type-btn{
-  flex:1;padding:10px;border-radius:8px;
-  border:1px solid #ccc;background:#f0f0f0;font-weight:bold
+  flex:1;
+  padding:10px;
+  border-radius:8px;
+
+  /* visual que você pediu */
+  background:#fff;              /* fundo branco */
+  border:1px solid #ccc;        /* contorno cinza 1px */
+  color:#777;                   /* texto cinza */
+
+  font-weight:bold;
 }
-.type-btn.active.income{background:#2e7d32;color:#fff;border:none}
-.type-btn.active.expense{background:#c62828;color:#fff;border:none}
+
+/* RECEITA SELECIONADA */
+.type-btn.active.income{
+  background:#2e7d32;
+  color:#fff;
+  border:none;
+}
+
+/* DESPESA SELECIONADA */
+.type-btn.active.expense{
+  background:#c62828;
+  color:#fff;
+  border:none;
+}
 
 /* INPUTS */
 .modal-content input,
@@ -167,6 +188,33 @@ header h2{
   -webkit-appearance:none;
   appearance:none;
 }
+
+
+/* ===============================
+   CORREÇÃO BOTÕES RECEITA / DESPESA
+   =============================== */
+
+/* botão padrão (não selecionado) */
+.modal-content .type-btn{
+  background:#fff !important;
+  border:1px solid #ccc !important;
+  color:#777 !important;
+}
+
+/* receita ativa */
+.modal-content .type-btn.active.income{
+  background:#2e7d32 !important;
+  color:#fff !important;
+  border:none !important;
+}
+
+/* despesa ativa */
+.modal-content .type-btn.active.expense{
+  background:#c62828 !important;
+  color:#fff !important;
+  border:none !important;
+}
+
 
 /* SWITCH */
 .switch-row{
@@ -234,6 +282,33 @@ input:checked + .slider:before{transform:translateX(20px)}
   overflow-y:auto;
   max-height:260px;
 }
+
+
+/* itens agrupados por dia */
+.item{
+  border-radius:0;
+  margin:0;
+}
+
+/* primeiro item do dia */
+.item.first-of-day{
+  border-top-left-radius:10px;
+  border-top-right-radius:10px;
+}
+
+/* último item do dia */
+.item.last-of-day{
+  border-bottom-left-radius:10px;
+  border-bottom-right-radius:10px;
+}
+
+/* remove espaço entre itens do mesmo dia */
+.day-items{
+  display:flex;
+  flex-direction:column;
+  gap:0;
+}
+
 
 </style>
 </head>
@@ -402,9 +477,9 @@ function render(){
   const container = document.getElementById("list");
   container.innerHTML = "";
 
-  let rPago=0,rPrev=0,dPago=0,dPrev=0;
+  let rPago = 0, rPrev = 0, dPago = 0, dPrev = 0;
 
-  // 🔥 IMPORTANTE
+  // remove listener antigo
   monthRef().off();
 
   monthRef().on("value", snap=>{
@@ -414,47 +489,98 @@ function render(){
 
     container.innerHTML = "";
 
+    // ==========================
+    // AGRUPA POR DATA
+    // ==========================
+    const groupedByDate = {};
+
     list.forEach(t=>{
-      if(t.type==="income"){
-        t.paid ? rPago+=t.value : rPrev+=t.value;
-      }else{
-        t.paid ? dPago+=t.value : dPrev+=t.value;
+      if(!groupedByDate[t.date]){
+        groupedByDate[t.date] = [];
       }
-
-      const late = !t.paid && new Date(t.date) < new Date();
-
-      const row = document.createElement("div");
-      row.className = "row";
-      row.onclick = () => editById(t.id);
-
-      row.innerHTML = `
-        <div class="date-card">${formatDate(t.date)}</div>
-        <div class="item">
-          <div class="item-top">
-            <div class="item-name">${t.name}</div>
-            <div class="item-value ${t.type}">
-              R$ ${t.value.toLocaleString("pt-BR",{minimumFractionDigits:2})}
-            </div>
-          </div>
-          <div class="item-bottom">
-            <div class="item-sub">${t.category}</div>
-            ${
-              t.paid
-                ? `<div class="badge green">${t.type==="income"?"Recebido":"Pago"}</div>`
-                : late ? `<div class="badge red">Atrasado</div>` : ""
-            }
-          </div>
-        </div>
-      `;
-      container.appendChild(row);
+      groupedByDate[t.date].push(t);
     });
 
-    recPago.innerText=`R$ ${rPago.toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
-    recPrev.innerText=`R$ ${(rPago+rPrev).toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
-    despPago.innerText=`R$ ${dPago.toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
-    despPrev.innerText=`R$ ${(dPago+dPrev).toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
-    saldoPago.innerText=`R$ ${(rPago-dPago).toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
-    saldoPrev.innerText=`R$ ${((rPago+rPrev)-(dPago+dPrev)).toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
+    // ==========================
+    // RENDERIZA POR DIA
+    // ==========================
+    Object.keys(groupedByDate)
+      .sort((a,b)=>new Date(b)-new Date(a))
+      .forEach(date=>{
+
+        const row = document.createElement("div");
+        row.className = "row";
+
+        // card da data
+        const dateCard = document.createElement("div");
+        dateCard.className = "date-card";
+        dateCard.innerText = formatDate(date);
+
+        // container dos itens do dia
+        const itemsWrap = document.createElement("div");
+        itemsWrap.className = "day-items";
+        itemsWrap.style.flex = "1";
+
+        groupedByDate[date].forEach((t, index) => {
+
+          // totais
+          if(t.type==="income"){
+            t.paid ? rPago+=t.value : rPrev+=t.value;
+          }else{
+            t.paid ? dPago+=t.value : dPrev+=t.value;
+          }
+
+          const late = !t.paid && new Date(t.date) < new Date();
+
+          const item = document.createElement("div");
+          item.className = "item";
+
+          // bordas corretas
+          if(index === 0){
+            item.classList.add("first-of-day");
+          }
+          if(index === groupedByDate[date].length - 1){
+            item.classList.add("last-of-day");
+          }
+
+          item.onclick = () => editById(t.id);
+
+          item.innerHTML = `
+            <div class="item-top">
+              <div class="item-name">${t.name}</div>
+              <div class="item-value ${t.type}">
+                R$ ${t.value.toLocaleString("pt-BR",{minimumFractionDigits:2})}
+              </div>
+            </div>
+            <div class="item-bottom">
+              <div class="item-sub">${t.category}</div>
+              ${
+                t.paid
+                  ? `<div class="badge green">${t.type==="income"?"Recebido":"Pago"}</div>`
+                  : late
+                    ? `<div class="badge red">Atrasado</div>`
+                    : ""
+              }
+            </div>
+          `;
+
+          itemsWrap.appendChild(item);
+        });
+
+        row.appendChild(dateCard);
+        row.appendChild(itemsWrap);
+        container.appendChild(row);
+      });
+
+    // ==========================
+    // ATUALIZA TOTAIS
+    // ==========================
+    recPago.innerText = `R$ ${rPago.toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
+    recPrev.innerText = `R$ ${(rPago+rPrev).toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
+    despPago.innerText = `R$ ${dPago.toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
+    despPrev.innerText = `R$ ${(dPago+dPrev).toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
+    saldoPago.innerText = `R$ ${(rPago-dPago).toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
+    saldoPrev.innerText = `R$ ${((rPago+rPrev)-(dPago+dPrev)).toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
   });
 }
 
