@@ -145,12 +145,33 @@ header h2{
 
 /* TYPE BUTTONS */
 .type-buttons{display:flex;gap:8px;margin-bottom:8px}
+/* BOTÃO PADRÃO (NÃO SELECIONADO) */
 .type-btn{
-  flex:1;padding:10px;border-radius:8px;
-  border:1px solid #ccc;background:#f0f0f0;font-weight:bold
+  flex:1;
+  padding:10px;
+  border-radius:8px;
+
+  /* visual que você pediu */
+  background:#fff;              /* fundo branco */
+  border:1px solid #ccc;        /* contorno cinza 1px */
+  color:#777;                   /* texto cinza */
+
+  font-weight:bold;
 }
-.type-btn.active.income{background:#2e7d32;color:#fff;border:none}
-.type-btn.active.expense{background:#c62828;color:#fff;border:none}
+
+/* RECEITA SELECIONADA */
+.type-btn.active.income{
+  background:#2e7d32;
+  color:#fff;
+  border:none;
+}
+
+/* DESPESA SELECIONADA */
+.type-btn.active.expense{
+  background:#c62828;
+  color:#fff;
+  border:none;
+}
 
 /* INPUTS */
 .modal-content input,
