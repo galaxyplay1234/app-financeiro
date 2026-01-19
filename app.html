@@ -521,6 +521,27 @@ function setType(t){
   document.querySelector(`.type-btn.${t}`).classList.add("active");
 }
 
+
+/* =========================
+   PARCELAMENTO
+========================= */
+let isParcel = false;
+
+function toggleParcel(){
+  isParcel = !isParcel;
+
+  const btn = document.getElementById("btnParcel");
+  const input = document.getElementById("parcelCount");
+
+  btn.classList.toggle("active", isParcel);
+  input.style.display = isParcel ? "block" : "none";
+
+  if(!isParcel){
+    input.value = "";
+  }
+}
+
+
 /* =========================
    RENDER
 ========================= */
