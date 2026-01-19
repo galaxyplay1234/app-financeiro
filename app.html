@@ -594,7 +594,9 @@ function render(){
         itemsWrap.className = "day-items";
         itemsWrap.style.flex = "1";
 
-        groupedByDate[date].forEach((t, index) => {
+        groupedByDate[date]
+  .sort((a, b) => b.value - a.value) // 🔥 MAIOR → MENOR
+  .forEach((t, index) => {
 
           // totais
           if(t.type==="income"){
