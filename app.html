@@ -240,6 +240,37 @@ input:checked + .slider:before{transform:translateX(20px)}
 .modal-content button.cancel{background:#9e9e9e}
 .modal-content button.delete{background:#c62828}
 
+/* ===============================
+   PARCELAMENTO
+=============================== */
+.parcel-buttons{
+  display:flex;
+  gap:8px;
+  margin-top:8px;
+}
+
+.parcel-btn{
+  flex:1;
+  padding:10px;
+  border-radius:8px;
+  background:#fff;
+  border:1px solid #ccc;
+  color:#777;
+  font-weight:bold;
+}
+
+/* NÃO REPETIR (PADRÃO) */
+.parcel-btn.active{
+  border-color:#1976d2; /* azul do tema */
+  color:#1976d2;
+}
+
+/* INPUT PARCELAS */
+#parcelCountWrap input{
+  margin-top:8px;
+}
+
+
 .category-item{
   display:flex;
   justify-content:space-between;
@@ -382,6 +413,21 @@ input:checked + .slider:before{transform:translateX(20px)}
   <option>Transporte</option>
 </select>
 <input id="date" type="date">
+  
+  <!-- PARCELAMENTO -->
+<div class="parcel-buttons">
+  <button id="btnSingle" class="parcel-btn active" onclick="setParcel(false)">
+    Não repetir
+  </button>
+  <button id="btnParcel" class="parcel-btn" onclick="setParcel(true)">
+    Parcelado
+  </button>
+</div>
+
+<!-- QUANTIDADE DE PARCELAS -->
+<div id="parcelCountWrap" style="display:none">
+  <input id="parcelCount" type="number" min="2" placeholder="Quantidade de meses">
+</div>
 
 <div class="switch-row">
   <span>Pago</span>
