@@ -643,35 +643,91 @@ if(late){
    SAVE
 ========================= */
 function save(){
-  const id = editId || Date.now().toString();
-  const val = Number(valueInput.value.replace(/\./g,"").replace(",","."));
+  const valTotal = Number(
+    valueInput.value.replace(/\./g,"").replace(",",".")
+  );
 
-  const item = {
-    id,
-    name: title.value.trim(),
-    value: val,
-    category: category.value,
-    date: date.value,
-    type: currentType,
-    paid: paid.checked
-  };
+  const baseDateStr = date.value;
 
-  // 🔑 mês baseado na data escolhida
-  const newMonthKey = getMonthKeyFromDate(item.date);
+  /* =========================
+     NÃO PARCELADO
+  ========================= */
+  if(!isParcel){
+    const id = editId || Date.now().toString();
 
-  // 🔥 SE ESTIVER EDITANDO E O MÊS MUDOU → REMOVE DO ANTIGO
-  if(editId && editMonthKey && editMonthKey !== newMonthKey){
+    const item = {
+      id,
+      name: title.value.trim(),
+      value: valTotal,
+      category: category.value,
+      date: baseDateStr,
+      type: currentType,
+      paid: paid.checked,
+      parcel: false
+    };
+
+    const newMonthKey = getMonthKeyFromDate(item.date);
+
+    // se estiver editando e mudou o mês
+    if(editId && editMonthKey && editMonthKey !== newMonthKey){
+      firebase
+        .database()
+        .ref("finance/meses/" + editMonthKey + "/" + id)
+        .remove();
+    }
+
     firebase
       .database()
-      .ref("finance/meses/" + editMonthKey + "/" + id)
-      .remove();
+      .ref("finance/meses/" + newMonthKey + "/" + id)
+      .set(item);
+
+    closeModal();
+    render();
+    return;
   }
 
-  // ✅ salva apenas no mês correto
-  firebase
-    .database()
-    .ref("finance/meses/" + newMonthKey + "/" + id)
-    .set(item);
+  /* =========================
+     PARCELADO
+  ========================= */
+  const totalParcels = Number(parcelCount.value || 0);
+
+  if(totalParcels < 2){
+    alert("Informe a quantidade de parcelas");
+    return;
+  }
+
+  const parcelValue = Number((valTotal / totalParcels).toFixed(2));
+  const groupId = Date.now().toString();
+  const baseDate = new Date(baseDateStr);
+
+  for(let i = 0; i < totalParcels; i++){
+    const d = new Date(baseDate);
+    d.setMonth(d.getMonth() + i);
+
+    const dateStr = d.toISOString().split("T")[0];
+    const monthKey = getMonthKeyFromDate(dateStr);
+    const id = `${groupId}_${i+1}`;
+
+    const item = {
+      id,
+      name: title.value.trim(),
+      value: parcelValue,
+      category: category.value,
+      date: dateStr,
+      type: currentType,
+      paid: false,
+
+      parcel: true,
+      parcelIndex: i + 1,
+      parcelTotal: totalParcels,
+      parcelGroupId: groupId
+    };
+
+    firebase
+      .database()
+      .ref("finance/meses/" + monthKey + "/" + id)
+      .set(item);
+  }
 
   closeModal();
   render();
