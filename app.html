@@ -189,6 +189,33 @@ header h2{
   appearance:none;
 }
 
+
+/* ===============================
+   CORREÇÃO BOTÕES RECEITA / DESPESA
+   =============================== */
+
+/* botão padrão (não selecionado) */
+.modal-content .type-btn{
+  background:#fff !important;
+  border:1px solid #ccc !important;
+  color:#777 !important;
+}
+
+/* receita ativa */
+.modal-content .type-btn.active.income{
+  background:#2e7d32 !important;
+  color:#fff !important;
+  border:none !important;
+}
+
+/* despesa ativa */
+.modal-content .type-btn.active.expense{
+  background:#c62828 !important;
+  color:#fff !important;
+  border:none !important;
+}
+
+
 /* SWITCH */
 .switch-row{
   display:flex;justify-content:space-between;
