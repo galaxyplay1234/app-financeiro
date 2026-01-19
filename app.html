@@ -633,10 +633,10 @@ if(late){
   ${t.category}
   ${
     t.parcel
-      ? `<span style="margin-left:6px;font-size:12px;color:#777">
-           ${t.parcel.index}/${t.parcel.total}
-         </span>`
-      : ""
+  ? `<span style="margin-left:6px;font-size:12px;color:#777">
+       ${t.parcelIndex}/${t.parcelTotal}
+     </span>`
+  : ""
   }
 </div>
               ${
@@ -726,7 +726,7 @@ function save(){
     return;
   }
 
-  const parcelValue = Number((valTotal / totalParcels).toFixed(2));
+  const parcelValue = valTotal;
   const groupId = Date.now().toString();
   const baseDate = new Date(baseDateStr);
 
