@@ -605,7 +605,13 @@ function render(){
             t.paid ? dPago+=t.value : dPrev+=t.value;
           }
 
-          const late = !t.paid && new Date(t.date) < new Date();
+          const today = new Date();
+today.setHours(0,0,0,0);
+
+const dueDate = new Date(t.date);
+dueDate.setHours(0,0,0,0);
+
+const late = !t.paid && dueDate < today;
 
           const item = document.createElement("div");
 item.className = "item";
