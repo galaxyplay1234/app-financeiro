@@ -343,6 +343,16 @@ input:checked + .slider:before{transform:translateX(20px)}
   border-left-color: #c62828; /* mantém coerência com despesa */
 }
 
+/* ITEM VENCE HOJE */
+.due-today-item{
+  background:#fff4e5;           /* laranja bem clarinho */
+  border-left-color:#f57c00;    /* laranja */
+}
+
+.badge.orange{
+  background:#f57c00;           /* laranja */
+}
+
 </style>
 </head>
 
@@ -611,13 +621,16 @@ today.setHours(0,0,0,0);
 const dueDate = new Date(t.date);
 dueDate.setHours(0,0,0,0);
 
-const late = !t.paid && dueDate < today;
+const isLate = !t.paid && dueDate < today;
+const isDueToday = !t.paid && dueDate.getTime() === today.getTime();
 
           const item = document.createElement("div");
 item.className = "item";
 
-if(late){
+if(isLate){
   item.classList.add("late-item");
+}else if(isDueToday){
+  item.classList.add("due-today-item");
 }
 
           // bordas corretas
@@ -649,12 +662,14 @@ if(late){
   }
 </div>
               ${
-                t.paid
-                  ? `<div class="badge green">${t.type==="income"?"Recebido":"Pago"}</div>`
-                  : late
-                    ? `<div class="badge red">Atrasado</div>`
-                    : ""
-              }
+  t.paid
+    ? `<div class="badge green">${t.type==="income"?"Recebido":"Pago"}</div>`
+    : isLate
+      ? `<div class="badge red">Atrasado</div>`
+      : isDueToday
+        ? `<div class="badge orange">Vence hoje</div>`
+        : ""
+}
             </div>
           `;
 
