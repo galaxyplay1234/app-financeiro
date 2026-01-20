@@ -615,14 +615,10 @@ function render(){
             t.paid ? dPago+=t.value : dPrev+=t.value;
           }
 
-          const today = new Date();
-today.setHours(0,0,0,0);
+          const todayStr = getTodayLocalString();
 
-const dueDate = new Date(t.date);
-dueDate.setHours(0,0,0,0);
-
-const isLate = !t.paid && dueDate < today;
-const isDueToday = !t.paid && dueDate.getTime() === today.getTime();
+const isLate = !t.paid && t.date < todayStr;
+const isDueToday = !t.paid && t.date === todayStr;
 
           const item = document.createElement("div");
 item.className = "item";
@@ -948,6 +944,11 @@ function getMonthKeyFromDate(dateStr){
   return `${year}-${month}`;
 }
 
+
+function getTodayLocalString(){
+  const now = new Date();
+  return `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}-${String(now.getDate()).padStart(2,"0")}`;
+}
 
 
 </script>
