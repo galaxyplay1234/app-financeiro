@@ -469,6 +469,15 @@ input:checked + .slider:before{transform:translateX(20px)}
 </div>
 
 <script>
+  if (localStorage.getItem("logged") !== "true") {
+    window.location.href = "index.html";
+  }
+</script>
+
+<script>
+
+
+
 let currentMonth = new Date();
 let editId = null;
 let editMonthKey = null;
