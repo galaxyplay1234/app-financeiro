@@ -469,9 +469,14 @@ input:checked + .slider:before{transform:translateX(20px)}
 </div>
 
 <script>
+  // 🔒 Se não veio do login, volta para o login
   if (localStorage.getItem("logged") !== "true") {
     window.location.href = "index.html";
   }
+
+  // 🔥 Remove o acesso imediatamente
+  // Assim, qualquer reload ou nova abertura pede o código de novo
+  localStorage.removeItem("logged");
 </script>
 
 <script>
