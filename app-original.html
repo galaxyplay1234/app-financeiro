@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Minhas Finanças</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#1976d2">
 
 <style>
@@ -117,8 +117,8 @@ header h2{
   padding:2px 8px;font-size:12px;border-radius:12px;
   color:#fff;white-space:nowrap
 }
-.green{background:#2e7d32}
-.red{background:#c62828}
+.green{background:#4EAE51}
+.red{background:#F24438}
 
 /* FAB */
 .fab{
@@ -240,6 +240,33 @@ input:checked + .slider:before{transform:translateX(20px)}
 .modal-content button.cancel{background:#9e9e9e}
 .modal-content button.delete{background:#c62828}
 
+/* ===============================
+   PARCELAMENTO
+=============================== */
+.parcel-buttons{
+  display:flex;
+  gap:8px;
+  margin-top:8px;
+  align-items:center;
+}
+
+.parcel-btn{
+  width:auto !important;
+  background:#fff !important;
+  color:#777 !important;
+  border:1px solid #ccc !important;
+  font-weight:bold; /* 👈 AQUI resolve */
+}
+
+/* ATIVO */
+.parcel-btn.active{
+  border-color:#1976d2 !important;
+  color:#1976d2 !important;
+}
+
+
+
+
 .category-item{
   display:flex;
   justify-content:space-between;
@@ -313,7 +340,17 @@ input:checked + .slider:before{transform:translateX(20px)}
 /* ITEM ATRASADO */
 .late-item{
   background: #fdecea; /* vermelho bem clarinho */
-  border-left-color: #c62828; /* mantém coerência com despesa */
+  border-left-color: #F24438; /* mantém coerência com despesa */
+}
+
+/* ITEM VENCE HOJE */
+.due-today-item{
+  background:#fff4e5;           /* laranja bem clarinho */
+  border-left-color:#FD9806;    /* laranja */
+}
+
+.badge.orange{
+  background:#FD9806;           /* laranja */
 }
 
 </style>
@@ -382,6 +419,23 @@ input:checked + .slider:before{transform:translateX(20px)}
   <option>Transporte</option>
 </select>
 <input id="date" type="date">
+  
+<!-- PARCELAMENTO -->
+<div class="parcel-buttons">
+  <button id="btnParcel" class="parcel-btn" onclick="toggleParcel()">
+    Parcelado
+  </button>
+
+  <input
+    id="parcelCount"
+    type="number"
+    min="2"
+    placeholder="Meses"
+    style="display:none; width:110px"
+  >
+</div>
+
+
 
 <div class="switch-row">
   <span>Pago</span>
@@ -415,10 +469,25 @@ input:checked + .slider:before{transform:translateX(20px)}
 </div>
 
 <script>
+  // 🔒 Se não veio do login, volta para o login
+  if (localStorage.getItem("logged") !== "true") {
+    window.location.href = "index.html";
+  }
+
+  // 🔥 Remove o acesso imediatamente
+  // Assim, qualquer reload ou nova abertura pede o código de novo
+  localStorage.removeItem("logged");
+</script>
+
+<script>
+
+
+
 let currentMonth = new Date();
 let editId = null;
 let editMonthKey = null;
 let currentType = "income";
+let editingParcelData = null;
 
 const monthLabel = document.getElementById("monthLabel");
 const modal = document.getElementById("modal");
@@ -477,6 +546,27 @@ function setType(t){
   document.querySelector(`.type-btn.${t}`).classList.add("active");
 }
 
+
+/* =========================
+   PARCELAMENTO
+========================= */
+let isParcel = false;
+
+function toggleParcel(){
+  isParcel = !isParcel;
+
+  const btn = document.getElementById("btnParcel");
+  const input = document.getElementById("parcelCount");
+
+  btn.classList.toggle("active", isParcel);
+  input.style.display = isParcel ? "block" : "none";
+
+  if(!isParcel){
+    input.value = "";
+  }
+}
+
+
 /* =========================
    RENDER
 ========================= */
@@ -528,7 +618,9 @@ function render(){
         itemsWrap.className = "day-items";
         itemsWrap.style.flex = "1";
 
-        groupedByDate[date].forEach((t, index) => {
+        groupedByDate[date]
+  .sort((a, b) => b.value - a.value) // 🔥 MAIOR → MENOR
+  .forEach((t, index) => {
 
           // totais
           if(t.type==="income"){
@@ -537,13 +629,18 @@ function render(){
             t.paid ? dPago+=t.value : dPrev+=t.value;
           }
 
-          const late = !t.paid && new Date(t.date) < new Date();
+          const todayStr = getTodayLocalString();
+
+const isLate = !t.paid && t.date < todayStr;
+const isDueToday = !t.paid && t.date === todayStr;
 
           const item = document.createElement("div");
 item.className = "item";
 
-if(late){
+if(isLate){
   item.classList.add("late-item");
+}else if(isDueToday){
+  item.classList.add("due-today-item");
 }
 
           // bordas corretas
@@ -564,14 +661,25 @@ if(late){
               </div>
             </div>
             <div class="item-bottom">
-              <div class="item-sub">${t.category}</div>
+              <div class="item-sub">
+  ${t.category}
+  ${
+    t.parcel
+  ? `<span style="margin-left:6px;font-size:12px;color:#777">
+       ${t.parcelIndex}/${t.parcelTotal}
+     </span>`
+  : ""
+  }
+</div>
               ${
-                t.paid
-                  ? `<div class="badge green">${t.type==="income"?"Recebido":"Pago"}</div>`
-                  : late
-                    ? `<div class="badge red">Atrasado</div>`
-                    : ""
-              }
+  t.paid
+    ? `<div class="badge green">${t.type==="income"?"Recebido":"Pago"}</div>`
+    : isLate
+      ? `<div class="badge red">Atrasado</div>`
+      : isDueToday
+        ? `<div class="badge orange">Vence hoje</div>`
+        : ""
+}
             </div>
           `;
 
@@ -599,35 +707,95 @@ if(late){
    SAVE
 ========================= */
 function save(){
-  const id = editId || Date.now().toString();
-  const val = Number(valueInput.value.replace(/\./g,"").replace(",","."));
+  const valTotal = Number(
+    valueInput.value.replace(/\./g,"").replace(",",".")
+  );
 
-  const item = {
-    id,
-    name: title.value.trim(),
-    value: val,
-    category: category.value,
-    date: date.value,
-    type: currentType,
-    paid: paid.checked
-  };
+  const baseDateStr = date.value;
 
-  // 🔑 mês baseado na data escolhida
-  const newMonthKey = getMonthKeyFromDate(item.date);
+  /* =========================
+     NÃO PARCELADO
+  ========================= */
+  if(!isParcel){
+    const id = editId || Date.now().toString();
 
-  // 🔥 SE ESTIVER EDITANDO E O MÊS MUDOU → REMOVE DO ANTIGO
-  if(editId && editMonthKey && editMonthKey !== newMonthKey){
+    const item = {
+  id,
+  name: title.value.trim(),
+  value: valTotal,
+  category: category.value,
+  date: baseDateStr,
+  type: currentType,
+  paid: paid.checked,
+
+  parcel: editingParcelData ? true : false,
+parcelIndex: editingParcelData ? editingParcelData.parcelIndex : null,
+parcelTotal: editingParcelData ? editingParcelData.parcelTotal : null,
+parcelGroupId: editingParcelData ? editingParcelData.parcelGroupId : null
+};
+
+    const newMonthKey = getMonthKeyFromDate(item.date);
+
+    // se estiver editando e mudou o mês
+    if(editId && editMonthKey && editMonthKey !== newMonthKey){
+      firebase
+        .database()
+        .ref("finance/meses/" + editMonthKey + "/" + id)
+        .remove();
+    }
+
     firebase
       .database()
-      .ref("finance/meses/" + editMonthKey + "/" + id)
-      .remove();
+      .ref("finance/meses/" + newMonthKey + "/" + id)
+      .set(item);
+
+    closeModal();
+    render();
+    return;
   }
 
-  // ✅ salva apenas no mês correto
-  firebase
-    .database()
-    .ref("finance/meses/" + newMonthKey + "/" + id)
-    .set(item);
+  /* =========================
+     PARCELADO
+  ========================= */
+  const totalParcels = Number(parcelCount.value || 0);
+
+  if(totalParcels < 2){
+    alert("Informe a quantidade de parcelas");
+    return;
+  }
+
+  const parcelValue = valTotal;
+  const groupId = Date.now().toString();
+  const baseDate = new Date(baseDateStr);
+
+  for(let i = 0; i < totalParcels; i++){
+    const d = new Date(baseDate);
+    d.setMonth(d.getMonth() + i);
+
+    const dateStr = d.toISOString().split("T")[0];
+    const monthKey = getMonthKeyFromDate(dateStr);
+    const id = `${groupId}_${i+1}`;
+
+    const item = {
+      id,
+      name: title.value.trim(),
+      value: parcelValue,
+      category: category.value,
+      date: dateStr,
+      type: currentType,
+      paid: false,
+
+      parcel: true,
+      parcelIndex: i + 1,
+      parcelTotal: totalParcels,
+      parcelGroupId: groupId
+    };
+
+    firebase
+      .database()
+      .ref("finance/meses/" + monthKey + "/" + id)
+      .set(item);
+  }
 
   closeModal();
   render();
@@ -637,27 +805,35 @@ function save(){
    EDIT
 ========================= */
 function editById(id){
-  const originalMonthKey = getMonthKey(); // mês da aba atual
+  const originalMonthKey = getMonthKey();
+
   firebase
     .database()
     .ref("finance/meses/" + originalMonthKey + "/" + id)
     .once("value", snap=>{
-    const t = snap.val();
-    if(!t) return;
+      const t = snap.val();
+      if(!t) return;
 
-    title.value = t.name;
-    valueInput.value = t.value.toLocaleString("pt-BR",{minimumFractionDigits:2});
-    category.value = t.category;
-    date.value = t.date;
-    paid.checked = t.paid;
-    currentType = t.type;
+      title.value = t.name;
+      valueInput.value = t.value.toLocaleString("pt-BR",{minimumFractionDigits:2});
+      category.value = t.category;
+      date.value = t.date;
+      paid.checked = t.paid;
+      currentType = t.type;
 
-    setType(currentType);
-    editId = id;
-    deleteBtn.style.display="block";
-    editMonthKey = originalMonthKey;
-    openModal();
-  });
+      // 🔑 GUARDA PARCELAMENTO (se existir)
+      editingParcelData = t.parcel ? {
+        parcelIndex: t.parcelIndex,
+        parcelTotal: t.parcelTotal,
+        parcelGroupId: t.parcelGroupId
+      } : null;
+
+      setType(currentType);
+      editId = id;
+      editMonthKey = originalMonthKey;
+      deleteBtn.style.display = "block";
+      openModal();
+    });
 }
 
 /* =========================
@@ -681,6 +857,11 @@ function openModal(){
     category.value="";
     paid.checked=false;
     setType("income");
+    
+    isParcel = false;
+document.getElementById("btnParcel").classList.remove("active");
+document.getElementById("parcelCount").style.display = "none";
+document.getElementById("parcelCount").value = "";
 
     const hoje=new Date();
     date.value=`${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2,"0")}-${String(hoje.getDate()).padStart(2,"0")}`;
@@ -689,7 +870,18 @@ function openModal(){
 }
 
 function closeModal(){
-  modal.style.display="none";
+  modal.style.display = "none";
+
+  isParcel = false;
+  editingParcelData = null; // 🔥 ESSENCIAL
+
+  const btn = document.getElementById("btnParcel");
+  const input = document.getElementById("parcelCount");
+
+  btn.classList.remove("active");
+  input.style.display = "none";
+  input.value = "";
+
   editId = null;
   editMonthKey = null;
 }
@@ -766,6 +958,11 @@ function getMonthKeyFromDate(dateStr){
   return `${year}-${month}`;
 }
 
+
+function getTodayLocalString(){
+  const now = new Date();
+  return `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}-${String(now.getDate()).padStart(2,"0")}`;
+}
 
 
 </script>
