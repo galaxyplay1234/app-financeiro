@@ -532,7 +532,12 @@ function categoriesRef(){
    MÊS
 ========================= */
 function changeMonth(step){
-  currentMonth.setMonth(currentMonth.getMonth()+step);
+  currentMonth = new Date(
+    currentMonth.getFullYear(),
+    currentMonth.getMonth() + step,
+    1 // 👈 força dia 1
+  );
+
   updateMonthLabel();
   render();
 }
