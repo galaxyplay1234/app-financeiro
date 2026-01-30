@@ -1,7 +1,7 @@
 const CACHE_NAME = "financas-v1";
 const FILES_TO_CACHE = [
   "/",
-  "/login.html",
+  "/index.html",
   "/app.html",
   "/relatorios.html",
   "/manifest.json"
