@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Relatórios</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#1976d2">
 
 <style>
@@ -80,6 +80,9 @@ header h2{margin:0;font-size:18px}
 </div>
 
 <section class="list" id="list"></section>
+
+
+
 
 <!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -158,14 +161,18 @@ function render(){
     });
 
     const categorias = Object.keys(grouped).map(cat=>{
-      const total = grouped[cat].reduce((s,i)=>s+i.value,0);
-      return {
-        name: cat,
-        total,
-        percent: Math.round((total/totalGeral)*100),
-        items: grouped[cat]
-      };
-    });
+  const total = grouped[cat].reduce((s,i)=>s+i.value,0);
+
+  const itemsOrdenados = grouped[cat]
+    .sort((a,b)=>new Date(a.date) - new Date(b.date)); // 👈 MENOR → MAIOR
+
+  return {
+    name: cat,
+    total,
+    percent: Math.round((total/totalGeral)*100),
+    items: itemsOrdenados
+  };
+});
 
     categorias
       .sort((a,b)=>b.percent-a.percent)
