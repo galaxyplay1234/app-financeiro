@@ -642,16 +642,14 @@ function render(){
     // 🔹 BUSCA SALDO DO MÊS ANTERIOR
     let saldoInicial = 0;
 
-const prevMonthKey = getPreviousMonthKeyForRender();
+const saldoKey = getMonthKey(); // 👈 mês exibido
 
-if(prevMonthKey){
-  const snapSaldo = await firebase
-    .database()
-    .ref("finance/saldos/" + prevMonthKey)
-    .once("value");
+const snapSaldo = await firebase
+  .database()
+  .ref("finance/saldos/" + saldoKey)
+  .once("value");
 
-  saldoInicial = Number(snapSaldo.val() || 0);
-}
+saldoInicial = Number(snapSaldo.val() || 0);
 
     // ==========================
     // AGRUPA POR DATA
