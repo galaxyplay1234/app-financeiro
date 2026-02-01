@@ -1021,16 +1021,26 @@ function getTodayLocalString(){
 function getPreviousMonthKeyForRender(){
   const today = new Date();
 
-  // só permite herança depois da virada real
+  // só no dia 1
   if(today.getDate() !== 1){
     return null;
   }
 
-  const prev = new Date(
-    currentMonth.getFullYear(),
-    currentMonth.getMonth() - 1,
-    1
-  );
+  // mês exibido
+  const renderYear = currentMonth.getFullYear();
+  const renderMonth = currentMonth.getMonth();
+
+  // mês real atual
+  const realYear = today.getFullYear();
+  const realMonth = today.getMonth();
+
+  // 🔒 só herda se estiver exibindo o mês atual real
+  if(renderYear !== realYear || renderMonth !== realMonth){
+    return null;
+  }
+
+  // mês anterior real
+  const prev = new Date(realYear, realMonth - 1, 1);
 
   return `${prev.getFullYear()}-${String(prev.getMonth()+1).padStart(2,"0")}`;
 }
