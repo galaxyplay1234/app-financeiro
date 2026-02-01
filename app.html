@@ -572,6 +572,53 @@ function toggleParcel(){
 }
 
 
+function checkMonthTurnover(){
+  const today = new Date();
+  const day = today.getDate();
+
+  // 🔒 só executa no dia 1
+  if(day !== 1) return;
+
+  const currentMonthKey =
+    `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,"0")}`;
+
+  const prev = new Date(today);
+  prev.setMonth(prev.getMonth() - 1);
+
+  const prevMonthKey =
+    `${prev.getFullYear()}-${String(prev.getMonth()+1).padStart(2,"0")}`;
+
+  // evita recalcular se já existir saldo salvo
+  firebase.database()
+    .ref("finance/saldos/" + currentMonthKey)
+    .once("value", snap=>{
+      if(snap.exists()) return;
+
+      firebase.database()
+        .ref("finance/meses/" + prevMonthKey)
+        .once("value", snapPrev=>{
+          const data = snapPrev.val() || {};
+          let saldoFinal = 0;
+
+          Object.values(data).forEach(t=>{
+            if(!t.paid) return;
+
+            if(t.type === "income"){
+              saldoFinal += t.value;
+            }else{
+              saldoFinal -= t.value;
+            }
+          });
+
+          firebase.database()
+            .ref("finance/saldos/" + currentMonthKey)
+            .set(saldoFinal);
+        });
+    });
+}
+
+
+
 /* =========================
    RENDER
 ========================= */
@@ -580,132 +627,123 @@ function render(){
   container.innerHTML = "";
 
   let rPago = 0, rPrev = 0, dPago = 0, dPrev = 0;
+  let saldoInicial = 0;
 
   // remove listener antigo
   monthRef().off();
 
-  monthRef().on("value", snap=>{
-    const data = snap.val() || {};
-    const list = Object.values(data)
-      .sort((a,b)=>new Date(b.date)-new Date(a.date));
+  // 🔹 PRIMEIRO pega o saldo inicial do mês
+  firebase.database()
+    .ref("finance/saldos/" + getMonthKey())
+    .once("value", snapSaldo=>{
+      saldoInicial = Number(snapSaldo.val() || 0);
 
-    container.innerHTML = "";
+      // 🔹 DEPOIS carrega os lançamentos do mês
+      monthRef().on("value", snap=>{
+        const data = snap.val() || {};
+        const list = Object.values(data)
+          .sort((a,b)=>new Date(b.date)-new Date(a.date));
 
-    // ==========================
-    // AGRUPA POR DATA
-    // ==========================
-    const groupedByDate = {};
+        container.innerHTML = "";
 
-    list.forEach(t=>{
-      if(!groupedByDate[t.date]){
-        groupedByDate[t.date] = [];
-      }
-      groupedByDate[t.date].push(t);
-    });
+        const groupedByDate = {};
 
-    // ==========================
-    // RENDERIZA POR DIA
-    // ==========================
-    Object.keys(groupedByDate)
-      .sort((a,b)=>new Date(b)-new Date(a))
-      .forEach(date=>{
-
-        const row = document.createElement("div");
-        row.className = "row";
-
-        // card da data
-        const dateCard = document.createElement("div");
-        dateCard.className = "date-card";
-        dateCard.innerText = formatDate(date);
-
-        // container dos itens do dia
-        const itemsWrap = document.createElement("div");
-        itemsWrap.className = "day-items";
-        itemsWrap.style.flex = "1";
-
-        groupedByDate[date]
-  .sort((a, b) => b.value - a.value) // 🔥 MAIOR → MENOR
-  .forEach((t, index) => {
-
-          // totais
-          if(t.type==="income"){
-            t.paid ? rPago+=t.value : rPrev+=t.value;
-          }else{
-            t.paid ? dPago+=t.value : dPrev+=t.value;
+        list.forEach(t=>{
+          if(!groupedByDate[t.date]){
+            groupedByDate[t.date] = [];
           }
-
-          const todayStr = getTodayLocalString();
-
-const isLate = !t.paid && t.date < todayStr;
-const isDueToday = !t.paid && t.date === todayStr;
-
-          const item = document.createElement("div");
-item.className = "item";
-
-if(isLate){
-  item.classList.add("late-item");
-}else if(isDueToday){
-  item.classList.add("due-today-item");
-}
-
-          // bordas corretas
-          if(index === 0){
-            item.classList.add("first-of-day");
-          }
-          if(index === groupedByDate[date].length - 1){
-            item.classList.add("last-of-day");
-          }
-
-          item.onclick = () => editById(t.id);
-
-          item.innerHTML = `
-            <div class="item-top">
-              <div class="item-name">${t.name}</div>
-              <div class="item-value ${t.type}">
-                R$ ${t.value.toLocaleString("pt-BR",{minimumFractionDigits:2})}
-              </div>
-            </div>
-            <div class="item-bottom">
-              <div class="item-sub">
-  ${t.category}
-  ${
-    t.parcel
-  ? `<span style="margin-left:6px;font-size:12px;color:#777">
-       ${t.parcelIndex}/${t.parcelTotal}
-     </span>`
-  : ""
-  }
-</div>
-              ${
-  t.paid
-    ? `<div class="badge green">${t.type==="income"?"Recebido":"Pago"}</div>`
-    : isLate
-      ? `<div class="badge red">Atrasado</div>`
-      : isDueToday
-        ? `<div class="badge orange">Vence hoje</div>`
-        : ""
-}
-            </div>
-          `;
-
-          itemsWrap.appendChild(item);
+          groupedByDate[t.date].push(t);
         });
 
-        row.appendChild(dateCard);
-        row.appendChild(itemsWrap);
-        container.appendChild(row);
-      });
+        Object.keys(groupedByDate)
+          .sort((a,b)=>new Date(b)-new Date(a))
+          .forEach(date=>{
 
-    // ==========================
-    // ATUALIZA TOTAIS
-    // ==========================
-    recPago.innerText = `R$ ${rPago.toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
-    recPrev.innerText = `R$ ${(rPago+rPrev).toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
-    despPago.innerText = `R$ ${dPago.toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
-    despPrev.innerText = `R$ ${(dPago+dPrev).toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
-    saldoPago.innerText = `R$ ${(rPago-dPago).toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
-    saldoPrev.innerText = `R$ ${((rPago+rPrev)-(dPago+dPrev)).toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
-  });
+            const row = document.createElement("div");
+            row.className = "row";
+
+            const dateCard = document.createElement("div");
+            dateCard.className = "date-card";
+            dateCard.innerText = formatDate(date);
+
+            const itemsWrap = document.createElement("div");
+            itemsWrap.className = "day-items";
+            itemsWrap.style.flex = "1";
+
+            groupedByDate[date]
+              .sort((a,b)=>b.value - a.value)
+              .forEach((t,index)=>{
+
+                if(t.type==="income"){
+                  t.paid ? rPago+=t.value : rPrev+=t.value;
+                }else{
+                  t.paid ? dPago+=t.value : dPrev+=t.value;
+                }
+
+                const todayStr = getTodayLocalString();
+                const isLate = !t.paid && t.date < todayStr;
+                const isDueToday = !t.paid && t.date === todayStr;
+
+                const item = document.createElement("div");
+                item.className = "item";
+
+                if(isLate) item.classList.add("late-item");
+                else if(isDueToday) item.classList.add("due-today-item");
+
+                if(index === 0) item.classList.add("first-of-day");
+                if(index === groupedByDate[date].length - 1)
+                  item.classList.add("last-of-day");
+
+                item.onclick = () => editById(t.id);
+
+                item.innerHTML = `
+                  <div class="item-top">
+                    <div class="item-name">${t.name}</div>
+                    <div class="item-value ${t.type}">
+                      R$ ${t.value.toLocaleString("pt-BR",{minimumFractionDigits:2})}
+                    </div>
+                  </div>
+                  <div class="item-bottom">
+                    <div class="item-sub">
+                      ${t.category}
+                      ${t.parcel ? `<span style="margin-left:6px;font-size:12px;color:#777">
+                        ${t.parcelIndex}/${t.parcelTotal}
+                      </span>` : ""}
+                    </div>
+                    ${
+                      t.paid
+                        ? `<div class="badge green">${t.type==="income"?"Recebido":"Pago"}</div>`
+                        : isLate
+                          ? `<div class="badge red">Atrasado</div>`
+                          : isDueToday
+                            ? `<div class="badge orange">Vence hoje</div>`
+                            : ""
+                    }
+                  </div>
+                `;
+
+                itemsWrap.appendChild(item);
+              });
+
+            row.appendChild(dateCard);
+            row.appendChild(itemsWrap);
+            container.appendChild(row);
+          });
+
+        // 🔹 TOTAIS COM SALDO HERDADO
+        recPago.innerText = `R$ ${rPago.toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
+        recPrev.innerText = `R$ ${(rPago+rPrev).toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
+        despPago.innerText = `R$ ${dPago.toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
+        despPrev.innerText = `R$ ${(dPago+dPrev).toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
+
+        saldoPago.innerText =
+          `R$ ${(saldoInicial + rPago - dPago).toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
+
+        saldoPrev.innerText =
+          `R$ ${(saldoInicial + rPago + rPrev - dPago - dPrev).toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
+      });
+    });
+}
 }
 
 /* =========================
@@ -994,6 +1032,7 @@ function getTodayLocalString(){
    INIT
 ========================= */
 updateMonthLabel();
+checkMonthTurnover(); // 👈 NOVO
 render();
 updateCategorySelect();
 </script>
