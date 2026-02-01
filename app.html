@@ -640,7 +640,18 @@ function render(){
     container.innerHTML = "";
 
     // 🔹 BUSCA SALDO DO MÊS ANTERIOR
-    const prevMonthKey = getPreviousMonthKey();
+    const prevMonthKey = getRealPreviousMonthKey();
+
+let saldoInicial = 0;
+
+if(prevMonthKey){
+  const snapSaldo = await firebase
+    .database()
+    .ref("finance/saldos/" + prevMonthKey)
+    .once("value");
+
+  saldoInicial = Number(snapSaldo.val() || 0);
+}
 
     const snapSaldo = await firebase
       .database()
@@ -1014,10 +1025,17 @@ function getTodayLocalString(){
 }
 
 
-function getPreviousMonthKey(){
-  const d = new Date(currentMonth);
-  d.setMonth(d.getMonth() - 1);
-  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`;
+function getRealPreviousMonthKey(){
+  const today = new Date();
+
+  // só herda se for dia 1 ou depois
+  if(today.getDate() !== 1){
+    return null;
+  }
+
+  const prev = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+
+  return `${prev.getFullYear()}-${String(prev.getMonth()+1).padStart(2,"0")}`;
 }
 
 
