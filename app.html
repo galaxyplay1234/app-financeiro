@@ -1014,6 +1014,13 @@ function getTodayLocalString(){
 }
 
 
+function getPreviousMonthKey(){
+  const d = new Date(currentMonth);
+  d.setMonth(d.getMonth() - 1);
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`;
+}
+
+
 </script>
 
 <!-- Firebase -->
