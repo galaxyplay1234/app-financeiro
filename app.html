@@ -592,7 +592,7 @@ function checkMonthTurnover(){
   firebase.database()
     .ref("finance/saldos/" + currentMonthKey)
     .once("value", snap=>{
-      if(snap.exists()) return;
+    
 
       firebase.database()
         .ref("finance/meses/" + prevMonthKey)
