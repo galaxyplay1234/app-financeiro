@@ -107,12 +107,17 @@ header h2{
   border-left:5px solid #2196f3;
   box-shadow:0 1px 4px rgba(0,0,0,.1);
 
-  min-height:100px; /* era 64px */
+  min-height:64px;
   height:auto;
 
   display:flex;
   flex-direction:column;
   justify-content:space-between;
+}
+
+/* Apenas itens com informações extras */
+.item.expand{
+  min-height:100px;
 }
 .item-top{display:flex;justify-content:space-between}
 .item-name{font-weight:bold;font-size:14px}
@@ -711,6 +716,13 @@ saldoInicial = Number(snapSaldo.val() || 0);
 
             const item = document.createElement("div");
             item.className = "item";
+            
+            if (
+    t.type === "income" &&
+    (t.receivedValue || 0) > 0
+){
+    item.classList.add("expand");
+}
 
             if(isLate) item.classList.add("late-item");
             else if(isDueToday) item.classList.add("due-today-item");
