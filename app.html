@@ -4,14 +4,44 @@
 <meta charset="UTF-8">
 <title>Minhas Finanças</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#1976d2">
+<meta name="theme-color" content="#165DFF">
 
 <style>
-*{box-sizing:border-box;font-family:Arial,sans-serif}
+:root {
+  --primary: #165DFF;
+  --primary-light: #E8F3FF;
+  --income: #00B42A;
+  --income-light: #E8FFEA;
+  --expense: #F53F3F;
+  --expense-light: #FFECE8;
+  --warning: #FF7D00;
+  --warning-light: #FFF3E8;
+  --neutral-100: #F7F8FA;
+  --neutral-200: #E5E6EB;
+  --neutral-300: #C9CDD4;
+  --neutral-600: #4E5969;
+  --neutral-800: #1D2129;
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.08);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.12);
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+*{
+  box-sizing:border-box;
+  font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  margin:0;
+  padding:0;
+}
+
 body{
   margin:0;
-  background:#f4f6f8;
+  background:var(--neutral-100);
   overflow-x:hidden;
+  color:var(--neutral-800);
+  line-height:1.5;
 }
 
 
@@ -19,112 +49,299 @@ body{
   position:sticky;
   top:0;
   z-index:20;
-  background:#f4f6f8;
+  background:linear-gradient(180deg, var(--primary) 0%, #2970FF 100%);
+  padding-bottom:16px;
+  box-shadow:var(--shadow-md);
 }
 
 /* HEADER */
 header{
-  background:#1976d2;
   color:#fff;
-  padding:12px;
+  padding:20px 16px 12px;
   display:flex;
   flex-direction:column;
-  align-items:flex-start;
+  gap:12px;
 }
 
 header h2{
   margin:0;
-  font-size:18px;
-  font-weight:600;
+  font-size:22px;
+  font-weight:700;
+  letter-spacing:-0.3px;
+}
+
+.header-actions{
+  display:flex;
+  gap:8px;
 }
 
 .cat-btn{
-  background:transparent;
+  background:rgba(255,255,255,0.15);
   border:none;
   color:#fff;
-  font-size:22px;
+  font-size:18px;
   cursor:pointer;
-  padding:4px 6px;
+  padding:8px 12px;
+  border-radius:var(--radius-sm);
+  transition:var(--transition);
+  backdrop-filter:blur(4px);
 }
-.cat-btn:active{opacity:.6}
+.cat-btn:hover{
+  background:rgba(255,255,255,0.25);
+  transform:translateY(-1px);
+}
+.cat-btn:active{
+  transform:translateY(0);
+  opacity:0.8;
+}
 
 .month-tabs{
   width:100%;
   display:flex;
   justify-content:center;
   align-items:center;
-  gap:14px;
-  margin-top:6px;
+  gap:20px;
+  margin-top:4px;
 }
 
 .month-btn{
-  background:transparent;
+  background:rgba(255,255,255,0.15);
   border:none;
   color:#fff;
-  font-size:22px;
+  font-size:20px;
   cursor:pointer;
-  padding:4px 6px;
+  padding:6px 10px;
+  border-radius:50%;
+  transition:var(--transition);
+  width:36px;
+  height:36px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
 }
-
-.month-btn:active{opacity:.6}
+.month-btn:hover{
+  background:rgba(255,255,255,0.25);
+}
+.month-btn:active{
+  transform:scale(0.95);
+}
 
 #monthLabel{
-  font-size:14px;
-  font-weight:500;
+  font-size:16px;
+  font-weight:600;
   min-width:140px;
   text-align:center;
+  text-shadow:0 1px 2px rgba(0,0,0,0.1);
 }
 
+/* CARDS */
 .cards{
   display:flex;
-  gap:10px;
-  padding:10px;
+  gap:12px;
+  padding:0 16px;
+  margin-top:8px;
 }
 .card{
-  flex:1;background:#fff;padding:12px;border-radius:10px;
-  text-align:center;box-shadow:0 2px 6px rgba(0,0,0,.1)
+  flex:1;
+  background:#fff;
+  padding:16px 12px;
+  border-radius:var(--radius-md);
+  text-align:center;
+  box-shadow:var(--shadow-sm);
+  transition:var(--transition);
+  position:relative;
+  overflow:hidden;
 }
-.card h4{margin:0;font-size:14px;color:#666}
-.card .main{font-size:18px;font-weight:bold;margin-top:6px}
-.card .sub{font-size:13px;color:#777}
-.saldo{border-top:4px solid #1976d2}
-.receita{border-top:4px solid #2e7d32}
-.despesa{border-top:4px solid #c62828}
+.card::before{
+  content:"";
+  position:absolute;
+  top:0;
+  left:0;
+  right:0;
+  height:4px;
+}
+.card:hover{
+  transform:translateY(-2px);
+  box-shadow:var(--shadow-md);
+}
+
+.card h4{
+  margin:0;
+  font-size:12px;
+  color:var(--neutral-600);
+  font-weight:500;
+  text-transform:uppercase;
+  letter-spacing:0.5px;
+}
+.card .main{
+  font-size:18px;
+  font-weight:700;
+  margin-top:6px;
+  letter-spacing:-0.5px;
+}
+.card .sub{
+  font-size:11px;
+  color:var(--neutral-300);
+  margin-top:2px;
+}
+
+.saldo::before{ background:var(--primary); }
+.saldo .main{ color:var(--primary); }
+
+.receita::before{ background:var(--income); }
+.receita .main{ color:var(--income); }
+
+.despesa::before{ background:var(--expense); }
+.despesa .main{ color:var(--expense); }
 
 /* LISTA */
-.list{padding:10px}
-.row{display:flex;gap:8px;margin-bottom:8px;cursor:pointer}
+.list{
+  padding:16px;
+  margin-top:8px;
+}
+
+.row{
+  display:flex;
+  gap:10px;
+  margin-bottom:10px;
+  cursor:pointer;
+  align-items:flex-start;
+}
+
 .date-card{
-  width:56px;height:64px;background:#fff;border-radius:10px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:14px;font-weight:bold;color:#888;
-  box-shadow:0 1px 4px rgba(0,0,0,.1)
+  width:56px;
+  min-height:64px;
+  background:#fff;
+  border-radius:var(--radius-md);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  font-size:14px;
+  font-weight:700;
+  color:var(--neutral-600);
+  box-shadow:var(--shadow-sm);
+  flex-shrink:0;
+  transition:var(--transition);
 }
+.date-card span{
+  font-size:11px;
+  font-weight:500;
+  color:var(--neutral-300);
+}
+
 .item{
-  flex:1;background:#fff;padding:10px;border-radius:10px;
-  border-left:5px solid #2196f3;
-  box-shadow:0 1px 4px rgba(0,0,0,.1);
-  height:64px;display:flex;flex-direction:column;justify-content:center
+  flex:1;
+  background:#fff;
+  padding:14px 12px;
+  border-radius:var(--radius-md);
+  border-left:5px solid var(--primary);
+  box-shadow:var(--shadow-sm);
+  transition:var(--transition);
 }
-.item-top{display:flex;justify-content:space-between}
-.item-name{font-weight:bold;font-size:14px}
-.item-value{font-size:16px;font-weight:bold}
-.income{color:#2e7d32}
-.expense{color:#c62828}
-.item-bottom{display:flex;justify-content:space-between;align-items:center}
-.item-sub{font-size:12px;color:#666}
+.item:hover{
+  transform:translateX(2px);
+  box-shadow:var(--shadow-md);
+}
+
+.item-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:8px;
+}
+.item-name{
+  font-weight:600;
+  font-size:15px;
+  color:var(--neutral-800);
+}
+.item-value{
+  font-size:16px;
+  font-weight:700;
+  white-space:nowrap;
+}
+.income{ color:var(--income); }
+.expense{ color:var(--expense); }
+
+.item-bottom{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-top:6px;
+}
+.item-sub{
+  font-size:12px;
+  color:var(--neutral-600);
+}
 .badge{
-  padding:2px 8px;font-size:12px;border-radius:12px;
-  color:#fff;white-space:nowrap
+  padding:3px 8px;
+  font-size:11px;
+  font-weight:600;
+  border-radius:20px;
+  color:#fff;
+  white-space:nowrap;
+  letter-spacing:0.3px;
 }
-.green{background:#4EAE51}
-.red{background:#F24438}
+.green{ background:var(--income); }
+.red{ background:var(--expense); }
+.orange{ background:var(--warning); }
+
+/* AGRUPAMENTO */
+.day-items{
+  display:flex;
+  flex-direction:column;
+  gap:0;
+  flex:1;
+}
+.item.first-of-day{
+  border-bottom-left-radius:0;
+  border-bottom-right-radius:0;
+}
+.item.middle-of-day{
+  border-radius:0;
+  border-top:1px solid var(--neutral-100);
+}
+.item.last-of-day{
+  border-top-left-radius:0;
+  border-top-right-radius:0;
+}
+
+/* STATUS ITEM */
+.late-item{
+  background:var(--expense-light);
+  border-left-color:var(--expense);
+}
+.due-today-item{
+  background:var(--warning-light);
+  border-left-color:var(--warning);
+}
 
 /* FAB */
 .fab{
-  position:fixed;right:20px;bottom:20px;
-  width:56px;height:56px;border-radius:50%;
-  font-size:26px;background:#1976d2;color:#fff;border:none
+  position:fixed;
+  right:20px;
+  bottom:24px;
+  width:56px;
+  height:56px;
+  border-radius:50%;
+  font-size:28px;
+  background:var(--primary);
+  color:#fff;
+  border:none;
+  box-shadow:0 4px 12px rgba(22,93,255,0.4);
+  cursor:pointer;
+  transition:var(--transition);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:30;
+}
+.fab:hover{
+  transform:scale(1.05) rotate(90deg);
+  box-shadow:0 6px 16px rgba(22,93,255,0.5);
+}
+.fab:active{
+  transform:scale(0.95);
 }
 
 /* MODAL */
@@ -132,227 +349,273 @@ header h2{
   display:none;
   position:fixed;
   inset:0;
-  background:rgba(0,0,0,.5);
+  background:rgba(0,0,0,0.5);
   justify-content:center;
   align-items:center;
-  z-index:9999; /* 👈 ESSA LINHA resolve tudo */
+  z-index:9999;
+  backdrop-filter:blur(4px);
+  animation:fadeIn 0.2s ease-out;
 }
+@keyframes fadeIn{
+  from{opacity:0}
+  to{opacity:1}
+}
+
 .modal-content{
-  background:#fff;width:90%;max-width:320px;
-  padding:16px;border-radius:12px;
-  font-size:16px
+  background:#fff;
+  width:90%;
+  max-width:360px;
+  padding:24px 20px;
+  border-radius:var(--radius-lg);
+  box-shadow:var(--shadow-md);
+  animation:slideUp 0.3s ease-out;
+}
+@keyframes slideUp{
+  from{transform:translateY(20px); opacity:0}
+  to{transform:translateY(0); opacity:1}
+}
+
+.modal-content h3{
+  font-size:18px;
+  font-weight:700;
+  margin-bottom:16px;
+  color:var(--neutral-800);
 }
 
 /* TYPE BUTTONS */
-.type-buttons{display:flex;gap:8px;margin-bottom:8px}
-/* BOTÃO PADRÃO (NÃO SELECIONADO) */
+.type-buttons{
+  display:flex;
+  gap:10px;
+  margin-bottom:16px;
+}
 .type-btn{
   flex:1;
-  padding:10px;
-  border-radius:8px;
-
-  /* visual que você pediu */
-  background:#fff;              /* fundo branco */
-  border:1px solid #ccc;        /* contorno cinza 1px */
-  color:#777;                   /* texto cinza */
-
-  font-weight:bold;
+  padding:12px;
+  border-radius:var(--radius-md);
+  background:#fff;
+  border:2px solid var(--neutral-200);
+  color:var(--neutral-600);
+  font-weight:600;
+  font-size:14px;
+  cursor:pointer;
+  transition:var(--transition);
+}
+.type-btn:hover{
+  border-color:var(--neutral-300);
 }
 
-/* RECEITA SELECIONADA */
 .type-btn.active.income{
-  background:#2e7d32;
-  color:#fff;
-  border:none;
+  background:var(--income-light);
+  color:var(--income);
+  border-color:var(--income);
 }
-
-/* DESPESA SELECIONADA */
 .type-btn.active.expense{
-  background:#c62828;
-  color:#fff;
-  border:none;
+  background:var(--expense-light);
+  color:var(--expense);
+  border-color:var(--expense);
 }
 
 /* INPUTS */
 .modal-content input,
 .modal-content select,
 .modal-content button{
-  width:100%;margin-top:8px;padding:10px;
-  border-radius:8px;border:1px solid #ccc;
-  font-size:16px
+  width:100%;
+  margin-top:10px;
+  padding:12px 14px;
+  border-radius:var(--radius-md);
+  border:1px solid var(--neutral-200);
+  font-size:15px;
+  transition:var(--transition);
+  background:#fff;
+  color:var(--neutral-800);
+}
+.modal-content input::placeholder{
+  color:var(--neutral-300);
+}
+.modal-content input:focus,
+.modal-content select:focus{
+  outline:none;
+  border-color:var(--primary);
+  box-shadow:0 0 0 3px rgba(22,93,255,0.1);
 }
 
 .modal-content input[type="date"]{
-  width:100%;
-  box-sizing:border-box;
   -webkit-appearance:none;
   appearance:none;
 }
 
-
-/* ===============================
-   CORREÇÃO BOTÕES RECEITA / DESPESA
-   =============================== */
-
-/* botão padrão (não selecionado) */
-.modal-content .type-btn{
-  background:#fff !important;
-  border:1px solid #ccc !important;
-  color:#777 !important;
-}
-
-/* receita ativa */
-.modal-content .type-btn.active.income{
-  background:#2e7d32 !important;
-  color:#fff !important;
-  border:none !important;
-}
-
-/* despesa ativa */
-.modal-content .type-btn.active.expense{
-  background:#c62828 !important;
-  color:#fff !important;
-  border:none !important;
-}
-
-
 /* SWITCH */
 .switch-row{
-  display:flex;justify-content:space-between;
-  align-items:center;margin-top:10px
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-top:16px;
+  font-size:15px;
+  font-weight:500;
+  color:var(--neutral-800);
 }
-.switch{position:relative;width:46px;height:26px}
-.switch input{display:none}
+.switch{
+  position:relative;
+  width:48px;
+  height:26px;
+}
+.switch input{
+  display:none;
+}
 .slider{
-  position:absolute;inset:0;cursor:pointer;
-  background:#ccc;border-radius:26px;transition:.3s
+  position:absolute;
+  inset:0;
+  cursor:pointer;
+  background:var(--neutral-200);
+  border-radius:26px;
+  transition:var(--transition);
 }
 .slider:before{
-  content:"";position:absolute;width:20px;height:20px;
-  left:3px;top:3px;background:#fff;border-radius:50%;
-  transition:.3s
+  content:"";
+  position:absolute;
+  width:20px;
+  height:20px;
+  left:3px;
+  top:3px;
+  background:#fff;
+  border-radius:50%;
+  transition:var(--transition);
+  box-shadow:var(--shadow-sm);
 }
-input:checked + .slider{background:#2e7d32}
-input:checked + .slider:before{transform:translateX(20px)}
+input:checked + .slider{
+  background:var(--income);
+}
+input:checked + .slider:before{
+  transform:translateX(22px);
+}
 
 /* BUTTONS */
-.modal-content button{background:#1976d2;color:#fff;border:none}
-.modal-content button.cancel{background:#9e9e9e}
-.modal-content button.delete{background:#c62828}
+.modal-content button{
+  font-weight:600;
+  border:none;
+  cursor:pointer;
+  font-size:15px;
+}
+.modal-content button:hover{
+  transform:translateY(-1px);
+  box-shadow:var(--shadow-sm);
+}
+.modal-content button:active{
+  transform:translateY(0);
+}
 
-/* ===============================
-   PARCELAMENTO
-=============================== */
+.modal-content button:first-of-type{
+  margin-top:20px;
+}
+
+.modal-content button:not(.cancel):not(.delete){
+  background:var(--primary);
+  color:#fff;
+}
+.modal-content button.cancel{
+  background:var(--neutral-100);
+  color:var(--neutral-600);
+}
+.modal-content button.delete{
+  background:var(--expense);
+  color:#fff;
+}
+
+/* PARCELAMENTO */
 .parcel-buttons{
   display:flex;
-  gap:8px;
-  margin-top:8px;
+  gap:10px;
+  margin-top:10px;
   align-items:center;
 }
 
 .parcel-btn{
   width:auto !important;
+  flex:1;
   background:#fff !important;
-  color:#777 !important;
-  border:1px solid #ccc !important;
-  font-weight:bold; /* 👈 AQUI resolve */
+  color:var(--neutral-600) !important;
+  border:1px solid var(--neutral-200) !important;
+  font-weight:600 !important;
+  font-size:14px !important;
+  margin:0 !important;
 }
-
-/* ATIVO */
 .parcel-btn.active{
-  border-color:#1976d2 !important;
-  color:#1976d2 !important;
+  border-color:var(--primary) !important;
+  background:var(--primary-light) !important;
+  color:var(--primary) !important;
 }
 
+#parcelCount{
+  width:110px !important;
+  margin:0 !important;
+}
 
-
-
+/* CATEGORIAS */
 .category-item{
   display:flex;
   justify-content:space-between;
   align-items:center;
-  background:#f4f6f8;
-  padding:8px 10px;
-  border-radius:8px;
-  margin-top:6px;
+  background:var(--neutral-100);
+  padding:10px 12px;
+  border-radius:var(--radius-md);
+  margin-top:8px;
   font-size:14px;
+  font-weight:500;
+  transition:var(--transition);
+}
+.category-item:hover{
+  background:var(--neutral-200);
 }
 
 .category-item button{
   background:none;
   border:none;
-  color:#c62828;
-  font-size:16px;
+  color:var(--expense);
+  font-size:18px;
   font-weight:bold;
   cursor:pointer;
-
-  /* alinhamento perfeito */
   display:flex;
   align-items:center;
   justify-content:center;
-
-  /* área de clique mínima */
-  width:20px;
-  height:20px;
-
+  width:24px;
+  height:24px;
   padding:0;
   line-height:1;
+  border-radius:50%;
+  transition:var(--transition);
+  margin:0 !important;
+}
+.category-item button:hover{
+  background:var(--expense-light);
+  transform:scale(1.1);
 }
 
 #categoryModal .modal-content{
-  max-height:80vh;
+  max-height:85vh;
   display:flex;
   flex-direction:column;
 }
 
 #categoryList{
   overflow-y:auto;
-  max-height:260px;
+  max-height:280px;
+  margin-top:10px;
 }
 
-
-/* itens agrupados por dia */
-.item{
-  border-radius:0;
-  margin:0;
+/* SCROLLBAR PERSONALIZADA */
+::-webkit-scrollbar{
+  width:6px;
 }
-
-/* primeiro item do dia */
-.item.first-of-day{
-  border-top-left-radius:10px;
-  border-top-right-radius:10px;
+::-webkit-scrollbar-track{
+  background:transparent;
 }
-
-/* último item do dia */
-.item.last-of-day{
-  border-bottom-left-radius:10px;
-  border-bottom-right-radius:10px;
+::-webkit-scrollbar-thumb{
+  background:var(--neutral-200);
+  border-radius:3px;
 }
-
-/* remove espaço entre itens do mesmo dia */
-.day-items{
-  display:flex;
-  flex-direction:column;
-  gap:0;
+::-webkit-scrollbar-thumb:hover{
+  background:var(--neutral-300);
 }
-
-
-/* ITEM ATRASADO */
-.late-item{
-  background: #fdecea; /* vermelho bem clarinho */
-  border-left-color: #F24438; /* mantém coerência com despesa */
-}
-
-/* ITEM VENCE HOJE */
-.due-today-item{
-  background:#fff4e5;           /* laranja bem clarinho */
-  border-left-color:#FD9806;    /* laranja */
-}
-
-.badge.orange{
-  background:#FD9806;           /* laranja */
-}
-
 </style>
 </head>
 
@@ -362,13 +625,12 @@ input:checked + .slider:before{transform:translateX(20px)}
 
   <header>
     <div style="width:100%;display:flex;justify-content:space-between;align-items:center">
-  <h2>💰 Minhas Finanças</h2>
-
-  <div style="display:flex;gap:10px">
-  <button class="cat-btn" onclick="openCategoryModal()">☰</button>
-  <button class="cat-btn" onclick="goReports()">📊</button>
-</div>
-</div>
+      <h2>💰 Minhas Finanças</h2>
+      <div class="header-actions">
+        <button class="cat-btn" onclick="openCategoryModal()">☰</button>
+        <button class="cat-btn" onclick="goReports()">📊</button>
+      </div>
+    </div>
     <div class="month-tabs">
       <button class="month-btn" onclick="changeMonth(-1)">&#10094;</button>
       <span id="monthLabel"></span>
@@ -410,7 +672,7 @@ input:checked + .slider:before{transform:translateX(20px)}
   <button class="type-btn expense" onclick="setType('expense')">Despesa</button>
 </div>
 
-<input id="title" placeholder="Nome">
+<input id="title" placeholder="Nome da transação">
 <input id="value" placeholder="Valor">
 <select id="category">
   <option>Geral</option>
@@ -420,32 +682,28 @@ input:checked + .slider:before{transform:translateX(20px)}
 </select>
 <input id="date" type="date">
   
-<!-- PARCELAMENTO -->
 <div class="parcel-buttons">
   <button id="btnParcel" class="parcel-btn" onclick="toggleParcel()">
     Parcelado
   </button>
-
   <input
     id="parcelCount"
     type="number"
     min="2"
-    placeholder="Meses"
-    style="display:none; width:110px"
+    placeholder="Qtd. parcelas"
+    style="display:none"
   >
 </div>
 
-
-
 <div class="switch-row">
-  <span>Pago</span>
+  <span>Já foi pago?</span>
   <label class="switch">
     <input type="checkbox" id="paid">
     <span class="slider"></span>
   </label>
 </div>
 
-<button onclick="save()">Salvar</button>
+<button onclick="save()">Salvar transação</button>
 <button id="deleteBtn" class="delete" onclick="remove()">Excluir</button>
 <button class="cancel" onclick="closeModal()">Cancelar</button>
 
@@ -455,13 +713,13 @@ input:checked + .slider:before{transform:translateX(20px)}
 <div class="modal" id="categoryModal">
   <div class="modal-content">
 
-    <h3 style="margin:0 0 10px 0">Categorias</h3>
+    <h3>Gerenciar Categorias</h3>
 
-    <input id="categoryName" placeholder="Nome da categoria">
+    <input id="categoryName" placeholder="Nova categoria">
 
-    <button onclick="saveCategory()">Salvar</button>
+    <button onclick="saveCategory()">Adicionar categoria</button>
 
-    <div id="categoryList" style="margin-top:12px"></div>
+    <div id="categoryList"></div>
 
     <button class="cancel" onclick="closeCategoryModal()">Fechar</button>
 
@@ -475,14 +733,10 @@ input:checked + .slider:before{transform:translateX(20px)}
   }
 
   // 🔥 Remove o acesso imediatamente
-  // Assim, qualquer reload ou nova abertura pede o código de novo
   localStorage.removeItem("logged");
 </script>
 
 <script>
-
-
-
 let currentMonth = new Date();
 let editId = null;
 let editMonthKey = null;
@@ -535,9 +789,8 @@ function changeMonth(step){
   currentMonth = new Date(
     currentMonth.getFullYear(),
     currentMonth.getMonth() + step,
-    1 // 👈 força dia 1
+    1
   );
-
   updateMonthLabel();
   render();
 }
@@ -551,7 +804,6 @@ function setType(t){
   document.querySelector(`.type-btn.${t}`).classList.add("active");
 }
 
-
 /* =========================
    PARCELAMENTO
 ========================= */
@@ -559,65 +811,39 @@ let isParcel = false;
 
 function toggleParcel(){
   isParcel = !isParcel;
-
   const btn = document.getElementById("btnParcel");
   const input = document.getElementById("parcelCount");
-
   btn.classList.toggle("active", isParcel);
   input.style.display = isParcel ? "block" : "none";
-
-  if(!isParcel){
-    input.value = "";
-  }
+  if(!isParcel) input.value = "";
 }
-
 
 function checkMonthTurnover(){
   const today = new Date();
   const day = today.getDate();
-
-  // 🔒 só executa no dia 1
   if(day !== 1) return;
 
-  const currentMonthKey =
-    `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,"0")}`;
-
+  const currentMonthKey = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,"0")}`;
   const prev = new Date(today);
   prev.setMonth(prev.getMonth() - 1);
+  const prevMonthKey = `${prev.getFullYear()}-${String(prev.getMonth()+1).padStart(2,"0")}`;
 
-  const prevMonthKey =
-    `${prev.getFullYear()}-${String(prev.getMonth()+1).padStart(2,"0")}`;
-
-  // evita recalcular se já existir saldo salvo
   firebase.database()
     .ref("finance/saldos/" + currentMonthKey)
     .once("value", snap=>{
-    
-
       firebase.database()
         .ref("finance/meses/" + prevMonthKey)
         .once("value", snapPrev=>{
           const data = snapPrev.val() || {};
           let saldoFinal = 0;
-
           Object.values(data).forEach(t=>{
             if(!t.paid) return;
-
-            if(t.type === "income"){
-              saldoFinal += t.value;
-            }else{
-              saldoFinal -= t.value;
-            }
+            saldoFinal += t.type === "income" ? t.value : -t.value;
           });
-
-          firebase.database()
-            .ref("finance/saldos/" + currentMonthKey)
-            .set(saldoFinal);
+          firebase.database().ref("finance/saldos/" + currentMonthKey).set(saldoFinal);
         });
     });
 }
-
-
 
 /* =========================
    RENDER
@@ -625,132 +851,100 @@ function checkMonthTurnover(){
 function render(){
   const container = document.getElementById("list");
   container.innerHTML = "";
-
   let rPago = 0, rPrev = 0, dPago = 0, dPrev = 0;
-  let saldoInicial = 0;
 
-  // remove listener antigo
   monthRef().off();
-
   monthRef().on("value", async snap=>{
     const data = snap.val() || {};
-    const list = Object.values(data)
-      .sort((a,b)=>new Date(b.date)-new Date(a.date));
-
+    const list = Object.values(data).sort((a,b)=>new Date(b.date)-new Date(a.date));
     container.innerHTML = "";
 
-    // 🔹 BUSCA SALDO DO MÊS ANTERIOR
     let saldoInicial = 0;
+    const saldoKey = getMonthKey();
+    const snapSaldo = await firebase.database().ref("finance/saldos/" + saldoKey).once("value");
+    saldoInicial = Number(snapSaldo.val() || 0);
 
-const saldoKey = getMonthKey(); // 👈 mês exibido
-
-const snapSaldo = await firebase
-  .database()
-  .ref("finance/saldos/" + saldoKey)
-  .once("value");
-
-saldoInicial = Number(snapSaldo.val() || 0);
-
-    // ==========================
-    // AGRUPA POR DATA
-    // ==========================
     const groupedByDate = {};
-
     list.forEach(t=>{
-      if(!groupedByDate[t.date]){
-        groupedByDate[t.date] = [];
-      }
+      if(!groupedByDate[t.date]) groupedByDate[t.date] = [];
       groupedByDate[t.date].push(t);
     });
 
-    Object.keys(groupedByDate)
-      .sort((a,b)=>new Date(b)-new Date(a))
-      .forEach(date=>{
+    const dates = Object.keys(groupedByDate).sort((a,b)=>new Date(b)-new Date(a));
+    dates.forEach((date, dateIndex)=>{
+      const row = document.createElement("div");
+      row.className = "row";
 
-        const row = document.createElement("div");
-        row.className = "row";
+      const dateObj = new Date(date + "T00:00:00");
+      const dayName = dateObj.toLocaleDateString("pt-BR", {weekday:'short'}).replace('.','');
+      
+      const dateCard = document.createElement("div");
+      dateCard.className = "date-card";
+      dateCard.innerHTML = `${formatDate(date)}<span>${dayName}</span>`;
 
-        const dateCard = document.createElement("div");
-        dateCard.className = "date-card";
-        dateCard.innerText = formatDate(date);
+      const itemsWrap = document.createElement("div");
+      itemsWrap.className = "day-items";
 
-        const itemsWrap = document.createElement("div");
-        itemsWrap.className = "day-items";
-        itemsWrap.style.flex = "1";
+      const items = groupedByDate[date].sort((a,b)=>b.value - a.value);
+      items.forEach((t,index)=>{
+        if(t.type==="income"){
+          t.paid ? rPago+=t.value : rPrev+=t.value;
+        }else{
+          t.paid ? dPago+=t.value : dPrev+=t.value;
+        }
 
-        groupedByDate[date]
-          .sort((a,b)=>b.value - a.value)
-          .forEach((t,index)=>{
+        const todayStr = getTodayLocalString();
+        const isLate = !t.paid && t.date < todayStr;
+        const isDueToday = !t.paid && t.date === todayStr;
 
-            if(t.type==="income"){
-              t.paid ? rPago+=t.value : rPrev+=t.value;
-            }else{
-              t.paid ? dPago+=t.value : dPrev+=t.value;
+        const item = document.createElement("div");
+        item.className = "item";
+        if(isLate) item.classList.add("late-item");
+        else if(isDueToday) item.classList.add("due-today-item");
+
+        if(index === 0) item.classList.add("first-of-day");
+        else if(index === items.length - 1) item.classList.add("last-of-day");
+        else item.classList.add("middle-of-day");
+
+        item.onclick = () => editById(t.id);
+
+        item.innerHTML = `
+          <div class="item-top">
+            <div class="item-name">${t.name}</div>
+            <div class="item-value ${t.type}">
+              R$ ${t.value.toLocaleString("pt-BR",{minimumFractionDigits:2})}
+            </div>
+          </div>
+          <div class="item-bottom">
+            <div class="item-sub">
+              ${t.category}
+              ${t.parcel ? `<span style="margin-left:6px">${t.parcelIndex}/${t.parcelTotal}</span>` : ""}
+            </div>
+            ${
+              t.paid
+                ? `<div class="badge green">${t.type==="income"?"Recebido":"Pago"}</div>`
+                : isLate
+                  ? `<div class="badge red">Atrasado</div>`
+                  : isDueToday
+                    ? `<div class="badge orange">Vence hoje</div>`
+                    : ""
             }
-
-            const todayStr = getTodayLocalString();
-            const isLate = !t.paid && t.date < todayStr;
-            const isDueToday = !t.paid && t.date === todayStr;
-
-            const item = document.createElement("div");
-            item.className = "item";
-
-            if(isLate) item.classList.add("late-item");
-            else if(isDueToday) item.classList.add("due-today-item");
-
-            if(index === 0) item.classList.add("first-of-day");
-            if(index === groupedByDate[date].length - 1)
-              item.classList.add("last-of-day");
-
-            item.onclick = () => editById(t.id);
-
-            item.innerHTML = `
-              <div class="item-top">
-                <div class="item-name">${t.name}</div>
-                <div class="item-value ${t.type}">
-                  R$ ${t.value.toLocaleString("pt-BR",{minimumFractionDigits:2})}
-                </div>
-              </div>
-              <div class="item-bottom">
-                <div class="item-sub">
-                  ${t.category}
-                  ${t.parcel ? `<span style="margin-left:6px;font-size:12px;color:#777">
-                    ${t.parcelIndex}/${t.parcelTotal}
-                  </span>` : ""}
-                </div>
-                ${
-                  t.paid
-                    ? `<div class="badge green">${t.type==="income"?"Recebido":"Pago"}</div>`
-                    : isLate
-                      ? `<div class="badge red">Atrasado</div>`
-                      : isDueToday
-                        ? `<div class="badge orange">Vence hoje</div>`
-                        : ""
-                }
-              </div>
-            `;
-
-            itemsWrap.appendChild(item);
-          });
-
-        row.appendChild(dateCard);
-        row.appendChild(itemsWrap);
-        container.appendChild(row);
+          </div>
+        `;
+        itemsWrap.appendChild(item);
       });
 
-    // ==========================
-    // TOTAIS (COM SALDO HERDADO)
-    // ==========================
+      row.appendChild(dateCard);
+      row.appendChild(itemsWrap);
+      container.appendChild(row);
+    });
+
     recPago.innerText = `R$ ${rPago.toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
     recPrev.innerText = `R$ ${(rPago+rPrev).toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
     despPago.innerText = `R$ ${dPago.toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
     despPrev.innerText = `R$ ${(dPago+dPrev).toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
-
-    saldoPago.innerText =
-      `R$ ${(saldoInicial + rPago - dPago).toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
-
-    saldoPrev.innerText =
-      `R$ ${(saldoInicial + rPago + rPrev - dPago - dPrev).toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
+    saldoPago.innerText = `R$ ${(saldoInicial + rPago - dPago).toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
+    saldoPrev.innerText = `R$ ${(saldoInicial + rPago + rPrev - dPago - dPrev).toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
   });
 }
 
@@ -758,58 +952,36 @@ saldoInicial = Number(snapSaldo.val() || 0);
    SAVE
 ========================= */
 function save(){
-  const valTotal = Number(
-    valueInput.value.replace(/\./g,"").replace(",",".")
-  );
-
+  const valTotal = Number(valueInput.value.replace(/\./g,"").replace(",","."));
   const baseDateStr = date.value;
 
-  /* =========================
-     NÃO PARCELADO
-  ========================= */
   if(!isParcel){
     const id = editId || Date.now().toString();
-
     const item = {
-  id,
-  name: title.value.trim(),
-  value: valTotal,
-  category: category.value,
-  date: baseDateStr,
-  type: currentType,
-  paid: paid.checked,
-
-  parcel: editingParcelData ? true : false,
-parcelIndex: editingParcelData ? editingParcelData.parcelIndex : null,
-parcelTotal: editingParcelData ? editingParcelData.parcelTotal : null,
-parcelGroupId: editingParcelData ? editingParcelData.parcelGroupId : null
-};
+      id,
+      name: title.value.trim(),
+      value: valTotal,
+      category: category.value,
+      date: baseDateStr,
+      type: currentType,
+      paid: paid.checked,
+      parcel: editingParcelData ? true : false,
+      parcelIndex: editingParcelData ? editingParcelData.parcelIndex : null,
+      parcelTotal: editingParcelData ? editingParcelData.parcelTotal : null,
+      parcelGroupId: editingParcelData ? editingParcelData.parcelGroupId : null
+    };
 
     const newMonthKey = getMonthKeyFromDate(item.date);
-
-    // se estiver editando e mudou o mês
     if(editId && editMonthKey && editMonthKey !== newMonthKey){
-      firebase
-        .database()
-        .ref("finance/meses/" + editMonthKey + "/" + id)
-        .remove();
+      firebase.database().ref("finance/meses/" + editMonthKey + "/" + id).remove();
     }
-
-    firebase
-      .database()
-      .ref("finance/meses/" + newMonthKey + "/" + id)
-      .set(item);
-
+    firebase.database().ref("finance/meses/" + newMonthKey + "/" + id).set(item);
     closeModal();
     render();
     return;
   }
 
-  /* =========================
-     PARCELADO
-  ========================= */
   const totalParcels = Number(parcelCount.value || 0);
-
   if(totalParcels < 2){
     alert("Informe a quantidade de parcelas");
     return;
@@ -818,15 +990,12 @@ parcelGroupId: editingParcelData ? editingParcelData.parcelGroupId : null
   const parcelValue = valTotal;
   const groupId = Date.now().toString();
   const baseDate = new Date(baseDateStr);
-
   for(let i = 0; i < totalParcels; i++){
     const d = new Date(baseDate);
     d.setMonth(d.getMonth() + i);
-
     const dateStr = d.toISOString().split("T")[0];
     const monthKey = getMonthKeyFromDate(dateStr);
     const id = `${groupId}_${i+1}`;
-
     const item = {
       id,
       name: title.value.trim(),
@@ -835,19 +1004,13 @@ parcelGroupId: editingParcelData ? editingParcelData.parcelGroupId : null
       date: dateStr,
       type: currentType,
       paid: false,
-
       parcel: true,
       parcelIndex: i + 1,
       parcelTotal: totalParcels,
       parcelGroupId: groupId
     };
-
-    firebase
-      .database()
-      .ref("finance/meses/" + monthKey + "/" + id)
-      .set(item);
+    firebase.database().ref("finance/meses/" + monthKey + "/" + id).set(item);
   }
-
   closeModal();
   render();
 }
@@ -857,28 +1020,22 @@ parcelGroupId: editingParcelData ? editingParcelData.parcelGroupId : null
 ========================= */
 function editById(id){
   const originalMonthKey = getMonthKey();
-
-  firebase
-    .database()
+  firebase.database()
     .ref("finance/meses/" + originalMonthKey + "/" + id)
     .once("value", snap=>{
       const t = snap.val();
       if(!t) return;
-
       title.value = t.name;
       valueInput.value = t.value.toLocaleString("pt-BR",{minimumFractionDigits:2});
       category.value = t.category;
       date.value = t.date;
       paid.checked = t.paid;
       currentType = t.type;
-
-      // 🔑 GUARDA PARCELAMENTO (se existir)
       editingParcelData = t.parcel ? {
         parcelIndex: t.parcelIndex,
         parcelTotal: t.parcelTotal,
         parcelGroupId: t.parcelGroupId
       } : null;
-
       setType(currentType);
       editId = id;
       editMonthKey = originalMonthKey;
@@ -908,12 +1065,10 @@ function openModal(){
     category.value="";
     paid.checked=false;
     setType("income");
-    
     isParcel = false;
-document.getElementById("btnParcel").classList.remove("active");
-document.getElementById("parcelCount").style.display = "none";
-document.getElementById("parcelCount").value = "";
-
+    document.getElementById("btnParcel").classList.remove("active");
+    document.getElementById("parcelCount").style.display = "none";
+    document.getElementById("parcelCount").value = "";
     const hoje=new Date();
     date.value=`${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2,"0")}-${String(hoje.getDate()).padStart(2,"0")}`;
     deleteBtn.style.display="none";
@@ -922,17 +1077,13 @@ document.getElementById("parcelCount").value = "";
 
 function closeModal(){
   modal.style.display = "none";
-
   isParcel = false;
-  editingParcelData = null; // 🔥 ESSENCIAL
-
+  editingParcelData = null;
   const btn = document.getElementById("btnParcel");
   const input = document.getElementById("parcelCount");
-
   btn.classList.remove("active");
   input.style.display = "none";
   input.value = "";
-
   editId = null;
   editMonthKey = null;
 }
@@ -953,7 +1104,6 @@ function saveCategory(){
   const input=document.getElementById("categoryName");
   const name=input.value.trim();
   if(!name) return;
-
   categoriesRef().child(name).set(true);
   input.value="";
   renderCategories();
@@ -969,7 +1119,6 @@ function deleteCategory(name){
 function renderCategories(){
   const container=document.getElementById("categoryList");
   container.innerHTML="";
-
   categoriesRef().once("value", snap=>{
     const data = snap.val() || {};
     Object.keys(data)
@@ -986,7 +1135,6 @@ function renderCategories(){
 function updateCategorySelect(){
   const select = document.getElementById("category");
   select.innerHTML="";
-
   categoriesRef().once("value", snap=>{
     const data = snap.val() || {};
     Object.keys(data).forEach(c=>{
@@ -998,52 +1146,31 @@ function updateCategorySelect(){
   });
 }
 
-
 function goReports(){
   window.location.href = "relatorios.html";
 }
-
 
 function getMonthKeyFromDate(dateStr){
   const [year, month] = dateStr.split("-");
   return `${year}-${month}`;
 }
 
-
 function getTodayLocalString(){
   const now = new Date();
   return `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}-${String(now.getDate()).padStart(2,"0")}`;
 }
 
-
 function getPreviousMonthKeyForRender(){
   const today = new Date();
-
-  // só no dia 1
-  if(today.getDate() !== 1){
-    return null;
-  }
-
-  // mês exibido
+  if(today.getDate() !== 1) return null;
   const renderYear = currentMonth.getFullYear();
   const renderMonth = currentMonth.getMonth();
-
-  // mês real atual
   const realYear = today.getFullYear();
   const realMonth = today.getMonth();
-
-  // 🔒 só herda se estiver exibindo o mês atual real
-  if(renderYear !== realYear || renderMonth !== realMonth){
-    return null;
-  }
-
-  // mês anterior real
+  if(renderYear !== realYear || renderMonth !== realMonth) return null;
   const prev = new Date(realYear, realMonth - 1, 1);
-
   return `${prev.getFullYear()}-${String(prev.getMonth()+1).padStart(2,"0")}`;
 }
-
-
 </script>
 
 <!-- Firebase -->
@@ -1064,11 +1191,8 @@ function getPreviousMonthKeyForRender(){
   firebase.initializeApp(firebaseConfig);
   const db = firebase.database();
   
-  /* =========================
-   INIT
-========================= */
 updateMonthLabel();
-checkMonthTurnover(); // 👈 NOVO
+checkMonthTurnover();
 render();
 updateCategorySelect();
 </script>
@@ -1078,7 +1202,6 @@ if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("sw.js");
 }
 </script>
-
 
 </body>
 </html>
