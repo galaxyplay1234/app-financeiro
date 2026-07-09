@@ -8,66 +8,64 @@
 
 <style>
 :root {
-  /* Cores premium */
-  --bg-principal: #F8FAFC;
+  /* Cores Premium */
+  --bg-app: #F7F9FC;
   --bg-card: #FFFFFF;
-  --bg-header: linear-gradient(160deg, #0F172A 0%, #1E293B 100%);
-  --primaria: #3B82F6;
-  --primaria-clara: #EFF6FF;
-  --sucesso: #10B981;
-  --sucesso-claro: #ECFDF5;
-  --erro: #EF4444;
-  --erro-claro: #FEF2F2;
-  --aviso: #F59E0B;
-  --aviso-claro: #FFFBEB;
-  
+  --bg-header: linear-gradient(170deg, #0F172A 0%, #1E293B 100%);
+  --primaria: #2563EB;
+  --primaria-suave: #DBEAFE;
+  --sucesso: #059669;
+  --suave-sucesso: #D1FAE5;
+  --perigo: #DC2626;
+  --suave-perigo: #FEE2E2;
+  --alerta: #D97706;
+  --suave-alerta: #FEF3C7;
+
   /* Texto */
-  --texto-escuro: #1E293B;
-  --texto-medio: #64748B;
-  --texto-claro: #CBD5E1;
-  
+  --titulo: #1E293B;
+  --texto: #475569;
+  --texto-claro: #94A3B8;
+
   /* Efeitos */
-  --sombra-suave: 0 2px 20px rgba(15, 23, 42, 0.06);
-  --sombra-media: 0 8px 30px rgba(15, 23, 42, 0.12);
-  --sombra-elevada: 0 12px 40px rgba(59, 130, 246, 0.25);
-  --raio-pequeno: 10px;
-  --raio-medio: 16px;
-  --raio-grande: 24px;
-  --transicao: all 0.28s cubic-bezier(0.25, 0.8, 0.25, 1);
+  --sombra-leve: 0 2px 8px rgba(15, 23, 42, 0.04);
+  --sombra-card: 0 4px 16px rgba(15, 23, 42, 0.06);
+  --sombra-fab: 0 8px 24px rgba(37, 99, 235, 0.35);
+  --raio: 16px;
+  --raio-p: 12px;
+  --transicao: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
-  background: var(--bg-principal);
-  color: var(--texto-escuro);
+  background: var(--bg-app);
+  color: var(--texto);
   min-height: 100vh;
 }
 
-/* Cabeçalho Fixo */
+/* CABEÇALHO */
 .top-fixed {
   position: sticky;
   top: 0;
-  z-index: 25;
+  z-index: 30;
   background: var(--bg-header);
-  padding: 20px 20px 28px;
-  border-bottom-left-radius: var(--raio-grande);
-  border-bottom-right-radius: var(--raio-grande);
-  box-shadow: var(--sombra-media);
+  padding: 22px 20px 32px;
+  border-bottom-left-radius: 24px;
+  border-bottom-right-radius: 24px;
+  box-shadow: var(--sombra-card);
 }
 
 header {
   color: white;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 20px;
 }
 
 header > div:first-child {
@@ -77,7 +75,7 @@ header > div:first-child {
 }
 
 header h2 {
-  font-size: 22px;
+  font-size: 24px;
   font-weight: 700;
   letter-spacing: -0.5px;
 }
@@ -88,10 +86,10 @@ header h2 {
 }
 
 .cat-btn {
-  width: 40px;
-  height: 40px;
+  width: 42px;
+  height: 42px;
   border-radius: 12px;
-  background: rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.12);
   border: none;
   color: white;
   font-size: 18px;
@@ -100,11 +98,11 @@ header h2 {
   display: flex;
   align-items: center;
   justify-content: center;
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(8px);
 }
 
 .cat-btn:hover {
-  background: rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.2);
   transform: translateY(-2px);
 }
 
@@ -112,17 +110,17 @@ header h2 {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 24px;
+  gap: 28px;
 }
 
 .month-btn {
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  background: rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.12);
   border: none;
   color: white;
-  font-size: 18px;
+  font-size: 20px;
   cursor: pointer;
   transition: var(--transicao);
   display: flex;
@@ -131,26 +129,26 @@ header h2 {
 }
 
 .month-btn:hover {
-  background: rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.22);
 }
 
 .month-btn:active {
-  transform: scale(0.92);
+  transform: scale(0.9);
 }
 
 #monthLabel {
-  font-size: 16px;
+  font-size: 17px;
   font-weight: 600;
-  min-width: 150px;
+  min-width: 160px;
   text-align: center;
 }
 
-/* Cards de Resumo */
+/* CARDS DE RESUMO */
 .cards {
   display: flex;
   gap: 12px;
   padding: 0 20px;
-  margin-top: -12px;
+  margin-top: -18px;
   position: relative;
   z-index: 2;
 }
@@ -158,40 +156,40 @@ header h2 {
 .card {
   flex: 1;
   background: var(--bg-card);
-  border-radius: var(--raio-medio);
-  padding: 16px 12px;
+  border-radius: var(--raio);
+  padding: 18px 12px;
   text-align: center;
-  box-shadow: var(--sombra-suave);
+  box-shadow: var(--sombra-leve);
   transition: var(--transicao);
   position: relative;
   overflow: hidden;
 }
 
-.card::after {
+.card::before {
   content: '';
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  height: 3px;
+  height: 4px;
 }
 
 .card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--sombra-media);
+  transform: translateY(-3px);
+  box-shadow: var(--sombra-card);
 }
 
 .card h4 {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: var(--texto-medio);
-  margin-bottom: 4px;
+  color: var(--texto-claro);
+  margin-bottom: 6px;
 }
 
 .card .main {
-  font-size: 17px;
+  font-size: 18px;
   font-weight: 800;
   letter-spacing: -0.3px;
 }
@@ -199,116 +197,148 @@ header h2 {
 .card .sub {
   font-size: 11px;
   color: var(--texto-claro);
-  margin-top: 2px;
+  margin-top: 3px;
 }
 
-.saldo::after { background: var(--primaria); }
+.saldo::before { background: var(--primaria); }
 .saldo .main { color: var(--primaria); }
 
-.receita::after { background: var(--sucesso); }
+.receita::before { background: var(--sucesso); }
 .receita .main { color: var(--sucesso); }
 
-.despesa::after { background: var(--erro); }
-.despesa .main { color: var(--erro); }
+.despesa::before { background: var(--perigo); }
+.despesa .main { color: var(--perigo); }
 
-/* Lista de Transações */
+/* LISTA TOTALMENTE RENOVADA */
 .list {
   padding: 24px 20px 100px;
-}
-
-.row {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 12px;
-  align-items: flex-start;
-}
-
-.date-card {
-  width: 54px;
-  min-height: 60px;
-  background: var(--bg-card);
-  border-radius: var(--raio-pequeno);
   display: flex;
   flex-direction: column;
+  gap: 16px;
+}
+
+/* Cabeçalho de Data */
+.date-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0 4px;
+}
+
+.date-header span {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--texto-claro);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.date-header::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #E2E8F0;
+}
+
+/* CARD DE TRANSAÇÃO - NOVO ESTILO */
+.transaction-card {
+  background: var(--bg-card);
+  border-radius: var(--raio);
+  padding: 16px 18px;
+  box-shadow: var(--sombra-leve);
+  transition: var(--transicao);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  position: relative;
+  overflow: hidden;
+}
+
+.transaction-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  transition: var(--transicao);
+}
+
+.transaction-card:hover {
+  transform: translateY(-2px) translateX(2px);
+  box-shadow: var(--sombra-card);
+}
+
+.transaction-card:hover::before {
+  width: 6px;
+}
+
+/* Ícone de tipo */
+.type-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: var(--sombra-suave);
+  font-size: 20px;
   flex-shrink: 0;
 }
 
-.date-card span:first-child {
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--texto-escuro);
+.icon-income {
+  background: var(--suave-sucesso);
+  color: var(--sucesso);
 }
 
-.date-card span:last-child {
-  font-size: 10px;
-  font-weight: 500;
-  color: var(--texto-medio);
-  text-transform: uppercase;
+.icon-expense {
+  background: var(--suave-perigo);
+  color: var(--perigo);
 }
 
-.day-items {
+/* Conteúdo */
+.trans-content {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 1px;
-  background: #F1F5F9;
-  border-radius: var(--raio-medio);
-  overflow: hidden;
-  box-shadow: var(--sombra-suave);
+  gap: 4px;
 }
 
-.item {
-  background: var(--bg-card);
-  padding: 14px 16px;
-  border-left: 3px solid var(--primaria);
-  transition: var(--transicao);
-  cursor: pointer;
-}
-
-.item:hover {
-  background: #FAFBFC;
-  padding-left: 20px;
-}
-
-.item-top {
+.trans-top {
   display: flex;
   justify-content: space-between;
-  align-items: baseline;
-  margin-bottom: 4px;
+  align-items: flex-start;
 }
 
-.item-name {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--texto-escuro);
-}
-
-.item-value {
+.trans-name {
   font-size: 15px;
-  font-weight: 700;
-  letter-spacing: -0.2px;
+  font-weight: 600;
+  color: var(--titulo);
 }
 
-.income { color: var(--sucesso); }
-.expense { color: var(--erro); }
+.trans-value {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
 
-.item-bottom {
+.trans-value.income { color: var(--sucesso); }
+.trans-value.expense { color: var(--perigo); }
+
+.trans-bottom {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.item-sub {
+.trans-details {
   font-size: 12px;
-  color: var(--texto-medio);
+  color: var(--texto-claro);
   font-weight: 500;
 }
 
-.badge {
-  padding: 3px 8px;
+.trans-badge {
+  padding: 4px 10px;
   border-radius: 20px;
   font-size: 10px;
   font-weight: 600;
@@ -317,60 +347,58 @@ header h2 {
   color: white;
 }
 
-.green { background: var(--sucesso); }
-.red { background: var(--erro); }
-.orange { background: var(--aviso); }
+.badge-paid { background: var(--sucesso); }
+.badge-received { background: var(--sucesso); }
+.badge-late { background: var(--perigo); }
+.badge-today { background: var(--alerta); }
+
+/* Cores laterais */
+.card-income::before { background: var(--sucesso); }
+.card-expense::before { background: var(--perigo); }
+.card-late::before { background: var(--perigo); background: var(--suave-perigo); }
+.card-today::before { background: var(--alerta); }
 
 /* Status especiais */
-.late-item {
-  background: var(--erro-claro);
-  border-left-color: var(--erro);
-}
-.late-item:hover { background: #FEE2E2; }
+.card-late { background: var(--suave-perigo); }
+.card-today { background: var(--suave-alerta); }
 
-.due-today-item {
-  background: var(--aviso-claro);
-  border-left-color: var(--aviso);
-}
-.due-today-item:hover { background: #FEF3C7; }
-
-/* Botão Flutuante */
+/* BOTÃO FLUTUANTE */
 .fab {
   position: fixed;
   right: 24px;
   bottom: 24px;
-  width: 56px;
-  height: 56px;
+  width: 58px;
+  height: 58px;
   border-radius: 50%;
   background: var(--primaria);
   color: white;
   border: none;
-  font-size: 28px;
+  font-size: 30px;
   cursor: pointer;
-  box-shadow: var(--sombra-elevada);
+  box-shadow: var(--sombra-fab);
   transition: var(--transicao);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 30;
+  z-index: 999;
 }
 
 .fab:hover {
-  transform: scale(1.08) rotate(90deg);
-  box-shadow: 0 16px 50px rgba(59, 130, 246, 0.35);
+  transform: scale(1.1) rotate(90deg);
+  box-shadow: 0 12px 32px rgba(37, 99, 235, 0.4);
 }
 
 .fab:active {
   transform: scale(0.95);
 }
 
-/* Modais */
+/* MODAIS */
 .modal {
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.6);
-  backdrop-filter: blur(6px);
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(8px);
   justify-content: center;
   align-items: flex-end;
   z-index: 9999;
@@ -384,85 +412,84 @@ header h2 {
 
 .modal-content {
   width: 100%;
-  max-width: 420px;
+  max-width: 440px;
   background: var(--bg-card);
-  border-radius: var(--raio-grande) var(--raio-grande) 0 0;
+  border-radius: 24px 24px 0 0;
   padding: 28px 24px 40px;
-  box-shadow: var(--sombra-elevada);
-  animation: modalSlide 0.3s ease-out;
+  box-shadow: var(--sombra-fab);
+  animation: modalUp 0.3s ease-out;
   max-height: 90vh;
   overflow-y: auto;
 }
 
-@keyframes modalSlide {
+@keyframes modalUp {
   from { transform: translateY(100%); }
   to { transform: translateY(0); }
 }
 
 .modal-content h3 {
-  font-size: 18px;
+  font-size: 19px;
   font-weight: 700;
-  color: var(--texto-escuro);
+  color: var(--titulo);
   margin-bottom: 20px;
   text-align: center;
 }
 
-/* Botões de Tipo */
+/* BOTÕES TIPO */
 .type-buttons {
   display: flex;
   gap: 12px;
-  margin-bottom: 16px;
+  margin-bottom: 18px;
 }
 
 .type-btn {
   flex: 1;
   padding: 14px;
-  border-radius: var(--raio-medio);
+  border-radius: var(--raio);
   border: 2px solid #E2E8F0;
   background: white;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 600;
   cursor: pointer;
   transition: var(--transicao);
-  color: var(--texto-medio);
+  color: var(--texto-claro);
 }
 
 .type-btn.active.income {
   border-color: var(--sucesso);
-  background: var(--sucesso-claro);
+  background: var(--suave-sucesso);
   color: var(--sucesso);
 }
 
 .type-btn.active.expense {
-  border-color: var(--erro);
-  background: var(--erro-claro);
-  color: var(--erro);
+  border-color: var(--perigo);
+  background: var(--suave-perigo);
+  color: var(--perigo);
 }
 
-/* Campos de Entrada */
+/* CAMPOS */
 .modal-content input,
 .modal-content select {
   width: 100%;
   padding: 14px 16px;
   margin-top: 10px;
   border: 2px solid #E2E8F0;
-  border-radius: var(--raio-medio);
+  border-radius: var(--raio);
   font-size: 15px;
   font-weight: 500;
   transition: var(--transicao);
   background: white;
-  color: var(--texto-escuro);
+  color: var(--titulo);
 }
 
-.modal-content input::placeholder { color: var(--texto-claro); }
 .modal-content input:focus,
 .modal-content select:focus {
   outline: none;
   border-color: var(--primaria);
-  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
 }
 
-/* Parcelamento */
+/* PARCELAMENTO */
 .parcel-buttons {
   display: flex;
   gap: 10px;
@@ -476,41 +503,31 @@ header h2 {
   margin: 0 !important;
   border: 2px solid #E2E8F0 !important;
   background: white !important;
-  color: var(--texto-medio) !important;
+  color: var(--texto-claro) !important;
   font-weight: 600 !important;
-  font-size: 14px !important;
 }
 
 .parcel-btn.active {
   border-color: var(--primaria) !important;
-  background: var(--primaria-clara) !important;
+  background: var(--primaria-suave) !important;
   color: var(--primaria) !important;
 }
 
-#parcelCount {
-  width: 120px !important;
-  margin: 0 !important;
-}
+#parcelCount { width: 120px !important; margin: 0 !important; }
 
-/* Switch */
+/* SWITCH */
 .switch-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 18px;
+  margin-top: 20px;
   font-size: 15px;
   font-weight: 600;
-  color: var(--texto-escuro);
+  color: var(--titulo);
 }
 
-.switch {
-  position: relative;
-  width: 50px;
-  height: 28px;
-}
-
+.switch { position: relative; width: 52px; height: 28px; }
 .switch input { display: none; }
-
 .slider {
   position: absolute;
   inset: 0;
@@ -518,7 +535,6 @@ header h2 {
   border-radius: 28px;
   transition: var(--transicao);
 }
-
 .slider:before {
   content: '';
   position: absolute;
@@ -529,19 +545,18 @@ header h2 {
   background: white;
   border-radius: 50%;
   transition: var(--transicao);
-  box-shadow: var(--sombra-suave);
+  box-shadow: var(--sombra-leve);
 }
-
 input:checked + .slider { background: var(--sucesso); }
-input:checked + .slider:before { transform: translateX(22px); }
+input:checked + .slider:before { transform: translateX(24px); }
 
-/* Botões do Modal */
+/* BOTÕES MODAL */
 .modal-content button {
   width: 100%;
   padding: 14px;
   margin-top: 12px;
   border: none;
-  border-radius: var(--raio-medio);
+  border-radius: var(--raio);
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
@@ -554,28 +569,28 @@ input:checked + .slider:before { transform: translateX(22px); }
 .modal-content button:not(.cancel):not(.delete) {
   background: var(--primaria);
   color: white;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
 }
 
 .modal-content button.cancel {
   background: #F1F5F9;
-  color: var(--texto-medio);
+  color: var(--texto);
 }
 
 .modal-content button.delete {
-  background: var(--erro);
+  background: var(--perigo);
   color: white;
-  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.25);
 }
 
-/* Categorias */
+/* CATEGORIAS */
 .category-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 16px;
+  padding: 14px 16px;
   background: #F8FAFC;
-  border-radius: var(--raio-medio);
+  border-radius: var(--raio);
   margin-top: 8px;
   font-size: 14px;
   font-weight: 500;
@@ -588,14 +603,14 @@ input:checked + .slider:before { transform: translateX(22px); }
 }
 
 .category-item button {
-  width: 28px;
-  height: 28px;
+  width: 30px;
+  height: 30px;
   padding: 0;
   margin: 0;
   border-radius: 50%;
-  background: var(--erro-claro);
-  color: var(--erro);
-  font-size: 16px;
+  background: var(--suave-perigo);
+  color: var(--perigo);
+  font-size: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -603,15 +618,11 @@ input:checked + .slider:before { transform: translateX(22px); }
 }
 
 #categoryModal .modal-content { max-height: 85vh; }
-#categoryList { margin-top: 10px; }
+#categoryList { margin-top: 12px; }
 
-/* Scrollbar */
+/* SCROLL */
 ::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb {
-  background: #CBD5E1;
-  border-radius: 3px;
-}
+::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
 </style>
 </head>
@@ -735,7 +746,9 @@ function getMonthKey(){
 
 function formatDate(d){
   const [y,m,day]=d.split("-");
-  return `${day}/${m}`;
+  const data = new Date(d + "T00:00:00");
+  const diasSemana = ["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"];
+  return `${day}/${m} · ${diasSemana[data.getDay()]}`;
 }
 
 function monthRef(){
@@ -812,18 +825,11 @@ function render(){
     });
 
     Object.keys(groupedByDate).sort((a,b)=>new Date(b)-new Date(a)).forEach(date=>{
-      const row = document.createElement("div");
-      row.className = "row";
-
-      const dateObj = new Date(date + "T00:00:00");
-      const dayName = dateObj.toLocaleDateString("pt-BR", {weekday:'short'}).replace('.','');
-      
-      const dateCard = document.createElement("div");
-      dateCard.className = "date-card";
-      dateCard.innerHTML = `<span>${formatDate(date)}</span><span>${dayName}</span>`;
-
-      const itemsWrap = document.createElement("div");
-      itemsWrap.className = "day-items";
+      // Cabeçalho da data
+      const dateHeader = document.createElement("div");
+      dateHeader.className = "date-header";
+      dateHeader.innerHTML = `<span>${formatDate(date)}</span>`;
+      container.appendChild(dateHeader);
 
       groupedByDate[date].sort((a,b)=>b.value - a.value).forEach(t=>{
         if(t.type==="income"){ t.paid ? rPago+=t.value : rPrev+=t.value; }
@@ -833,28 +839,39 @@ function render(){
         const isLate = !t.paid && t.date < todayStr;
         const isDueToday = !t.paid && t.date === todayStr;
 
-        const item = document.createElement("div");
-        item.className = "item";
-        if(isLate) item.classList.add("late-item");
-        else if(isDueToday) item.classList.add("due-today-item");
-        item.onclick = () => editById(t.id);
+        const card = document.createElement("div");
+        card.className = `transaction-card card-${t.type}`;
+        if(isLate) card.classList.add("card-late");
+        if(isDueToday) card.classList.add("card-today");
+        card.onclick = () => editById(t.id);
 
-        item.innerHTML = `
-          <div class="item-top">
-            <div class="item-name">${t.name}</div>
-            <div class="item-value ${t.type}">R$ ${t.value.toLocaleString("pt-BR",{minimumFractionDigits:2})}</div>
-          </div>
-          <div class="item-bottom">
-            <div class="item-sub">${t.category} ${t.parcel ? `<span style="margin-left:6px">${t.parcelIndex}/${t.parcelTotal}</span>` : ""}</div>
-            ${t.paid ? `<div class="badge green">${t.type==="income"?"Recebido":"Pago"}</div>` : isLate ? `<div class="badge red">Atrasado</div>` : isDueToday ? `<div class="badge orange">Vence hoje</div>` : ""}
+        const icone = t.type === "income" ? "⬆️" : "⬇️";
+        const classeIcone = t.type === "income" ? "icon-income" : "icon-expense";
+        const sinal = t.type === "income" ? "+ " : "- ";
+
+        let badge = "";
+        if(t.paid) badge = `<span class="trans-badge ${t.type==='income'?'badge-received':'badge-paid'}">${t.type==='income'?'Recebido':'Pago'}</span>`;
+        else if(isLate) badge = `<span class="trans-badge badge-late">Atrasado</span>`;
+        else if(isDueToday) badge = `<span class="trans-badge badge-today">Vence hoje</span>`;
+
+        card.innerHTML = `
+          <div class="type-icon ${classeIcone}">${icone}</div>
+          <div class="trans-content">
+            <div class="trans-top">
+              <span class="trans-name">${t.name}</span>
+              <span class="trans-value ${t.type}">${sinal}R$ ${t.value.toLocaleString("pt-BR",{minimumFractionDigits:2})}</span>
+            </div>
+            <div class="trans-bottom">
+              <span class="trans-details">
+                ${t.category}
+                ${t.parcel ? ` · ${t.parcelIndex}/${t.parcelTotal}` : ""}
+              </span>
+              ${badge}
+            </div>
           </div>
         `;
-        itemsWrap.appendChild(item);
+        container.appendChild(card);
       });
-
-      row.appendChild(dateCard);
-      row.appendChild(itemsWrap);
-      container.appendChild(row);
     });
 
     recPago.innerText = `R$ ${rPago.toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
@@ -970,7 +987,6 @@ function updateCategorySelect(){
 function goReports(){ window.location.href="relatorios.html"; }
 function getMonthKeyFromDate(dateStr){ const [y,m]=dateStr.split("-"); return `${y}-${m}`; }
 function getTodayLocalString(){ const n=new Date(); return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,"0")}-${String(n.getDate()).padStart(2,"0")}`; }
-function getPreviousMonthKeyForRender(){ return null; }
 </script>
 
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
