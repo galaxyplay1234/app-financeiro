@@ -168,6 +168,30 @@ header h2{
 .item-sub{
     font-size:12px;
     color:#666;
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    gap:4px;
+}
+
+
+.parcel-badge{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+
+    padding:2px 10px;
+
+    font-size:11px;
+    font-weight:600;
+
+    color:#5f6670;
+
+    background:#eef2f8;
+    border:1px solid #d8dee8;
+    border-radius:999px;
+
+    width:max-content;
 }
 
 .received{
@@ -811,15 +835,15 @@ saldoInicial = Number(snapSaldo.val() || 0);
 <div class="item-bottom">
 
     <div class="item-sub">
-        ${t.category}
-        ${
-            t.parcel
-            ? `<span style="margin-left:6px;color:#777">
-                ${t.parcelIndex}/${t.parcelTotal}
-              </span>`
-            : ``
-        }
-    </div>
+    ${t.category}
+    ${
+        t.parcel
+        ? `<span class="parcel-badge">
+              ${t.parcelIndex} de ${t.parcelTotal}
+          </span>`
+        : ``
+    }
+</div>
 
     ${
         t.paid
