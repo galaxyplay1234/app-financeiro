@@ -412,6 +412,9 @@ input:checked + .slider:before{transform:translateX(20px)}
 
 <input id="title" placeholder="Nome">
 <input id="value" placeholder="Valor">
+  <div id="receivedArea" style="display:none">
+  <input id="receivedValue" placeholder="Valor recebido">
+</div>
 <select id="category">
   <option>Geral</option>
   <option>Alimentação</option>
@@ -488,11 +491,13 @@ let editId = null;
 let editMonthKey = null;
 let currentType = "income";
 let editingParcelData = null;
+let editingItem = null;
 
 const monthLabel = document.getElementById("monthLabel");
 const modal = document.getElementById("modal");
 const deleteBtn = document.getElementById("deleteBtn");
 const valueInput = document.getElementById("value");
+const receivedInput = document.getElementById("receivedValue");
 
 /* =========================
    UTIL
@@ -501,6 +506,13 @@ valueInput.addEventListener("input",()=>{
   let v = valueInput.value.replace(/\D/g,"");
   v = (Number(v)/100).toLocaleString("pt-BR",{minimumFractionDigits:2});
   valueInput.value = v;
+});
+
+
+receivedInput.addEventListener("input",()=>{
+  let v = receivedInput.value.replace(/\D/g,"");
+  v = (Number(v)/100).toLocaleString("pt-BR",{minimumFractionDigits:2});
+  receivedInput.value = v;
 });
 
 function updateMonthLabel(){
@@ -774,15 +786,20 @@ function save(){
   id,
   name: title.value.trim(),
   value: valTotal,
+
+  // 👇 NOVOS CAMPOS
+  receivedValue: editingItem?.receivedValue || 0,
+  remainingValue: editingItem?.remainingValue ?? valTotal,
+
   category: category.value,
   date: baseDateStr,
   type: currentType,
   paid: paid.checked,
 
   parcel: editingParcelData ? true : false,
-parcelIndex: editingParcelData ? editingParcelData.parcelIndex : null,
-parcelTotal: editingParcelData ? editingParcelData.parcelTotal : null,
-parcelGroupId: editingParcelData ? editingParcelData.parcelGroupId : null
+  parcelIndex: editingParcelData ? editingParcelData.parcelIndex : null,
+  parcelTotal: editingParcelData ? editingParcelData.parcelTotal : null,
+  parcelGroupId: editingParcelData ? editingParcelData.parcelGroupId : null
 };
 
     const newMonthKey = getMonthKeyFromDate(item.date);
@@ -863,10 +880,16 @@ function editById(id){
     .ref("finance/meses/" + originalMonthKey + "/" + id)
     .once("value", snap=>{
       const t = snap.val();
+      editingItem = t;
       if(!t) return;
 
       title.value = t.name;
       valueInput.value = t.value.toLocaleString("pt-BR",{minimumFractionDigits:2});
+      document.getElementById("receivedArea").style.display =
+  t.type === "income" ? "block" : "none";
+
+receivedInput.value =
+  (t.receivedValue || 0).toLocaleString("pt-BR",{minimumFractionDigits:2});
       category.value = t.category;
       date.value = t.date;
       paid.checked = t.paid;
@@ -905,14 +928,17 @@ function openModal(){
   if(editId===null){
     title.value="";
     valueInput.value="";
+    receivedInput.value=""; // 👈 NOVO
+    document.getElementById("receivedArea").style.display="none"; // 👈 NOVO
+
     category.value="";
     paid.checked=false;
     setType("income");
-    
+
     isParcel = false;
-document.getElementById("btnParcel").classList.remove("active");
-document.getElementById("parcelCount").style.display = "none";
-document.getElementById("parcelCount").value = "";
+    document.getElementById("btnParcel").classList.remove("active");
+    document.getElementById("parcelCount").style.display = "none";
+    document.getElementById("parcelCount").value = "";
 
     const hoje=new Date();
     date.value=`${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2,"0")}-${String(hoje.getDate()).padStart(2,"0")}`;
@@ -925,6 +951,7 @@ function closeModal(){
 
   isParcel = false;
   editingParcelData = null; // 🔥 ESSENCIAL
+  editingItem = null;
 
   const btn = document.getElementById("btnParcel");
   const input = document.getElementById("parcelCount");
