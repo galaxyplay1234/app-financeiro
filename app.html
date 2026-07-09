@@ -702,11 +702,22 @@ saldoInicial = Number(snapSaldo.val() || 0);
           .sort((a,b)=>b.value - a.value)
           .forEach((t,index)=>{
 
-            if(t.type==="income"){
-              t.paid ? rPago+=t.value : rPrev+=t.value;
-            }else{
-              t.paid ? dPago+=t.value : dPrev+=t.value;
-            }
+            if(t.type === "income"){
+
+  // Valor realmente recebido
+  const recebido = t.receivedValue || (t.paid ? t.value : 0);
+
+  // Soma apenas o que entrou
+  rPago += recebido;
+
+  // Soma o valor total previsto
+  rPrev += t.value;
+
+}else{
+
+  t.paid ? dPago += t.value : dPrev += t.value;
+
+}
 
             const todayStr = getTodayLocalString();
             const isLate = !t.paid && t.date < todayStr;
@@ -733,22 +744,22 @@ saldoInicial = Number(snapSaldo.val() || 0);
   </div>
 
   ${
-    t.type === "income"
-      ? `
-      <div style="font-size:12px;color:#666;margin-top:2px">
-        Recebido:
-        <b style="color:#2e7d32">
-          R$ ${(t.receivedValue || 0).toLocaleString("pt-BR",{minimumFractionDigits:2})}
-        </b>
-        &nbsp;&nbsp;
-        Falta:
-        <b style="color:#F24438">
-          R$ ${(t.remainingValue || t.value).toLocaleString("pt-BR",{minimumFractionDigits:2})}
-        </b>
+  t.type === "income" && (t.receivedValue || 0) > 0
+    ? `
+      <div style="font-size:12px;margin-top:2px">
+        <div style="color:#2e7d32">
+          Recebido:
+          <b>R$ ${(t.receivedValue||0).toLocaleString("pt-BR",{minimumFractionDigits:2})}</b>
+        </div>
+
+        <div style="color:#F24438">
+          Falta:
+          <b>R$ ${(t.remainingValue||t.value).toLocaleString("pt-BR",{minimumFractionDigits:2})}</b>
+        </div>
       </div>
-      `
-      : ""
-  }
+    `
+    : ""
+}
 
   <div class="item-bottom">
                 <div class="item-sub">
