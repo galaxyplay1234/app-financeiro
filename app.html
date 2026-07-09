@@ -14,7 +14,6 @@ body{
   overflow-x:hidden;
 }
 
-
 .top-fixed{
   position:sticky;
   top:0;
@@ -198,7 +197,6 @@ header h2{
   appearance:none;
 }
 
-
 /* ===============================
    CORREÇÃO BOTÕES RECEITA / DESPESA
    =============================== */
@@ -223,7 +221,6 @@ header h2{
   color:#fff !important;
   border:none !important;
 }
-
 
 /* SWITCH */
 .switch-row{
@@ -273,9 +270,6 @@ input:checked + .slider:before{transform:translateX(20px)}
   color:#1976d2 !important;
 }
 
-
-
-
 .category-item{
   display:flex;
   justify-content:space-between;
@@ -319,8 +313,6 @@ input:checked + .slider:before{transform:translateX(20px)}
   max-height:260px;
 }
 
-
-
 /* primeiro item do dia */
 .item.first-of-day{
   border-top-left-radius:10px;
@@ -339,7 +331,6 @@ input:checked + .slider:before{transform:translateX(20px)}
   flex-direction:column;
   gap:0;
 }
-
 
 /* ITEM ATRASADO */
 .late-item{
@@ -442,8 +433,6 @@ input:checked + .slider:before{transform:translateX(20px)}
   >
 </div>
 
-
-
 <div class="switch-row">
   <span>Pago</span>
   <label class="switch">
@@ -488,8 +477,6 @@ input:checked + .slider:before{transform:translateX(20px)}
 
 <script>
 
-
-
 let currentMonth = new Date();
 let editId = null;
 let editMonthKey = null;
@@ -511,7 +498,6 @@ valueInput.addEventListener("input",()=>{
   v = (Number(v)/100).toLocaleString("pt-BR",{minimumFractionDigits:2});
   valueInput.value = v;
 });
-
 
 receivedInput.addEventListener("input",()=>{
   let v = receivedInput.value.replace(/\D/g,"");
@@ -575,7 +561,6 @@ function setType(t){
     t === "income" ? "block" : "none";
 }
 
-
 /* =========================
    PARCELAMENTO
 ========================= */
@@ -594,7 +579,6 @@ function toggleParcel(){
     input.value = "";
   }
 }
-
 
 function checkMonthTurnover(){
   const today = new Date();
@@ -640,8 +624,6 @@ function checkMonthTurnover(){
         });
     });
 }
-
-
 
 /* =========================
    RENDER
@@ -794,7 +776,7 @@ saldoInicial = Number(snapSaldo.val() || 0);
 
 </div>
 
-
+`;
 
             itemsWrap.appendChild(item);
           });
@@ -1090,23 +1072,19 @@ function updateCategorySelect(){
   });
 }
 
-
 function goReports(){
   window.location.href = "relatorios.html";
 }
-
 
 function getMonthKeyFromDate(dateStr){
   const [year, month] = dateStr.split("-");
   return `${year}-${month}`;
 }
 
-
 function getTodayLocalString(){
   const now = new Date();
   return `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}-${String(now.getDate()).padStart(2,"0")}`;
 }
-
 
 function getPreviousMonthKeyForRender(){
   const today = new Date();
@@ -1134,7 +1112,6 @@ function getPreviousMonthKeyForRender(){
 
   return `${prev.getFullYear()}-${String(prev.getMonth()+1).padStart(2,"0")}`;
 }
-
 
 </script>
 
@@ -1170,7 +1147,6 @@ if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("sw.js");
 }
 </script>
-
 
 </body>
 </html>
