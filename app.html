@@ -355,15 +355,15 @@ input:checked + .slider:before{transform:translateX(20px)}
   border-left-color:#FD9806;    /* laranja */
 }
 
-.badge.orange{
-  background:#FD9806;           /* laranja */
-}
-
-
 .right-info{
     display:flex;
     flex-direction:column;
     align-items:flex-end;
+}
+
+.badge{
+    margin-top:6px;
+    align-self:flex-end;
 }
 
 .received{
@@ -760,31 +760,15 @@ saldoInicial = Number(snapSaldo.val() || 0);
 <div class="item-top">
 
     <div class="left-info">
-
         <div class="item-name">${t.name}</div>
 
-        <div class="item-bottom">
-
-            <div class="item-sub">
-                ${t.category}
-                ${t.parcel ? `
-                <span style="margin-left:6px;color:#777">
-                    ${t.parcelIndex}/${t.parcelTotal}
-                </span>` : ""}
-            </div>
-
-            ${
-                t.paid
-                ? `<div class="badge green">${t.type==="income"?"Recebido":"Pago"}</div>`
-                : isLate
-                    ? `<div class="badge red">Atrasado</div>`
-                    : isDueToday
-                        ? `<div class="badge orange">Vence hoje</div>`
-                        : ``
-            }
-
+        <div class="item-sub">
+            ${t.category}
+            ${t.parcel ? `
+            <span style="margin-left:6px;color:#777">
+                ${t.parcelIndex}/${t.parcelTotal}
+            </span>` : ""}
         </div>
-
     </div>
 
     <div class="right-info">
@@ -796,17 +780,26 @@ saldoInicial = Number(snapSaldo.val() || 0);
         ${
         t.type==="income" && (t.receivedValue||0)>0
         ? `
-        <div class="received">
-            <div class="ok">
-                Recebido: R$ ${(t.receivedValue||0).toLocaleString("pt-BR",{minimumFractionDigits:2})}
-            </div>
+            <div class="received">
+                <div class="ok">
+                    Recebido: R$ ${(t.receivedValue||0).toLocaleString("pt-BR",{minimumFractionDigits:2})}
+                </div>
 
-            <div class="rest">
-                Falta: R$ ${(t.remainingValue||t.value).toLocaleString("pt-BR",{minimumFractionDigits:2})}
+                <div class="rest">
+                    Falta: R$ ${(t.remainingValue||t.value).toLocaleString("pt-BR",{minimumFractionDigits:2})}
+                </div>
             </div>
-        </div>
-        `
-        : ``
+        ` : ``
+        }
+
+        ${
+            t.paid
+            ? `<div class="badge green">${t.type==="income"?"Recebido":"Pago"}</div>`
+            : isLate
+                ? `<div class="badge red">Atrasado</div>`
+                : isDueToday
+                    ? `<div class="badge orange">Vence hoje</div>`
+                    : ``
         }
 
     </div>
