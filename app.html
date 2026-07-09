@@ -101,10 +101,19 @@ header h2{
   box-shadow:0 1px 4px rgba(0,0,0,.1)
 }
 .item{
-  flex:1;background:#fff;padding:10px;border-radius:10px;
+  flex:1;
+  background:#fff;
+  padding:10px;
+  border-radius:10px;
   border-left:5px solid #2196f3;
   box-shadow:0 1px 4px rgba(0,0,0,.1);
-  height:64px;display:flex;flex-direction:column;justify-content:center
+
+  min-height:64px;
+  height:auto;
+
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
 }
 .item-top{display:flex;justify-content:space-between}
 .item-name{font-weight:bold;font-size:14px}
@@ -737,6 +746,7 @@ saldoInicial = Number(snapSaldo.val() || 0);
 
             item.innerHTML = `
   <div class="item-top">
+
   <div class="item-name">
     ${t.name}
   </div>
@@ -747,26 +757,23 @@ saldoInicial = Number(snapSaldo.val() || 0);
       R$ ${t.value.toLocaleString("pt-BR",{minimumFractionDigits:2})}
     </div>
 
-  </div>
-</div>
-
-  ${
-  t.type === "income" && (t.receivedValue || 0) > 0
-    ? `
-      <div style="font-size:12px;margin-top:2px">
-        <div style="color:#2e7d32">
-          Recebido:
-          <b>R$ ${(t.receivedValue||0).toLocaleString("pt-BR",{minimumFractionDigits:2})}</b>
-        </div>
-
-        <div style="color:#F24438">
-          Falta:
-          <b>R$ ${(t.remainingValue||t.value).toLocaleString("pt-BR",{minimumFractionDigits:2})}</b>
-        </div>
+    ${
+      t.type === "income" && (t.receivedValue || 0) > 0
+      ? `
+      <div style="font-size:11px;color:#2e7d32;line-height:1.2">
+        Recebido: R$ ${(t.receivedValue||0).toLocaleString("pt-BR",{minimumFractionDigits:2})}
       </div>
-    `
-    : ""
-}
+
+      <div style="font-size:11px;color:#F24438;line-height:1.2">
+        Falta: R$ ${(t.remainingValue||t.value).toLocaleString("pt-BR",{minimumFractionDigits:2})}
+      </div>
+      `
+      : ""
+    }
+
+  </div>
+
+</div>
 
   <div class="item-bottom">
                 <div class="item-sub">
