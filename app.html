@@ -773,6 +773,14 @@ function save(){
   const valTotal = Number(
     valueInput.value.replace(/\./g,"").replace(",",".")
   );
+  
+  const valReceived = Number(
+  (receivedInput.value || "0")
+    .replace(/\./g,"")
+    .replace(",",".")
+) || 0;
+
+const remaining = Math.max(0, valTotal - valReceived);
 
   const baseDateStr = date.value;
 
@@ -787,9 +795,8 @@ function save(){
   name: title.value.trim(),
   value: valTotal,
 
-  // 👇 NOVOS CAMPOS
-  receivedValue: editingItem?.receivedValue || 0,
-  remainingValue: editingItem?.remainingValue ?? valTotal,
+  receivedValue: valReceived,
+  remainingValue: remaining,
 
   category: category.value,
   date: baseDateStr,
