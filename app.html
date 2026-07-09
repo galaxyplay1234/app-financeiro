@@ -504,31 +504,6 @@ input:checked + .slider:before{transform:translateX(20px)}
   <span>Pago</span>
   <label class="switch">
     <input type="checkbox" id="paid">
-      document.getElementById("paid").addEventListener("change", function(){
-
-    const area = document.getElementById("receivedArea");
-
-    if(currentType !== "income"){
-        area.style.display = "none";
-        return;
-    }
-
-    if(this.checked){
-
-        // esconde campo
-        area.style.display = "none";
-
-        // coloca automaticamente o valor total
-        receivedInput.value = valueInput.value;
-
-    }else{
-
-        // mostra novamente
-        area.style.display = "block";
-
-    }
-
-});
     <span class="slider"></span>
   </label>
 </div>
@@ -640,20 +615,23 @@ function changeMonth(step){
    TYPE
 ========================= */
 function setType(t){
-  currentType = t;
 
-  document.querySelectorAll(".type-btn")
-    .forEach(b => b.classList.remove("active"));
+    currentType = t;
 
-  document.querySelector(`.type-btn.${t}`)
-    .classList.add("active");
+    document.querySelectorAll(".type-btn")
+        .forEach(b => b.classList.remove("active"));
 
-  const area = document.getElementById("receivedArea");
+    document.querySelector(`.type-btn.${t}`)
+        .classList.add("active");
 
-if(t === "income" && !paid.checked){
-    area.style.display = "block";
-}else{
-    area.style.display = "none";
+    const area = document.getElementById("receivedArea");
+
+    if(t === "income" && !paid.checked){
+        area.style.display = "block";
+    }else{
+        area.style.display = "none";
+    }
+
 }
 
 /* =========================
@@ -1212,6 +1190,25 @@ function getPreviousMonthKeyForRender(){
 
   return `${prev.getFullYear()}-${String(prev.getMonth()+1).padStart(2,"0")}`;
 }
+
+document.getElementById("paid").addEventListener("change", function(){
+
+    const area = document.getElementById("receivedArea");
+
+    if(currentType !== "income"){
+        area.style.display = "none";
+        return;
+    }
+
+    if(this.checked){
+        area.style.display = "none";
+        receivedInput.value = valueInput.value;
+    }else{
+        area.style.display = "block";
+    }
+
+});
+
 
 </script>
 
