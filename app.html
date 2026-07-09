@@ -788,17 +788,17 @@ saldoInicial = Number(snapSaldo.val() || 0);
             if(t.type === "income"){
 
   // Valor realmente recebido
-  const recebido = t.receivedValue || (t.paid ? t.value : 0);
+const recebido = t.receivedValue || (t.paid ? t.value : 0);
 
-  // Soma apenas o que entrou
-  rPago += recebido;
+// Soma apenas o que entrou
+rPago += recebido;
 
-  // Soma o valor total previsto
-  rPrev += t.value;
+// Soma somente o que ainda falta receber
+rPrev += (t.value - recebido);
 
 }else{
 
-  t.paid ? dPago += t.value : dPrev += t.value;
+    t.paid ? dPago += t.value : dPrev += t.value;
 
 }
 
