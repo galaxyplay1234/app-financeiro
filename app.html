@@ -504,6 +504,31 @@ input:checked + .slider:before{transform:translateX(20px)}
   <span>Pago</span>
   <label class="switch">
     <input type="checkbox" id="paid">
+      document.getElementById("paid").addEventListener("change", function(){
+
+    const area = document.getElementById("receivedArea");
+
+    if(currentType !== "income"){
+        area.style.display = "none";
+        return;
+    }
+
+    if(this.checked){
+
+        // esconde campo
+        area.style.display = "none";
+
+        // coloca automaticamente o valor total
+        receivedInput.value = valueInput.value;
+
+    }else{
+
+        // mostra novamente
+        area.style.display = "block";
+
+    }
+
+});
     <span class="slider"></span>
   </label>
 </div>
@@ -623,9 +648,12 @@ function setType(t){
   document.querySelector(`.type-btn.${t}`)
     .classList.add("active");
 
-  // Mostrar campo "Valor recebido" apenas para receitas
-  document.getElementById("receivedArea").style.display =
-    t === "income" ? "block" : "none";
+  const area = document.getElementById("receivedArea");
+
+if(t === "income" && !paid.checked){
+    area.style.display = "block";
+}else{
+    area.style.display = "none";
 }
 
 /* =========================
@@ -999,9 +1027,13 @@ function editById(id){
 
       title.value = t.name;
       valueInput.value = t.value.toLocaleString("pt-BR",{minimumFractionDigits:2});
-      document.getElementById("receivedArea").style.display =
-  t.type === "income" ? "block" : "none";
+      const area = document.getElementById("receivedArea");
 
+if(t.type === "income" && !t.paid){
+    area.style.display = "block";
+}else{
+    area.style.display = "none";
+}
 receivedInput.value =
   (t.receivedValue || 0).toLocaleString("pt-BR",{minimumFractionDigits:2});
       category.value = t.category;
@@ -1047,6 +1079,7 @@ function openModal(){
 
     category.value="";
     paid.checked=false;
+    document.getElementById("receivedArea").style.display = "block";
     setType("income");
 
     isParcel = false;
