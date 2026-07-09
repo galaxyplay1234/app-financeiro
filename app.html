@@ -558,9 +558,17 @@ function changeMonth(step){
    TYPE
 ========================= */
 function setType(t){
-  currentType=t;
-  document.querySelectorAll(".type-btn").forEach(b=>b.classList.remove("active"));
-  document.querySelector(`.type-btn.${t}`).classList.add("active");
+  currentType = t;
+
+  document.querySelectorAll(".type-btn")
+    .forEach(b => b.classList.remove("active"));
+
+  document.querySelector(`.type-btn.${t}`)
+    .classList.add("active");
+
+  // Mostrar campo "Valor recebido" apenas para receitas
+  document.getElementById("receivedArea").style.display =
+    t === "income" ? "block" : "none";
 }
 
 
