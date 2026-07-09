@@ -122,9 +122,9 @@ header h2{
 
 .item-bottom{
     display:flex;
-    justify-content:flex-end;
+    justify-content:space-between;
     align-items:center;
-    margin-top:8px;
+    margin-top:4px;
 }
 .item-name{font-weight:bold;font-size:14px}
 .item-value{font-size:16px;font-weight:bold}
@@ -759,16 +759,32 @@ saldoInicial = Number(snapSaldo.val() || 0);
             item.innerHTML = `
 <div class="item-top">
 
-    <div>
+    <div class="left-info">
+
         <div class="item-name">${t.name}</div>
 
-        <div class="item-sub">
-            ${t.category}
-            ${t.parcel ? `
-            <span style="margin-left:6px;color:#777">
-                ${t.parcelIndex}/${t.parcelTotal}
-            </span>` : ""}
+        <div class="item-bottom">
+
+            <div class="item-sub">
+                ${t.category}
+                ${t.parcel ? `
+                <span style="margin-left:6px;color:#777">
+                    ${t.parcelIndex}/${t.parcelTotal}
+                </span>` : ""}
+            </div>
+
+            ${
+                t.paid
+                ? `<div class="badge green">${t.type==="income"?"Recebido":"Pago"}</div>`
+                : isLate
+                    ? `<div class="badge red">Atrasado</div>`
+                    : isDueToday
+                        ? `<div class="badge orange">Vence hoje</div>`
+                        : ``
+            }
+
         </div>
+
     </div>
 
     <div class="right-info">
@@ -790,17 +806,7 @@ saldoInicial = Number(snapSaldo.val() || 0);
             </div>
         </div>
         `
-        : `
-        ${
-            t.paid
-            ? `<div class="badge green">${t.type==="income"?"Recebido":"Pago"}</div>`
-            : isLate
-            ? `<div class="badge red">Atrasado</div>`
-            : isDueToday
-            ? `<div class="badge orange">Vence hoje</div>`
-            : ``
-        }
-        `
+        : ``
         }
 
     </div>
