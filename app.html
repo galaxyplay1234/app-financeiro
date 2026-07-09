@@ -13,13 +13,14 @@
   --bg-card: #FFFFFF;
   --bg-header: linear-gradient(170deg, #0F172A 0%, #1E293B 100%);
   --primaria: #2563EB;
-  --primaria-suave: #DBEAFE;
   --sucesso: #059669;
   --suave-sucesso: #D1FAE5;
   --perigo: #DC2626;
   --suave-perigo: #FEE2E2;
   --alerta: #D97706;
   --suave-alerta: #FEF3C7;
+  --borda-suave: #E2E8F0;
+  --fundo-etiqueta: #F1F5F9;
 
   /* Texto */
   --titulo: #1E293B;
@@ -47,15 +48,18 @@ body {
   background: var(--bg-app);
   color: var(--texto);
   min-height: 100vh;
+  padding-top: 170px; /* Espaço para os cards fixos */
 }
 
 /* CABEÇALHO */
 .top-fixed {
-  position: sticky;
+  position: fixed; /* FIXO NO TOPO */
   top: 0;
+  left: 0;
+  right: 0;
   z-index: 30;
   background: var(--bg-header);
-  padding: 22px 20px 32px;
+  padding: 22px 20px 16px;
   border-bottom-left-radius: 24px;
   border-bottom-right-radius: 24px;
   box-shadow: var(--sombra-card);
@@ -143,21 +147,24 @@ header h2 {
   text-align: center;
 }
 
-/* CARDS DE RESUMO */
+/* CARDS DE RESUMO - FIXOS */
 .cards {
   display: flex;
   gap: 12px;
   padding: 0 20px;
-  margin-top: -18px;
-  position: relative;
-  z-index: 2;
+  margin-top: 12px;
+  position: fixed; /* FIXOS */
+  top: 145px;
+  left: 0;
+  right: 0;
+  z-index: 25;
 }
 
 .card {
   flex: 1;
   background: var(--bg-card);
   border-radius: var(--raio);
-  padding: 18px 12px;
+  padding: 14px 10px;
   text-align: center;
   box-shadow: var(--sombra-leve);
   transition: var(--transicao);
@@ -171,33 +178,28 @@ header h2 {
   top: 0;
   left: 0;
   right: 0;
-  height: 4px;
-}
-
-.card:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--sombra-card);
+  height: 3px;
 }
 
 .card h4 {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   color: var(--texto-claro);
-  margin-bottom: 6px;
+  margin-bottom: 4px;
 }
 
 .card .main {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 800;
   letter-spacing: -0.3px;
 }
 
 .card .sub {
-  font-size: 11px;
+  font-size: 10px;
   color: var(--texto-claro);
-  margin-top: 3px;
+  margin-top: 2px;
 }
 
 .saldo::before { background: var(--primaria); }
@@ -209,12 +211,14 @@ header h2 {
 .despesa::before { background: var(--perigo); }
 .despesa .main { color: var(--perigo); }
 
-/* LISTA TOTALMENTE RENOVADA */
+/* LISTA */
 .list {
   padding: 24px 20px 100px;
   display: flex;
   flex-direction: column;
   gap: 16px;
+  position: relative;
+  z-index: 1;
 }
 
 /* Cabeçalho de Data */
@@ -237,10 +241,10 @@ header h2 {
   content: '';
   flex: 1;
   height: 1px;
-  background: #E2E8F0;
+  background: var(--borda-suave);
 }
 
-/* CARD DE TRANSAÇÃO - NOVO ESTILO */
+/* CARD DE TRANSAÇÃO */
 .transaction-card {
   background: var(--bg-card);
   border-radius: var(--raio);
@@ -274,7 +278,7 @@ header h2 {
   width: 6px;
 }
 
-/* Ícone de tipo */
+/* Ícones de seta modernos */
 .type-icon {
   width: 44px;
   height: 44px;
@@ -282,8 +286,9 @@ header h2 {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 20px;
+  font-size: 22px;
   flex-shrink: 0;
+  font-weight: 900;
 }
 
 .icon-income {
@@ -301,7 +306,7 @@ header h2 {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
 }
 
 .trans-top {
@@ -327,14 +332,32 @@ header h2 {
 
 .trans-bottom {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-start;
 }
 
 .trans-details {
   font-size: 12px;
   color: var(--texto-claro);
   font-weight: 500;
+}
+
+/* Etiqueta de parcelamento com contorno cinza */
+.parcel-tag {
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--texto);
+  background: var(--fundo-etiqueta);
+  border: 1px solid var(--borda-suave);
+}
+
+.trans-status {
+  display: flex;
+  align-self: flex-end;
+  margin-top: -20px;
 }
 
 .trans-badge {
@@ -355,10 +378,6 @@ header h2 {
 /* Cores laterais */
 .card-income::before { background: var(--sucesso); }
 .card-expense::before { background: var(--perigo); }
-.card-late::before { background: var(--perigo); background: var(--suave-perigo); }
-.card-today::before { background: var(--alerta); }
-
-/* Status especiais */
 .card-late { background: var(--suave-perigo); }
 .card-today { background: var(--suave-alerta); }
 
@@ -435,7 +454,7 @@ header h2 {
   text-align: center;
 }
 
-/* BOTÕES TIPO */
+/* BOTÕES TIPO - CORRIGIDO */
 .type-buttons {
   display: flex;
   gap: 12px;
@@ -446,40 +465,43 @@ header h2 {
   flex: 1;
   padding: 14px;
   border-radius: var(--raio);
-  border: 2px solid #E2E8F0;
-  background: white;
+  border: 2px solid var(--borda-suave);
+  background: transparent;
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
   transition: var(--transicao);
-  color: var(--texto-claro);
+  color: var(--texto);
 }
 
+.type-btn.income { border-color: var(--sucesso); color: var(--sucesso); }
+.type-btn.expense { border-color: var(--perigo); color: var(--perigo); }
+
 .type-btn.active.income {
-  border-color: var(--sucesso);
   background: var(--suave-sucesso);
   color: var(--sucesso);
 }
 
 .type-btn.active.expense {
-  border-color: var(--perigo);
   background: var(--suave-perigo);
   color: var(--perigo);
 }
 
-/* CAMPOS */
+/* CAMPOS - CORRIGIDO DATA */
 .modal-content input,
 .modal-content select {
   width: 100%;
   padding: 14px 16px;
   margin-top: 10px;
-  border: 2px solid #E2E8F0;
+  border: 2px solid var(--borda-suave);
   border-radius: var(--raio);
   font-size: 15px;
   font-weight: 500;
   transition: var(--transicao);
   background: white;
   color: var(--titulo);
+  text-align: left;
+  direction: ltr;
 }
 
 .modal-content input:focus,
@@ -501,15 +523,15 @@ header h2 {
   flex: 1;
   padding: 14px !important;
   margin: 0 !important;
-  border: 2px solid #E2E8F0 !important;
+  border: 2px solid var(--borda-suave) !important;
   background: white !important;
-  color: var(--texto-claro) !important;
+  color: var(--texto) !important;
   font-weight: 600 !important;
 }
 
 .parcel-btn.active {
   border-color: var(--primaria) !important;
-  background: var(--primaria-suave) !important;
+  background: rgba(37, 99, 235, 0.05) !important;
   color: var(--primaria) !important;
 }
 
@@ -639,9 +661,9 @@ input:checked + .slider:before { transform: translateX(24px); }
       </div>
     </div>
     <div class="month-tabs">
-      <button class="month-btn" onclick="changeMonth(-1)">&#10094;</button>
+      <button class="month-btn" onclick="changeMonth(-1)">‹</button>
       <span id="monthLabel"></span>
-      <button class="month-btn" onclick="changeMonth(1)">&#10095;</button>
+      <button class="month-btn" onclick="changeMonth(1)">›</button>
     </div>
   </header>
 </div>
@@ -825,7 +847,6 @@ function render(){
     });
 
     Object.keys(groupedByDate).sort((a,b)=>new Date(b)-new Date(a)).forEach(date=>{
-      // Cabeçalho da data
       const dateHeader = document.createElement("div");
       dateHeader.className = "date-header";
       dateHeader.innerHTML = `<span>${formatDate(date)}</span>`;
@@ -845,7 +866,7 @@ function render(){
         if(isDueToday) card.classList.add("card-today");
         card.onclick = () => editById(t.id);
 
-        const icone = t.type === "income" ? "⬆️" : "⬇️";
+        const icone = t.type === "income" ? "↑" : "↓";
         const classeIcone = t.type === "income" ? "icon-income" : "icon-expense";
         const sinal = t.type === "income" ? "+ " : "- ";
 
@@ -853,6 +874,9 @@ function render(){
         if(t.paid) badge = `<span class="trans-badge ${t.type==='income'?'badge-received':'badge-paid'}">${t.type==='income'?'Recebido':'Pago'}</span>`;
         else if(isLate) badge = `<span class="trans-badge badge-late">Atrasado</span>`;
         else if(isDueToday) badge = `<span class="trans-badge badge-today">Vence hoje</span>`;
+
+        let parcelHtml = "";
+        if(t.parcel) parcelHtml = `<span class="parcel-tag">${t.parcelIndex} de ${t.parcelTotal}</span>`;
 
         card.innerHTML = `
           <div class="type-icon ${classeIcone}">${icone}</div>
@@ -862,13 +886,11 @@ function render(){
               <span class="trans-value ${t.type}">${sinal}R$ ${t.value.toLocaleString("pt-BR",{minimumFractionDigits:2})}</span>
             </div>
             <div class="trans-bottom">
-              <span class="trans-details">
-                ${t.category}
-                ${t.parcel ? ` · ${t.parcelIndex}/${t.parcelTotal}` : ""}
-              </span>
-              ${badge}
+              <span class="trans-details">${t.category}</span>
+              ${parcelHtml}
             </div>
           </div>
+          <div class="trans-status">${badge}</div>
         `;
         container.appendChild(card);
       });
