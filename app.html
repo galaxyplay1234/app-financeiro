@@ -737,11 +737,32 @@ saldoInicial = Number(snapSaldo.val() || 0);
 
             item.innerHTML = `
   <div class="item-top">
-    <div class="item-name">${t.name}</div>
+  <div class="item-name">
+    ${t.name}
+  </div>
+
+  <div style="text-align:right">
+
     <div class="item-value ${t.type}">
       R$ ${t.value.toLocaleString("pt-BR",{minimumFractionDigits:2})}
     </div>
+
+    ${
+      t.type === "income" && (t.receivedValue || 0) > 0
+      ? `
+      <div style="font-size:11px;color:#2e7d32">
+        Recebido: R$ ${(t.receivedValue||0).toLocaleString("pt-BR",{minimumFractionDigits:2})}
+      </div>
+
+      <div style="font-size:11px;color:#F24438">
+        Falta: R$ ${(t.remainingValue||t.value).toLocaleString("pt-BR",{minimumFractionDigits:2})}
+      </div>
+      `
+      : ""
+    }
+
   </div>
+</div>
 
   ${
   t.type === "income" && (t.receivedValue || 0) > 0
