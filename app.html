@@ -8,7 +8,6 @@
 
 <style>
 :root {
-  /* Cores EXATAS do seu design */
   --fundo-tela: #F5F7FA;
   --fundo-card: #FFFFFF;
   --fundo-header: linear-gradient(180deg, #0F172A 0%, #1E293B 100%);
@@ -23,7 +22,6 @@
   --borda-suave: #E2E8F0;
   --etiqueta-fundo: #F1F5F9;
 
-  /* Efeitos */
   --sombra-suave: 0 2px 12px rgba(15, 23, 42, 0.05);
   --raio-card: 16px;
   --raio-botao: 14px;
@@ -41,11 +39,11 @@
 body {
   background: var(--fundo-tela);
   color: var(--texto-principal);
-  padding-top: 200px; /* Espaço para cabeçalho + cards fixos */
+  padding-top: 200px;
 }
 
-/* ---------------- CABEÇALHO FIXO ---------------- */
-.header-topo {
+/* CABEÇALHO FIXO */
+.top-fixed {
   position: fixed;
   top: 0;
   left: 0;
@@ -58,27 +56,24 @@ body {
   color: white;
 }
 
-.topo-principal {
+header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 24px;
 }
 
-.topo-principal h1 {
+header h2 {
   font-size: 28px;
   font-weight: 700;
-  display: flex;
-  align-items: center;
-  gap: 10px;
 }
 
-.botoes-topo {
+.header-actions {
   display: flex;
   gap: 12px;
 }
 
-.btn-acao {
+.cat-btn {
   width: 48px;
   height: 48px;
   border-radius: 14px;
@@ -90,19 +85,19 @@ body {
   transition: var(--transicao);
 }
 
-.btn-acao:hover {
+.cat-btn:hover {
   background: rgba(255,255,255,0.2);
   transform: translateY(-2px);
 }
 
-.navegacao-mes {
+.month-tabs {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 32px;
 }
 
-.btn-mes {
+.month-btn {
   width: 44px;
   height: 44px;
   border-radius: 50%;
@@ -114,19 +109,19 @@ body {
   transition: var(--transicao);
 }
 
-.btn-mes:hover {
+.month-btn:hover {
   background: rgba(255,255,255,0.2);
 }
 
-#nomeMes {
+#monthLabel {
   font-size: 20px;
   font-weight: 600;
   min-width: 180px;
   text-align: center;
 }
 
-/* ---------------- CARDS DE RESUMO FIXOS ---------------- */
-.cards-resumo {
+/* CARDS DE RESUMO FIXOS */
+.cards {
   position: fixed;
   top: 160px;
   left: 16px;
@@ -136,7 +131,7 @@ body {
   gap: 12px;
 }
 
-.card-valor {
+.card {
   flex: 1;
   background: var(--fundo-card);
   border-radius: var(--raio-card);
@@ -147,7 +142,7 @@ body {
   overflow: hidden;
 }
 
-.card-valor::before {
+.card::before {
   content: '';
   position: absolute;
   top: 0;
@@ -156,7 +151,7 @@ body {
   height: 4px;
 }
 
-.card-valor h4 {
+.card h4 {
   font-size: 13px;
   font-weight: 600;
   color: var(--texto-secundario);
@@ -165,57 +160,56 @@ body {
   letter-spacing: 0.5px;
 }
 
-.valor-principal {
+.main {
   font-size: 18px;
   font-weight: 800;
   margin-bottom: 2px;
 }
 
-.valor-secundario {
+.sub {
   font-size: 11px;
   color: var(--texto-secundario);
 }
 
-/* Cores dos cards */
-.card-saldo::before { background: var(--cor-saldo); }
-.card-saldo .valor-principal { color: var(--cor-saldo); }
+.saldo::before { background: var(--cor-saldo); }
+.saldo .main { color: var(--cor-saldo); }
 
-.card-receitas::before { background: var(--cor-receita); }
-.card-receitas .valor-principal { color: var(--cor-receita); }
+.receita::before { background: var(--cor-receita); }
+.receita .main { color: var(--cor-receita); }
 
-.card-despesas::before { background: var(--cor-despesa); }
-.card-despesas .valor-principal { color: var(--cor-despesa); }
+.despesa::before { background: var(--cor-despesa); }
+.despesa .main { color: var(--cor-despesa); }
 
-/* ---------------- LISTA DE TRANSAÇÕES ---------------- */
-.lista-transacoes {
+/* LISTA DE TRANSAÇÕES */
+.list {
   padding: 20px 16px 100px;
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
-.cabecalho-data {
+.date-header {
   display: flex;
   align-items: center;
   gap: 8px;
   margin: 8px 0 4px;
 }
 
-.cabecalho-data span {
+.date-header span {
   font-size: 14px;
   font-weight: 600;
   color: var(--texto-secundario);
 }
 
-.cabecalho-data::after {
+.date-header::after {
   content: '';
   flex: 1;
   height: 1px;
   background: var(--borda-suave);
 }
 
-/* CARD DE TRANSAÇÃO EXATO AO MODELO */
-.card-transacao {
+/* CARD DE TRANSAÇÃO */
+.transaction-card {
   background: var(--fundo-card);
   border-radius: var(--raio-card);
   padding: 18px 20px;
@@ -229,7 +223,7 @@ body {
   transition: var(--transicao);
 }
 
-.card-transacao::before {
+.transaction-card::before {
   content: '';
   position: absolute;
   left: 0;
@@ -238,13 +232,12 @@ body {
   width: 5px;
 }
 
-.card-transacao:hover {
+.transaction-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 16px rgba(15, 23, 42, 0.08);
 }
 
-/* Ícone redondo */
-.icone-tipo {
+.type-icon {
   width: 52px;
   height: 52px;
   border-radius: 50%;
@@ -256,71 +249,72 @@ body {
   flex-shrink: 0;
 }
 
-.icone-receita {
+.icon-income {
   background: var(--fundo-receita);
   color: var(--cor-receita);
 }
 
-.icone-despesa {
+.icon-expense {
   background: var(--fundo-despesa);
   color: var(--cor-despesa);
 }
 
-/* Conteúdo esquerdo */
-.info-esquerda {
+.trans-content {
   flex: 1;
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
 
-.nome-transacao {
+.trans-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.trans-name {
   font-size: 18px;
   font-weight: 700;
   color: var(--texto-principal);
 }
 
-.detalhes-transacao {
+.trans-value {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.trans-value.income { color: var(--cor-receita); }
+.trans-value.expense { color: var(--cor-despesa); }
+
+.trans-bottom {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  align-items: flex-start;
 }
 
-.categoria {
+.trans-details {
   font-size: 14px;
   color: var(--texto-secundario);
   font-weight: 500;
 }
 
-.etiqueta-parcela {
-  display: inline-block;
+.parcel-tag {
   padding: 4px 10px;
   background: var(--etiqueta-fundo);
   border-radius: 12px;
   font-size: 12px;
   font-weight: 600;
   color: var(--texto-principal);
-  align-self: flex-start;
+  border: 1px solid var(--borda-suave);
 }
 
-/* Conteúdo direito */
-.info-direita {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 10px;
+.trans-status {
+  align-self: flex-end;
 }
 
-.valor-transacao {
-  font-size: 20px;
-  font-weight: 800;
-  letter-spacing: -0.5px;
-}
-
-.valor-receita { color: var(--cor-receita); }
-.valor-despesa { color: var(--cor-despesa); }
-
-.etiqueta-status {
+.trans-badge {
   padding: 6px 14px;
   border-radius: 20px;
   font-size: 12px;
@@ -329,18 +323,17 @@ body {
   text-transform: uppercase;
 }
 
-.status-pago { background: var(--cor-receita); }
-.status-atrasado { background: var(--cor-despesa); }
-.status-hoje { background: var(--cor-alerta); }
+.badge-paid, .badge-received { background: var(--cor-receita); }
+.badge-late { background: var(--cor-despesa); }
+.badge-today { background: var(--cor-alerta); }
 
-/* Cores da borda lateral */
-.borda-receita::before { background: var(--cor-receita); }
-.borda-despesa::before { background: var(--cor-despesa); }
-.borda-atrasado { background: rgba(220, 38, 38, 0.05); }
-.borda-hoje { background: rgba(217, 119, 6, 0.05); }
+.card-income::before { background: var(--cor-receita); }
+.card-expense::before { background: var(--cor-despesa); }
+.card-late { background: rgba(220, 38, 38, 0.05); }
+.card-today { background: rgba(217, 119, 6, 0.05); }
 
-/* ---------------- BOTÃO FLUTUANTE ---------------- */
-.botao-adicionar {
+/* BOTÃO FLUTUANTE */
+.fab {
   position: fixed;
   right: 24px;
   bottom: 24px;
@@ -357,11 +350,11 @@ body {
   z-index: 50;
 }
 
-.botao-adicionar:hover {
+.fab:hover {
   transform: scale(1.1);
 }
 
-/* ---------------- MODAL ---------------- */
+/* MODAL */
 .modal {
   display: none;
   position: fixed;
@@ -373,34 +366,33 @@ body {
   z-index: 100;
 }
 
-.conteudo-modal {
+.modal-content {
   width: 100%;
   max-width: 480px;
   background: var(--fundo-card);
   border-radius: 28px 28px 0 0;
   padding: 32px 24px 48px;
   box-shadow: 0 -4px 24px rgba(15, 23, 42, 0.1);
-  animation: subirModal 0.3s ease;
+  animation: modalUp 0.3s ease;
 }
 
-@keyframes subirModal {
+@keyframes modalUp {
   from { transform: translateY(100%); }
   to { transform: translateY(0); }
 }
 
-/* Botões de tipo NO MODELO */
-.grupo-botoes-tipo {
+.type-buttons {
   display: flex;
   gap: 16px;
   margin-bottom: 24px;
 }
 
-.botao-tipo {
+.type-btn {
   flex: 1;
   padding: 16px;
   border-radius: var(--raio-botao);
-  border: 3px solid transparent;
-  background: var(--borda-suave);
+  border: 2px solid var(--borda-suave);
+  background: transparent;
   font-size: 18px;
   font-weight: 700;
   cursor: pointer;
@@ -408,21 +400,23 @@ body {
   color: var(--texto-principal);
 }
 
-/* Cores corretas: SEM AZUL */
-.botao-tipo.receita.ativo {
+.type-btn.income { color: var(--cor-receita); border-color: var(--cor-receita); }
+.type-btn.expense { color: var(--cor-despesa); border-color: var(--cor-despesa); }
+
+.type-btn.active.income {
   background: var(--cor-receita);
   color: white;
   box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
 }
 
-.botao-tipo.despesa.ativo {
+.type-btn.active.expense {
   background: var(--cor-despesa);
   color: white;
   box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
 }
 
-/* Campos do formulário */
-.campo-form {
+.modal-content input,
+.modal-content select {
   width: 100%;
   padding: 16px 18px;
   margin-top: 12px;
@@ -432,42 +426,44 @@ body {
   font-weight: 500;
   background: white;
   color: var(--texto-principal);
+  text-align: left;
+  direction: ltr;
   transition: var(--transicao);
 }
 
-.campo-form:focus {
+.modal-content input:focus,
+.modal-content select:focus {
   outline: none;
   border-color: var(--cor-saldo);
   box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
 }
 
-/* Botão parcelado */
-.botao-parcelado {
-  width: 100%;
-  padding: 16px;
-  margin-top: 12px;
-  border: 2px solid var(--borda-suave);
-  border-radius: var(--raio-botao);
-  background: white;
-  font-size: 17px;
-  font-weight: 600;
-  color: var(--texto-principal);
-  cursor: pointer;
-  transition: var(--transicao);
+.parcel-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+  align-items: center;
 }
 
-.botao-parcelado.ativo {
-  border-color: var(--cor-saldo);
-  background: rgba(37, 99, 235, 0.05);
+.parcel-btn {
+  flex: 1;
+  padding: 16px !important;
+  margin: 0 !important;
+  border: 2px solid var(--borda-suave) !important;
+  background: white !important;
+  color: var(--texto-principal) !important;
+  font-weight: 600 !important;
 }
 
-#quantidade-parcelas {
-  width: 100%;
-  display: none;
+.parcel-btn.active {
+  border-color: var(--cor-saldo) !important;
+  background: rgba(37, 99, 235, 0.05) !important;
+  color: var(--cor-saldo) !important;
 }
 
-/* Switch pago */
-.linha-switch {
+#parcelCount { width: 120px !important; margin: 0 !important; display: none; }
+
+.switch-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -477,25 +473,16 @@ body {
   color: var(--texto-principal);
 }
 
-.switch {
-  position: relative;
-  width: 56px;
-  height: 30px;
-}
-
-.switch input {
-  display: none;
-}
-
-.alavanca {
+.switch { position: relative; width: 56px; height: 30px; }
+.switch input { display: none; }
+.slider {
   position: absolute;
   inset: 0;
   background: var(--borda-suave);
   border-radius: 30px;
   transition: var(--transicao);
 }
-
-.alavanca::before {
+.slider:before {
   content: '';
   position: absolute;
   width: 24px;
@@ -507,65 +494,71 @@ body {
   transition: var(--transicao);
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
+input:checked + .slider { background: var(--cor-receita); }
+input:checked + .slider:before { transform: translateX(26px); }
 
-input:checked + .alavanca {
-  background: var(--cor-receita);
-}
-
-input:checked + .alavanca::before {
-  transform: translateX(26px);
-}
-
-/* Botões de ação */
-.botao-salvar {
+.modal-content button {
   width: 100%;
   padding: 18px;
-  margin-top: 24px;
+  margin-top: 12px;
   border: none;
   border-radius: var(--raio-botao);
-  background: var(--cor-saldo);
-  color: white;
   font-size: 18px;
   font-weight: 700;
   cursor: pointer;
   transition: var(--transicao);
 }
 
-.botao-salvar:hover {
-  transform: translateY(-2px);
+.modal-content button:hover { transform: translateY(-2px); }
+
+.modal-content button:not(.cancel):not(.delete) {
+  background: var(--cor-saldo);
+  color: white;
   box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
 }
 
-.botao-cancelar {
-  width: 100%;
-  padding: 16px;
-  margin-top: 12px;
-  border: none;
-  border-radius: var(--raio-botao);
+.modal-content button.cancel {
   background: var(--borda-suave);
   color: var(--texto-principal);
-  font-size: 17px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: var(--transicao);
 }
 
-.botao-excluir {
-  width: 100%;
-  padding: 14px;
-  margin-top: 12px;
-  border: none;
-  border-radius: var(--raio-botao);
+.modal-content button.delete {
   background: var(--cor-despesa);
   color: white;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: var(--transicao);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.25);
   display: none;
 }
 
-/* Rolar suave */
+.category-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+  background: #F8FAFC;
+  border-radius: var(--raio-card);
+  margin-top: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  transition: var(--transicao);
+}
+
+.category-item:hover { background: #F1F5F9; }
+
+.category-item button {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  margin: 0;
+  border-radius: 50%;
+  background: var(--fundo-despesa);
+  color: var(--cor-despesa);
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+}
+
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-thumb { background: var(--borda-suave); border-radius: 3px; }
 </style>
@@ -573,444 +566,378 @@ input:checked + .alavanca::before {
 
 <body>
 
-<!-- Cabeçalho Fixo -->
-<div class="header-topo">
-  <div class="topo-principal">
-    <h1>💰 Minhas Finanças</h1>
-    <div class="botoes-topo">
-      <button class="btn-acao" onclick="abrirModalCategorias()">☰</button>
-      <button class="btn-acao" onclick="irRelatorios()">📊</button>
+<div class="top-fixed">
+  <header>
+    <h2>💰 Minhas Finanças</h2>
+    <div class="header-actions">
+      <button class="cat-btn" onclick="openCategoryModal()">☰</button>
+      <button class="cat-btn" onclick="goReports()">📊</button>
     </div>
-  </div>
-  <div class="navegacao-mes">
-    <button class="btn-mes" onclick="mudarMes(-1)">‹</button>
-    <span id="nomeMes"></span>
-    <button class="btn-mes" onclick="mudarMes(1)">›</button>
+  </header>
+  <div class="month-tabs">
+    <button class="month-btn" onclick="changeMonth(-1)">‹</button>
+    <span id="monthLabel"></span>
+    <button class="month-btn" onclick="changeMonth(1)">›</button>
   </div>
 </div>
 
-<!-- Cards de Resumo Fixos -->
-<div class="cards-resumo">
-  <div class="card-valor card-saldo">
+<section class="cards">
+  <div class="card saldo">
     <h4>Saldo</h4>
-    <div class="valor-principal" id="saldoPago">R$ 0,00</div>
-    <div class="valor-secundario" id="saldoPrev">R$ 0,00</div>
+    <div class="main" id="saldoPago">R$ 0,00</div>
+    <div class="sub" id="saldoPrev">R$ 0,00</div>
   </div>
-  <div class="card-valor card-receitas">
+  <div class="card receita">
     <h4>Receitas</h4>
-    <div class="valor-principal" id="recPago">R$ 0,00</div>
-    <div class="valor-secundario" id="recPrev">R$ 0,00</div>
+    <div class="main" id="recPago">R$ 0,00</div>
+    <div class="sub" id="recPrev">R$ 0,00</div>
   </div>
-  <div class="card-valor card-despesas">
+  <div class="card despesa">
     <h4>Despesas</h4>
-    <div class="valor-principal" id="despPago">R$ 0,00</div>
-    <div class="valor-secundario" id="despPrev">R$ 0,00</div>
+    <div class="main" id="despPago">R$ 0,00</div>
+    <div class="sub" id="despPrev">R$ 0,00</div>
   </div>
+</section>
+
+<section class="list" id="list"></section>
+
+<button class="fab" onclick="openModal()">+</button>
+
+<div class="modal" id="modal">
+<div class="modal-content">
+  <div class="type-buttons">
+    <button class="type-btn income active" onclick="setType('income')">Receita</button>
+    <button class="type-btn expense" onclick="setType('expense')">Despesa</button>
+  </div>
+  <input id="title" placeholder="Nome da transação">
+  <input id="value" placeholder="Valor">
+  <select id="category">
+    <option>Geral</option>
+    <option>Alimentação</option>
+    <option>Moradia</option>
+    <option>Transporte</option>
+  </select>
+  <input id="date" type="date">
+  <div class="parcel-buttons">
+    <button id="btnParcel" class="parcel-btn" onclick="toggleParcel()">Parcelado</button>
+    <input id="parcelCount" type="number" min="2" placeholder="Qtd.">
+  </div>
+  <div class="switch-row">
+    <span>Já foi pago?</span>
+    <label class="switch">
+      <input type="checkbox" id="paid">
+      <span class="slider"></span>
+    </label>
+  </div>
+  <button onclick="save()">Salvar transação</button>
+  <button id="deleteBtn" class="delete" onclick="remove()">Excluir</button>
+  <button class="cancel" onclick="closeModal()">Cancelar</button>
+</div>
 </div>
 
-<!-- Lista de Transações -->
-<div class="lista-transacoes" id="lista"></div>
-
-<!-- Botão Adicionar -->
-<button class="botao-adicionar" onclick="abrirModal()">+</button>
-
-<!-- Modal de Transação -->
-<div class="modal" id="modalTransacao">
-  <div class="conteudo-modal">
-    <div class="grupo-botoes-tipo">
-      <button class="botao-tipo receita ativo" onclick="definirTipo('receita')">Receita</button>
-      <button class="botao-tipo despesa" onclick="definirTipo('despesa')">Despesa</button>
-    </div>
-
-    <input type="text" class="campo-form" id="nomeTransacao" placeholder="Nome da transação">
-    <input type="text" class="campo-form" id="valorTransacao" placeholder="Valor">
-    <select class="campo-form" id="categoriaTransacao">
-      <option>Geral</option>
-      <option>Alimentação</option>
-      <option>Moradia</option>
-      <option>Transporte</option>
-    </select>
-    <input type="date" class="campo-form" id="dataTransacao">
-
-    <button class="botao-parcelado" id="botaoParcelado" onclick="alternarParcelado()">Parcelado</button>
-    <input type="number" class="campo-form" id="quantidade-parcelas" min="2" placeholder="Quantidade de parcelas">
-
-    <div class="linha-switch">
-      <span>Já foi pago?</span>
-      <label class="switch">
-        <input type="checkbox" id="pagoTransacao">
-        <span class="alavanca"></span>
-      </label>
-    </div>
-
-    <button class="botao-salvar" onclick="salvarTransacao()">Salvar transação</button>
-    <button class="botao-excluir" id="botaoExcluir" onclick="excluirTransacao()">Excluir</button>
-    <button class="botao-cancelar" onclick="fecharModal()">Cancelar</button>
-  </div>
-</div>
-
-<!-- Modal de Categorias -->
-<div class="modal" id="modalCategorias">
-  <div class="conteudo-modal">
+<div class="modal" id="categoryModal">
+  <div class="modal-content">
     <h3 style="text-align:center; margin-bottom:20px;">Gerenciar Categorias</h3>
-    <input type="text" class="campo-form" id="nomeCategoria" placeholder="Nome da categoria">
-    <button class="botao-salvar" onclick="salvarCategoria()">Adicionar</button>
-    <div id="listaCategorias" style="margin-top:16px;"></div>
-    <button class="botao-cancelar" onclick="fecharModalCategorias()">Fechar</button>
+    <input id="categoryName" placeholder="Nome da categoria">
+    <button onclick="saveCategory()">Adicionar</button>
+    <div id="categoryList"></div>
+    <button class="cancel" onclick="closeCategoryModal()">Fechar</button>
   </div>
 </div>
 
 <script>
-  if (localStorage.getItem("logado") !== "true") {
+  if (localStorage.getItem("logged") !== "true") {
     window.location.href = "index.html";
   }
-  localStorage.removeItem("logado");
+  localStorage.removeItem("logged");
 </script>
 
 <script>
-let mesAtual = new Date();
-let idEdicao = null;
-let chaveMesEdicao = null;
-let tipoAtual = "receita";
-let dadosParcelamentoEdicao = null;
+let currentMonth = new Date();
+let editId = null;
+let editMonthKey = null;
+let currentType = "income";
+let editingParcelData = null;
 
-const nomeMes = document.getElementById("nomeMes");
-const modal = document.getElementById("modalTransacao");
-const botaoExcluir = document.getElementById("botaoExcluir");
-const inputValor = document.getElementById("valorTransacao");
+const monthLabel = document.getElementById("monthLabel");
+const modal = document.getElementById("modal");
+const deleteBtn = document.getElementById("deleteBtn");
+const valueInput = document.getElementById("value");
 
-// Formatação de valor automática
-inputValor.addEventListener("input", () => {
-  let valor = inputValor.value.replace(/\D/g, "");
-  valor = (Number(valor)/100).toLocaleString("pt-BR", {minimumFractionDigits: 2});
-  inputValor.value = valor;
+valueInput.addEventListener("input",()=>{
+  let v = valueInput.value.replace(/\D/g,"");
+  v = (Number(v)/100).toLocaleString("pt-BR",{minimumFractionDigits:2});
+  valueInput.value = v;
 });
 
-// Atualiza nome do mês
-function atualizarNomeMes() {
-  const meses = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
-  nomeMes.innerText = `${meses[mesAtual.getMonth()]} ${mesAtual.getFullYear()}`;
+function updateMonthLabel(){
+  const meses=["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
+  monthLabel.innerText = `${meses[currentMonth.getMonth()]} ${currentMonth.getFullYear()}`;
 }
 
-// Chave do mês para o Firebase
-function obterChaveMes() {
-  return `${mesAtual.getFullYear()}-${String(mesAtual.getMonth()+1).padStart(2, "0")}`;
+function getMonthKey(){
+  return `${currentMonth.getFullYear()}-${String(currentMonth.getMonth()+1).padStart(2,"0")}`;
 }
 
-// Formata data para exibição
-function formatarDataExibicao(dataStr) {
-  const [ano, mes, dia] = dataStr.split("-");
-  const data = new Date(dataStr + "T00:00:00");
-  const diasSemana = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
-  return `${dia}/${mes} · ${diasSemana[data.getDay()]}`;
+function formatDate(d){
+  const [y,m,day]=d.split("-");
+  const data = new Date(d + "T00:00:00");
+  const diasSemana = ["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"];
+  return `${day}/${m} · ${diasSemana[data.getDay()]}`;
 }
 
-// Referências do Firebase
-function refMes() {
-  return firebase.database().ref("finance/meses/" + obterChaveMes());
+function monthRef(){
+  return firebase.database().ref("finance/meses/"+getMonthKey());
 }
-function refCategorias() {
+
+function categoriesRef(){
   return firebase.database().ref("finance/categorias");
 }
 
-// Navegar entre meses
-function mudarMes(passo) {
-  mesAtual = new Date(mesAtual.getFullYear(), mesAtual.getMonth() + passo, 1);
-  atualizarNomeMes();
-  renderizarLista();
+function changeMonth(step){
+  currentMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + step, 1);
+  updateMonthLabel();
+  render();
 }
 
-// Definir tipo da transação
-function definirTipo(tipo) {
-  tipoAtual = tipo;
-  document.querySelectorAll(".botao-tipo").forEach(b => b.classList.remove("ativo"));
-  document.querySelector(`.botao-tipo.${tipo}`).classList.add("ativo");
+function setType(t){
+  currentType=t;
+  document.querySelectorAll(".type-btn").forEach(b=>b.classList.remove("active"));
+  document.querySelector(`.type-btn.${t}`).classList.add("active");
 }
 
-let parcelado = false;
-function alternarParcelado() {
-  parcelado = !parcelado;
-  const botao = document.getElementById("botaoParcelado");
-  const input = document.getElementById("quantidade-parcelas");
-  botao.classList.toggle("ativo", parcelado);
-  input.style.display = parcelado ? "block" : "none";
-  if (!parcelado) input.value = "";
+let isParcel = false;
+function toggleParcel(){
+  isParcel = !isParcel;
+  const btn = document.getElementById("btnParcel");
+  const input = document.getElementById("parcelCount");
+  btn.classList.toggle("active", isParcel);
+  input.style.display = isParcel ? "block" : "none";
+  if(!isParcel) input.value = "";
 }
 
-// Renderizar lista completa
-function renderizarLista() {
-  const container = document.getElementById("lista");
+function checkMonthTurnover(){
+  const today = new Date();
+  if(today.getDate() !== 1) return;
+  const currentMonthKey = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,"0")}`;
+  const prev = new Date(today);
+  prev.setMonth(prev.getMonth() - 1);
+  const prevMonthKey = `${prev.getFullYear()}-${String(prev.getMonth()+1).padStart(2,"0")}`;
+
+  firebase.database().ref("finance/saldos/" + currentMonthKey).once("value", snap=>{
+    firebase.database().ref("finance/meses/" + prevMonthKey).once("value", snapPrev=>{
+      const data = snapPrev.val() || {};
+      let saldoFinal = 0;
+      Object.values(data).forEach(t=>{
+        if(!t.paid) return;
+        saldoFinal += t.type === "income" ? t.value : -t.value;
+      });
+      firebase.database().ref("finance/saldos/" + currentMonthKey).set(saldoFinal);
+    });
+  });
+}
+
+function render(){
+  const container = document.getElementById("list");
   container.innerHTML = "";
-  let recPago = 0, recPrev = 0, despPago = 0, despPrev = 0;
+  let rPago = 0, rPrev = 0, dPago = 0, dPrev = 0;
 
-  refMes().off();
-  refMes().on("value", async (snapshot) => {
-    const dados = snapshot.val() || {};
-    const listaOrdenada = Object.values(dados).sort((a,b) => new Date(b.data) - new Date(a.data));
+  monthRef().off();
+  monthRef().on("value", async snap=>{
+    const data = snap.val() || {};
+    const list = Object.values(data).sort((a,b)=>new Date(b.date)-new Date(a.date));
     container.innerHTML = "";
 
-    // Saldo inicial do mês
     let saldoInicial = 0;
-    const chaveSaldo = obterChaveMes();
-    const snapSaldo = await firebase.database().ref("finance/saldos/" + chaveSaldo).once("value");
+    const saldoKey = getMonthKey();
+    const snapSaldo = await firebase.database().ref("finance/saldos/" + saldoKey).once("value");
     saldoInicial = Number(snapSaldo.val() || 0);
 
-    // Agrupar por data
-    const agrupadoPorData = {};
-    listaOrdenada.forEach(trans => {
-      if (!agrupadoPorData[trans.data]) agrupadoPorData[trans.data] = [];
-      agrupadoPorData[trans.data].push(trans);
+    const groupedByDate = {};
+    list.forEach(t=>{
+      if(!groupedByDate[t.date]) groupedByDate[t.date] = [];
+      groupedByDate[t.date].push(t);
     });
 
-    Object.keys(agrupadoPorData).sort((a,b) => new Date(b) - new Date(a)).forEach(data => {
-      // Cabeçalho da data
-      const cabecalho = document.createElement("div");
-      cabecalho.className = "cabecalho-data";
-      cabecalho.innerHTML = `<span>${formatarDataExibicao(data)}</span>`;
-      container.appendChild(cabecalho);
+    Object.keys(groupedByDate).sort((a,b)=>new Date(b)-new Date(a)).forEach(date=>{
+      const dateHeader = document.createElement("div");
+      dateHeader.className = "date-header";
+      dateHeader.innerHTML = `<span>${formatDate(date)}</span>`;
+      container.appendChild(dateHeader);
 
-      agrupadoPorData[data].sort((a,b) => b.valor - a.valor).forEach(trans => {
-        // Cálculos de totais
-        if (trans.tipo === "receita") {
-          trans.pago ? recPago += trans.valor : recPrev += trans.valor;
-        } else {
-          trans.pago ? despPago += trans.valor : despPrev += trans.valor;
-        }
+      groupedByDate[date].sort((a,b)=>b.value - a.value).forEach(t=>{
+        if(t.type==="income"){ t.paid ? rPago+=t.value : rPrev+=t.value; }
+        else{ t.paid ? dPago+=t.value : dPrev+=t.value; }
 
-        const hoje = new Date().toISOString().split("T")[0];
-        const atrasado = !trans.pago && trans.data < hoje;
-        const venceHoje = !trans.pago && trans.data === hoje;
+        const todayStr = getTodayLocalString();
+        const isLate = !t.paid && t.date < todayStr;
+        const isDueToday = !t.paid && t.date === todayStr;
 
-        // Construir card
         const card = document.createElement("div");
-        card.className = `card-transacao borda-${trans.tipo}`;
-        if (atrasado) card.classList.add("borda-atrasado");
-        if (venceHoje) card.classList.add("borda-hoje");
-        card.onclick = () => editarTransacao(trans.id);
+        card.className = `transaction-card card-${t.type}`;
+        if(isLate) card.classList.add("card-late");
+        if(isDueToday) card.classList.add("card-today");
+        card.onclick = () => editById(t.id);
 
-        // Ícone e valor
-        const icone = trans.tipo === "receita" ? "↑" : "↓";
-        const classeIcone = trans.tipo === "receita" ? "icone-receita" : "icone-despesa";
-        const sinal = trans.tipo === "receita" ? "+ " : "- ";
+        const icone = t.type === "income" ? "↑" : "↓";
+        const classeIcone = t.type === "income" ? "icon-income" : "icon-expense";
+        const sinal = t.type === "income" ? "+ " : "- ";
 
-        // Status
-        let statusHtml = "";
-        if (trans.pago) {
-          statusHtml = `<span class="etiqueta-status status-pago">${trans.tipo === "receita" ? "Recebido" : "Pago"}</span>`;
-        } else if (atrasado) {
-          statusHtml = `<span class="etiqueta-status status-atrasado">Atrasado</span>`;
-        } else if (venceHoje) {
-          statusHtml = `<span class="etiqueta-status status-hoje">Vence hoje</span>`;
-        }
+        let badge = "";
+        if(t.paid) badge = `<span class="trans-badge ${t.type==='income'?'badge-received':'badge-paid'}">${t.type==='income'?'Recebido':'Pago'}</span>`;
+        else if(isLate) badge = `<span class="trans-badge badge-late">Atrasado</span>`;
+        else if(isDueToday) badge = `<span class="trans-badge badge-today">Vence hoje</span>`;
 
-        // Parcelamento
-        let parcelaHtml = "";
-        if (trans.parcelado) {
-          parcelaHtml = `<span class="etiqueta-parcela">${trans.indiceParcela} de ${trans.totalParcelas}</span>`;
-        }
+        let parcelHtml = "";
+        if(t.parcel) parcelHtml = `<span class="parcel-tag">${t.parcelIndex} de ${t.parcelTotal}</span>`;
 
         card.innerHTML = `
-          <div class="icone-tipo ${classeIcone}">${icone}</div>
-          <div class="info-esquerda">
-            <div class="nome-transacao">${trans.nome}</div>
-            <div class="detalhes-transacao">
-              <span class="categoria">${trans.categoria}</span>
-              ${parcelaHtml}
+          <div class="type-icon ${classeIcone}">${icone}</div>
+          <div class="trans-content">
+            <div class="trans-top">
+              <span class="trans-name">${t.name}</span>
+              <span class="trans-value ${t.type}">${sinal}R$ ${t.value.toLocaleString("pt-BR",{minimumFractionDigits:2})}</span>
+            </div>
+            <div class="trans-bottom">
+              <span class="trans-details">${t.category}</span>
+              ${parcelHtml}
             </div>
           </div>
-          <div class="info-direita">
-            <span class="valor-transacao valor-${trans.tipo}">${sinal}R$ ${trans.valor.toLocaleString("pt-BR", {minimumFractionDigits:2})}</span>
-            ${statusHtml}
-          </div>
+          <div class="trans-status">${badge}</div>
         `;
         container.appendChild(card);
       });
     });
 
-    // Atualizar valores dos cards
-    recPago.innerText = `R$ ${recPago.toLocaleString("pt-BR", {minimumFractionDigits:2})}`;
-    recPrev.innerText = `R$ ${(recPago + recPrev).toLocaleString("pt-BR", {minimumFractionDigits:2})}`;
-    despPago.innerText = `R$ ${despPago.toLocaleString("pt-BR", {minimumFractionDigits:2})}`;
-    despPrev.innerText = `R$ ${(despPago + despPrev).toLocaleString("pt-BR", {minimumFractionDigits:2})}`;
-    saldoPago.innerText = `R$ ${(saldoInicial + recPago - despPago).toLocaleString("pt-BR", {minimumFractionDigits:2})}`;
-    saldoPrev.innerText = `R$ ${(saldoInicial + recPago + recPrev - despPago - despPrev).toLocaleString("pt-BR", {minimumFractionDigits:2})}`;
+    recPago.innerText = `R$ ${rPago.toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
+    recPrev.innerText = `R$ ${(rPago+rPrev).toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
+    despPago.innerText = `R$ ${dPago.toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
+    despPrev.innerText = `R$ ${(dPago+dPrev).toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
+    saldoPago.innerText = `R$ ${(saldoInicial + rPago - dPago).toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
+    saldoPrev.innerText = `R$ ${(saldoInicial + rPago + rPrev - dPago - dPrev).toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
   });
 }
 
-// Demais funções (salvar, editar, excluir, categorias) mantêm a lógica original adaptada aos nomes novos
-function salvarTransacao() {
-  const valorTotal = Number(inputValor.value.replace(/\./g, "").replace(",", "."));
-  const dataBase = document.getElementById("dataTransacao").value;
+function save(){
+  const valTotal = Number(valueInput.value.replace(/\./g,"").replace(",","."));
+  const baseDateStr = date.value;
 
-  if (!parcelado) {
-    const id = idEdicao || Date.now().toString();
-    const transacao = {
-      id,
-      nome: document.getElementById("nomeTransacao").value.trim(),
-      valor: valorTotal,
-      categoria: document.getElementById("categoriaTransacao").value,
-      data: dataBase,
-      tipo: tipoAtual,
-      pago: document.getElementById("pagoTransacao").checked,
-      parcelado: dadosParcelamentoEdicao ? true : false,
-      indiceParcela: dadosParcelamentoEdicao ? dadosParcelamentoEdicao.indice : null,
-      totalParcelas: dadosParcelamentoEdicao ? dadosParcelamentoEdicao.total : null,
-      grupoParcelas: dadosParcelamentoEdicao ? dadosParcelamentoEdicao.grupo : null
+  if(!isParcel){
+    const id = editId || Date.now().toString();
+    const item = {
+      id, name: title.value.trim(), value: valTotal, category: category.value, date: baseDateStr,
+      type: currentType, paid: paid.checked,
+      parcel: editingParcelData ? true : false,
+      parcelIndex: editingParcelData ? editingParcelData.parcelIndex : null,
+      parcelTotal: editingParcelData ? editingParcelData.parcelTotal : null,
+      parcelGroupId: editingParcelData ? editingParcelData.parcelGroupId : null
     };
-
-    const novaChaveMes = `${dataBase.split("-")[0]}-${dataBase.split("-")[1]}`;
-    if (idEdicao && chaveMesEdicao && chaveMesEdicao !== novaChaveMes) {
-      firebase.database().ref("finance/meses/" + chaveMesEdicao + "/" + id).remove();
+    const newMonthKey = getMonthKeyFromDate(item.date);
+    if(editId && editMonthKey && editMonthKey !== newMonthKey){
+      firebase.database().ref("finance/meses/" + editMonthKey + "/" + id).remove();
     }
-    firebase.database().ref("finance/meses/" + novaChaveMes + "/" + id).set(transacao);
-    fecharModal(); renderizarLista();
-    return;
+    firebase.database().ref("finance/meses/" + newMonthKey + "/" + id).set(item);
+    closeModal(); render(); return;
   }
 
-  const totalParcelas = Number(document.getElementById("quantidade-parcelas").value || 0);
-  if (totalParcelas < 2) { alert("Informe a quantidade de parcelas"); return; }
-  const grupoId = Date.now().toString();
-  const dataBaseObj = new Date(dataBase);
-
-  for (let i = 0; i < totalParcelas; i++) {
-    const dataParcela = new Date(dataBaseObj);
-    dataParcela.setMonth(dataParcela.getMonth() + i);
-    const dataStr = dataParcela.toISOString().split("T")[0];
-    const chaveMes = `${dataStr.split("-")[0]}-${dataStr.split("-")[1]}`;
-    const idParcela = `${grupoId}_${i+1}`;
-
-    const transacao = {
-      id: idParcela,
-      nome: document.getElementById("nomeTransacao").value.trim(),
-      valor: valorTotal,
-      categoria: document.getElementById("categoriaTransacao").value,
-      data: dataStr,
-      tipo: tipoAtual,
-      pago: false,
-      parcelado: true,
-      indiceParcela: i+1,
-      totalParcelas,
-      grupoParcelas: grupoId
+  const totalParcels = Number(parcelCount.value || 0);
+  if(totalParcels < 2){ alert("Informe a quantidade de parcelas"); return; }
+  const parcelValue = valTotal;
+  const groupId = Date.now().toString();
+  const baseDate = new Date(baseDateStr);
+  for(let i = 0; i < totalParcels; i++){
+    const d = new Date(baseDate); d.setMonth(d.getMonth() + i);
+    const dateStr = d.toISOString().split("T")[0];
+    const monthKey = getMonthKeyFromDate(dateStr);
+    const id = `${groupId}_${i+1}`;
+    const item = {
+      id, name: title.value.trim(), value: parcelValue, category: category.value, date: dateStr,
+      type: currentType, paid: false, parcel: true, parcelIndex: i+1, parcelTotal: totalParcels, parcelGroupId: groupId
     };
-    firebase.database().ref("finance/meses/" + chaveMes + "/" + idParcela).set(transacao);
+    firebase.database().ref("finance/meses/" + monthKey + "/" + id).set(item);
   }
-  fecharModal(); renderizarLista();
+  closeModal(); render();
 }
 
-function editarTransacao(id) {
-  const chaveMesOriginal = obterChaveMes();
-  firebase.database().ref("finance/meses/" + chaveMesOriginal + "/" + id).once("value", (snap) => {
-    const trans = snap.val();
-    if (!trans) return;
-
-    document.getElementById("nomeTransacao").value = trans.nome;
-    inputValor.value = trans.valor.toLocaleString("pt-BR", {minimumFractionDigits:2});
-    document.getElementById("categoriaTransacao").value = trans.categoria;
-    document.getElementById("dataTransacao").value = trans.data;
-    document.getElementById("pagoTransacao").checked = trans.pago;
-    tipoAtual = trans.tipo;
-    definirTipo(tipoAtual);
-
-    dadosParcelamentoEdicao = trans.parcelado ? {
-      indice: trans.indiceParcela,
-      total: trans.totalParcelas,
-      grupo: trans.grupoParcelas
-    } : null;
-
-    idEdicao = id;
-    chaveMesEdicao = chaveMesOriginal;
-    botaoExcluir.style.display = "block";
-    abrirModal();
+function editById(id){
+  const originalMonthKey = getMonthKey();
+  firebase.database().ref("finance/meses/" + originalMonthKey + "/" + id).once("value", snap=>{
+    const t = snap.val(); if(!t) return;
+    title.value = t.name;
+    valueInput.value = t.value.toLocaleString("pt-BR",{minimumFractionDigits:2});
+    category.value = t.category; date.value = t.date; paid.checked = t.paid; currentType = t.type;
+    editingParcelData = t.parcel ? {parcelIndex:t.parcelIndex,parcelTotal:t.parcelTotal,parcelGroupId:t.parcelGroupId} : null;
+    setType(currentType); editId = id; editMonthKey = originalMonthKey; deleteBtn.style.display = "block"; openModal();
   });
 }
 
-function excluirTransacao() {
-  if (!idEdicao) return;
-  refMes().child(idEdicao).remove();
-  fecharModal();
-  renderizarLista();
-}
+function remove(){ if(!editId) return; monthRef().child(editId).remove(); closeModal(); render(); }
 
-function abrirModal() {
-  modal.style.display = "flex";
-  if (!idEdicao) {
-    document.getElementById("nomeTransacao").value = "";
-    inputValor.value = "";
-    document.getElementById("categoriaTransacao").value = "Geral";
-    document.getElementById("pagoTransacao").checked = false;
-    definirTipo("receita");
-    parcelado = false;
-    document.getElementById("botaoParcelado").classList.remove("ativo");
-    document.getElementById("quantidade-parcelas").style.display = "none";
-    document.getElementById("quantidade-parcelas").value = "";
-    const hoje = new Date();
-    document.getElementById("dataTransacao").value = `${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2,"0")}-${String(hoje.getDate()).padStart(2,"0")}`;
-    botaoExcluir.style.display = "none";
+function openModal(){
+  modal.style.display="flex";
+  if(editId===null){
+    title.value=""; valueInput.value=""; category.value=""; paid.checked=false; setType("income");
+    isParcel=false; document.getElementById("btnParcel").classList.remove("active");
+    document.getElementById("parcelCount").style.display="none"; document.getElementById("parcelCount").value="";
+    const hoje=new Date(); date.value=`${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2,"0")}-${String(hoje.getDate()).padStart(2,"0")}`;
+    deleteBtn.style.display="none";
   }
 }
 
-function fecharModal() {
-  modal.style.display = "none";
-  parcelado = false;
-  dadosParcelamentoEdicao = null;
-  idEdicao = null;
-  chaveMesEdicao = null;
+function closeModal(){
+  modal.style.display="none"; isParcel=false; editingParcelData=null;
+  const btn=document.getElementById("btnParcel"); const input=document.getElementById("parcelCount");
+  btn.classList.remove("active"); input.style.display="none"; input.value="";
+  editId=null; editMonthKey=null;
 }
 
-// Funções de categorias e relatórios mantidas
-function abrirModalCategorias() { document.getElementById("modalCategorias").style.display = "flex"; }
-function fecharModalCategorias() { document.getElementById("modalCategorias").style.display = "none"; }
-function salvarCategoria() {
-  const nome = document.getElementById("nomeCategoria").value.trim();
-  if (!nome) return;
-  refCategorias().child(nome).set(true);
-  document.getElementById("nomeCategoria").value = "";
-  atualizarListaCategorias();
-  atualizarSelectCategorias();
+function openCategoryModal(){ document.getElementById("categoryModal").style.display="flex"; renderCategories(); }
+function closeCategoryModal(){ document.getElementById("categoryModal").style.display="none"; }
+function saveCategory(){
+  const input=document.getElementById("categoryName"); const name=input.value.trim(); if(!name) return;
+  categoriesRef().child(name).set(true); input.value=""; renderCategories(); updateCategorySelect();
 }
-function excluirCategoria(nome) { refCategorias().child(nome).remove(); atualizarListaCategorias(); atualizarSelectCategorias(); }
-function atualizarListaCategorias() {
-  const container = document.getElementById("listaCategorias");
-  container.innerHTML = "";
-  refCategorias().once("value", (snap) => {
-    const dados = snap.val() || {};
-    Object.keys(dados).sort().forEach(cat => {
-      const item = document.createElement("div");
-      item.style = "display:flex; justify-content:space-between; align-items:center; padding:12px; background:#F8FAFC; border-radius:12px; margin-top:8px; font-size:15px;";
-      item.innerHTML = `<span>${cat}</span><button style="width:32px; height:32px; border-radius:50%; border:none; background:#FEE2E2; color:#DC2626; font-size:18px; cursor:pointer;" onclick="excluirCategoria('${cat}')">✕</button>`;
-      container.appendChild(item);
+function deleteCategory(name){ categoriesRef().child(name).remove(); renderCategories(); updateCategorySelect(); }
+function renderCategories(){
+  const container=document.getElementById("categoryList"); container.innerHTML="";
+  categoriesRef().once("value", snap=>{
+    const data=snap.val()||{};
+    Object.keys(data).sort((a,b)=>a.localeCompare(b,'pt-BR')).forEach(c=>{
+      const div=document.createElement("div"); div.className="category-item";
+      div.innerHTML=`<span>${c}</span><button onclick="deleteCategory('${c}')">✕</button>`;
+      container.appendChild(div);
     });
   });
 }
-function atualizarSelectCategorias() {
-  const select = document.getElementById("categoriaTransacao");
-  select.innerHTML = `<option>Geral</option>`;
-  refCategorias().once("value", (snap) => {
-    const dados = snap.val() || {};
-    Object.keys(dados).forEach(cat => {
-      const opt = document.createElement("option");
-      opt.value = cat;
-      opt.innerText = cat;
-      select.appendChild(opt);
+function updateCategorySelect(){
+  const select=document.getElementById("category"); select.innerHTML="";
+  categoriesRef().once("value", snap=>{
+    const data=snap.val()||{};
+    Object.keys(data).forEach(c=>{
+      const opt=document.createElement("option"); opt.value=c; opt.innerText=c; select.appendChild(opt);
     });
   });
 }
-function irRelatorios() { window.location.href = "relatorios.html"; }
 
-// Inicialização
-const firebaseConfig = {
-  apiKey: "AIzaSyAd-ttfpK460D4fyfoNZY6DJRhzuItpHe0",
-  authDomain: "box-financeiro.firebaseapp.com",
-  databaseURL: "https://box-financeiro-default-rtdb.firebaseio.com",
-  projectId: "box-financeiro",
-  storageBucket: "box-financeiro.firebasestorage.app",
-  messagingSenderId: "249966609723",
-  appId: "1:249966609723:web:12339b100df393031ea31e"
-};
-firebase.initializeApp(firebaseConfig);
-atualizarNomeMes();
-renderizarLista();
-atualizarSelectCategorias();
+function goReports(){ window.location.href="relatorios.html"; }
+function getMonthKeyFromDate(dateStr){ const [y,m]=dateStr.split("-"); return `${y}-${m}`; }
+function getTodayLocalString(){ const n=new Date(); return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,"0")}-${String(n.getDate()).padStart(2,"0")}`; }
+</script>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyAd-ttfpK460D4fyfoNZY6DJRhzuItpHe0",
+    authDomain: "box-financeiro.firebaseapp.com",
+    databaseURL: "https://box-financeiro-default-rtdb.firebaseio.com",
+    projectId: "box-financeiro",
+    storageBucket: "box-financeiro.firebasestorage.app",
+    messagingSenderId: "249966609723",
+    appId: "1:249966609723:web:12339b100df393031ea31e"
+  };
+  firebase.initializeApp(firebaseConfig);
+  updateMonthLabel(); checkMonthTurnover(); render(); updateCategorySelect();
 </script>
 <script>if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");</script>
 </body>
