@@ -834,16 +834,18 @@ saldoInicial = Number(snapSaldo.val() || 0);
 </div>
 
 ${
-t.type==="income" && (t.receivedValue||0)>0
+t.type === "income" &&
+!t.paid &&
+(t.receivedValue || 0) > 0
 ? `
 <div class="received">
 
     <div class="ok">
-        Recebido: R$ ${(t.receivedValue||0).toLocaleString("pt-BR",{minimumFractionDigits:2})}
+        Recebido: R$ ${(t.receivedValue || 0).toLocaleString("pt-BR",{minimumFractionDigits:2})}
     </div>
 
     <div class="rest">
-        Falta: R$ ${(t.remainingValue||t.value).toLocaleString("pt-BR",{minimumFractionDigits:2})}
+        Falta: R$ ${((t.value || 0) - (t.receivedValue || 0)).toLocaleString("pt-BR",{minimumFractionDigits:2})}
     </div>
 
 </div>
@@ -883,11 +885,15 @@ function save(){
     valueInput.value.replace(/\./g,"").replace(",",".")
   );
   
-  const valReceived = Number(
-  (receivedInput.value || "0")
-    .replace(/\./g,"")
-    .replace(",",".")
+  let valReceived = Number(
+    (receivedInput.value || "0")
+        .replace(/\./g,"")
+        .replace(",",".")
 ) || 0;
+
+if(currentType === "income" && paid.checked){
+    valReceived = valTotal;
+}
 
 const remaining = Math.max(0, valTotal - valReceived);
 
