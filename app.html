@@ -794,27 +794,7 @@ saldoInicial = Number(snapSaldo.val() || 0);
 
 </div>
 
-<div class="item-bottom">
-  <div class="item-sub">
-    ${t.category}
-    ${t.parcel ? `
-      <span style="margin-left:6px;font-size:12px;color:#777">
-        ${t.parcelIndex}/${t.parcelTotal}
-      </span>
-    ` : ""}
-  </div>
 
-  ${
-    t.paid
-      ? `<div class="badge green">${t.type==="income"?"Recebido":"Pago"}</div>`
-      : isLate
-        ? `<div class="badge red">Atrasado</div>`
-        : isDueToday
-          ? `<div class="badge orange">Vence hoje</div>`
-          : ""
-  }
-</div>
-`;
 
             itemsWrap.appendChild(item);
           });
