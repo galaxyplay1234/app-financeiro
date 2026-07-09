@@ -845,19 +845,23 @@ function save(){
     const id = `${groupId}_${i+1}`;
 
     const item = {
-      id,
-      name: title.value.trim(),
-      value: parcelValue,
-      category: category.value,
-      date: dateStr,
-      type: currentType,
-      paid: false,
+  id,
+  name: title.value.trim(),
+  value: parcelValue,
 
-      parcel: true,
-      parcelIndex: i + 1,
-      parcelTotal: totalParcels,
-      parcelGroupId: groupId
-    };
+  receivedValue: 0,
+  remainingValue: parcelValue,
+
+  category: category.value,
+  date: dateStr,
+  type: currentType,
+  paid: false,
+
+  parcel: true,
+  parcelIndex: i + 1,
+  parcelTotal: totalParcels,
+  parcelGroupId: groupId
+};
 
     firebase
       .database()
