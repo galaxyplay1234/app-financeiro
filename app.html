@@ -534,6 +534,16 @@ input:checked + .slider:before{transform:translateX(20px)}
   </label>
 </div>
 
+
+<div class="switch-row" id="editAllRow" style="display:none">
+    <span>Editar parcelas futuras</span>
+
+    <label class="switch">
+        <input type="checkbox" id="editAll">
+        <span class="slider"></span>
+    </label>
+</div>
+
 <button onclick="save()">Salvar</button>
 <button id="deleteBtn" class="delete" onclick="remove()">Excluir</button>
 <div id="parcelDeleteOptions" style="display:none;margin-top:8px">
@@ -952,24 +962,17 @@ const remaining = Math.max(0, valTotal - valReceived);
 
 if(!isParcel){
 
-    if(editingItem?.parcel){
+    if(editingItem?.parcel &&
+   document.getElementById("editAll").checked){
 
-        const editarTudo = confirm(
+    updateParcelGroup();
 
-            "OK = Editar todas as parcelas\n\nCancelar = Editar somente esta parcela."
+    closeModal();
 
-        );
+    render();
 
-        if(editarTudo){
-
-            updateParcelGroup();
-
-            closeModal();
-
-            render();
-
-            return;
-    }
+    return;
+}
 
 }
     const id = editId || Date.now().toString();
@@ -1118,6 +1121,10 @@ function editById(id){
     .once("value", snap=>{
       const t = snap.val();
       editingItem = t;
+      document.getElementById("editAllRow").style.display =
+    t.parcel ? "flex" : "none";
+
+document.getElementById("editAll").checked = false;
       if(!t) return;
 
       title.value = t.name;
@@ -1262,6 +1269,9 @@ function closeModal(){
   
   document.getElementById("deleteBtn").style.display="block";
 document.getElementById("parcelDeleteOptions").style.display="none";
+
+document.getElementById("editAll").checked = false;
+document.getElementById("editAllRow").style.display = "none";
 
   isParcel = false;
   editingParcelData = null; // 🔥 ESSENCIAL
