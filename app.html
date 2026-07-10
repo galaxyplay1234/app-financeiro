@@ -84,8 +84,28 @@ header h2{
   text-align:center;box-shadow:0 2px 6px rgba(0,0,0,.1)
 }
 .card h4{margin:0;font-size:14px;color:#666}
-.card .main{font-size:18px;font-weight:bold;margin-top:6px}
-.card .sub{font-size:13px;color:#777}
+.card .main{
+    margin-top:6px;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    white-space:nowrap;
+    overflow:hidden;
+
+    font-size:clamp(14px,3.8vw,18px);
+    font-weight:bold;
+    line-height:1;
+}
+.card .sub{
+    font-size:clamp(11px,3vw,13px);
+    color:#777;
+
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
 .saldo{border-top:4px solid #1976d2}
 .receita{border-top:4px solid #2e7d32}
 .despesa{border-top:4px solid #c62828}
