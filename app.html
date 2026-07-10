@@ -965,14 +965,13 @@ if(!isParcel){
     if(editingItem?.parcel &&
    document.getElementById("editAll").checked){
 
+    alert("Entrou");
+
     updateParcelGroup(valReceived, remaining);
 
     closeModal();
-
     render();
-
     return;
-
 }
     const id = editId || Date.now().toString();
 
