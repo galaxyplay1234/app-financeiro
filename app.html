@@ -1102,15 +1102,16 @@ return;
 
 if(isFixed){
 
-    if(editId){
+    // Só atualiza se já era uma fixa
+    if(editId && editingItem?.fixed){
 
-    await updateFixedGroup(valReceived, remaining);
+        await updateFixedGroup(valReceived, remaining);
 
-    closeModal();
-    render();
-    return;
+        closeModal();
+        render();
+        return;
 
-}
+    }
 
     // continua o código atual de criar fixa...
     const groupId = Date.now().toString();
@@ -1132,49 +1133,31 @@ if(isFixed){
         const item = {
 
             id,
-
             name: title.value.trim(),
-
             value: valTotal,
-
             receivedValue: 0,
-
             remainingValue: valTotal,
-
             category: category.value,
-
             date: dateStr,
-
             type: currentType,
-
             paid: false,
-
             fixed: true,
-
             parcel: false,
-
             parcelGroupId: groupId,
-
             parcelIndex: i + 1,
-
             parcelTotal: 12
 
         };
 
         await firebase.database()
-
             .ref("finance/meses/" + monthKey + "/" + id)
-
             .set(item);
 
     }
 
     closeModal();
-
     render();
-
     return;
-
 }
 
 
@@ -1182,7 +1165,7 @@ if(isFixed){
   /* =========================
      PARCELADO
   ========================= */
-  if(isParcel && editId){
+  if(isParcel && editId && editingItem?.parcel){
 
     await updateParcelGroup(valReceived, remaining);
 
