@@ -1026,7 +1026,15 @@ const remaining = Math.max(0, valTotal - valReceived);
 
   const baseDateStr = date.value;
   
-  
+if(editingItem?.parcel && isFixed){
+
+    await convertParcelToFixed(valReceived, remaining);
+
+    closeModal();
+    render();
+    return;
+
+} 
 
 /* =========================
 
@@ -1176,16 +1184,7 @@ if(isFixed){
 }
 
 
-// Converter Parcelado -> Fixa
-if(editingItem?.parcel && isFixed){
 
-    await deleteGroup(editingItem.parcelGroupId);
-
-    editId = null;
-    editingItem = null;
-    editingParcelData = null;
-
-}
 
 // Converter Fixa -> Parcelado
 if(editingItem?.fixed && isParcel){
@@ -1338,6 +1337,80 @@ promises.push(
 
     await Promise.all(promises);
 }
+
+
+async function convertParcelToFixed(valReceived, remaining){
+
+    const snap = await firebase.database()
+        .ref("finance/meses")
+        .once("value");
+
+    const meses = snap.val() || {};
+    const promises = [];
+
+    const novoValor = Number(
+        valueInput.value.replace(/\./g,"").replace(",",".")
+    );
+
+    const novoDia = new Date(date.value).getDate();
+
+    Object.keys(meses).forEach(mes=>{
+
+        Object.keys(meses[mes]).forEach(id=>{
+
+            const item = meses[mes][id];
+
+            if(
+                item.parcelGroupId === editingItem.parcelGroupId &&
+                item.parcelIndex >= editingItem.parcelIndex
+            ){
+
+                item.fixed = true;
+                item.parcel = false;
+
+                item.name = title.value.trim();
+                item.category = category.value;
+                item.value = novoValor;
+                item.type = currentType;
+
+                const data = new Date(item.date);
+                data.setDate(novoDia);
+                item.date = data.toISOString().split("T")[0];
+
+                if(item.id === editingItem.id){
+
+                    item.paid = paid.checked;
+
+                    if(currentType==="income"){
+                        item.receivedValue = valReceived;
+                        item.remainingValue = remaining;
+                    }
+
+                }else{
+
+                    item.remainingValue = Math.max(
+                        0,
+                        novoValor-(item.receivedValue||0)
+                    );
+
+                }
+
+                promises.push(
+                    firebase.database()
+                    .ref("finance/meses/"+mes+"/"+id)
+                    .set(item)
+                );
+
+            }
+
+        });
+
+    });
+
+    await Promise.all(promises);
+
+}
+
 
 
 async function updateFixedGroup(valReceived, remaining){
