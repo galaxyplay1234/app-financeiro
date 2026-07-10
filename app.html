@@ -1094,18 +1094,21 @@ async function updateParcelGroup(valReceived, remaining){
             ){
 
                 item.name = title.value.trim();
-                item.category = category.value;
-                item.value = novoValor;
-                item.type = currentType;
-                item.paid = paid.checked;
-                item.receivedValue = valReceived;
-                item.remainingValue = remaining;
+item.category = category.value;
+item.value = novoValor;
+item.type = currentType;
 
-                promises.push(
-                    firebase.database()
-                        .ref("finance/meses/"+mes+"/"+id)
-                        .set(item)
-                );
+// mantém o status de pagamento de cada parcela
+item.remainingValue = Math.max(
+    0,
+    novoValor - (item.receivedValue || 0)
+);
+
+promises.push(
+    firebase.database()
+        .ref("finance/meses/"+mes+"/"+id)
+        .set(item)
+);
             }
 
         });
