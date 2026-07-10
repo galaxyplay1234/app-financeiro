@@ -534,8 +534,37 @@ input:checked + .slider:before{transform:translateX(20px)}
   </label>
 </div>
 
+
+<div class="switch-row" id="editAllRow" style="display:none">
+    <span>Editar parcelas futuras</span>
+
+    <label class="switch">
+        <input type="checkbox" id="editAll">
+        <span class="slider"></span>
+    </label>
+</div>
+
 <button onclick="save()">Salvar</button>
 <button id="deleteBtn" class="delete" onclick="remove()">Excluir</button>
+<div id="parcelDeleteOptions" style="display:none;margin-top:8px">
+
+    <div style="display:flex;gap:8px">
+
+        <button
+    class="delete"
+    onclick="removeAllParcels()">
+    Excluir todas
+</button>
+
+        <button
+    class="delete"
+    onclick="removeCurrentParcel()">
+    Somente esta
+</button>
+
+    </div>
+
+</div>
 <button class="cancel" onclick="closeModal()">Cancelar</button>
 
 </div>
@@ -906,7 +935,7 @@ t.type === "income" &&
 /* =========================
    SAVE
 ========================= */
-function save(){
+async function save(){
   const valTotal = Number(
     valueInput.value.replace(/\./g,"").replace(",",".")
   );
@@ -925,10 +954,26 @@ const remaining = Math.max(0, valTotal - valReceived);
 
   const baseDateStr = date.value;
 
-  /* =========================
-     NÃO PARCELADO
-  ========================= */
-  if(!isParcel){
+/* =========================
+
+   NÃO PARCELADO
+
+========================= */
+
+if(!isParcel){
+
+    if(editingItem?.parcel &&
+   document.getElementById("editAll").checked){
+
+
+    await updateParcelGroup(valReceived, remaining);
+
+closeModal();
+
+render();
+
+return;
+}
     const id = editId || Date.now().toString();
 
     const item = {
@@ -1021,6 +1066,76 @@ const remaining = Math.max(0, valTotal - valReceived);
   render();
 }
 
+async function updateParcelGroup(valReceived, remaining){
+
+    const snap = await firebase.database()
+        .ref("finance/meses")
+        .once("value");
+
+    const meses = snap.val() || {};
+    const promises = [];
+
+    const novoValor = Number(
+        valueInput.value
+            .replace(/\./g,"")
+            .replace(",",".")
+    );
+
+    Object.keys(meses).forEach(mes=>{
+
+        Object.keys(meses[mes]).forEach(id=>{
+
+            const item = meses[mes][id];
+
+            // somente a parcela atual e as futuras
+            if(
+                item.parcelGroupId === editingItem.parcelGroupId &&
+                item.parcelIndex >= editingItem.parcelIndex
+            ){
+
+                item.name = title.value.trim();
+item.category = category.value;
+item.value = novoValor;
+item.type = currentType;
+
+if(item.id === editingItem.id){
+
+    // Apenas a parcela atual muda o status
+    item.paid = paid.checked;
+
+    if(currentType === "income"){
+        item.receivedValue = valReceived;
+        item.remainingValue = remaining;
+    }else{
+        item.remainingValue = 0;
+    }
+
+}else{
+
+    // Parcelas futuras mantêm o status
+    item.remainingValue = Math.max(
+        0,
+        novoValor - (item.receivedValue || 0)
+    );
+
+}
+
+promises.push(
+    firebase.database()
+        .ref("finance/meses/"+mes+"/"+id)
+        .set(item)
+);
+            }
+
+        });
+
+    });
+
+    await Promise.all(promises);
+}
+
+
+
 /* =========================
    EDIT
 ========================= */
@@ -1033,6 +1148,10 @@ function editById(id){
     .once("value", snap=>{
       const t = snap.val();
       editingItem = t;
+      document.getElementById("editAllRow").style.display =
+    t.parcel ? "flex" : "none";
+
+document.getElementById("editAll").checked = false;
       if(!t) return;
 
       title.value = t.name;
@@ -1070,10 +1189,79 @@ receivedInput.value =
    DELETE
 ========================= */
 function remove(){
-  if(!editId) return;
-  monthRef().child(editId).remove();
-  closeModal();
-  render();
+
+    if(!editingItem?.parcel){
+
+        monthRef().child(editId).remove();
+        closeModal();
+        render();
+        return;
+
+    }
+
+    document.getElementById("deleteBtn").style.display="none";
+    document.getElementById("parcelDeleteOptions").style.display="block";
+
+}
+
+
+
+function removeParcelGroup(groupId){
+
+    firebase.database()
+    .ref("finance/meses")
+    .once("value",snap=>{
+
+        const meses = snap.val() || {};
+        const promises = [];
+
+        Object.keys(meses).forEach(mes=>{
+
+            Object.keys(meses[mes]).forEach(id=>{
+
+                const item = meses[mes][id];
+
+                if(
+                    item.parcelGroupId === groupId &&
+                    item.parcelIndex >= editingItem.parcelIndex
+                ){
+
+                    promises.push(
+                        firebase.database()
+                        .ref("finance/meses/"+mes+"/"+id)
+                        .remove()
+                    );
+
+                }
+
+            });
+
+        });
+
+        Promise.all(promises).then(()=>{
+            closeModal();
+            render();
+        });
+
+    });
+
+}
+
+
+function removeAllParcels(){
+    removeParcelGroup(editingItem.parcelGroupId);
+}
+
+function removeCurrentParcel(){
+
+    monthRef()
+        .child(editId)
+        .remove()
+        .then(()=>{
+            closeModal();
+            render();
+        });
+
 }
 
 /* =========================
@@ -1105,6 +1293,12 @@ function openModal(){
 
 function closeModal(){
   modal.style.display = "none";
+  
+  document.getElementById("deleteBtn").style.display="block";
+document.getElementById("parcelDeleteOptions").style.display="none";
+
+document.getElementById("editAll").checked = false;
+document.getElementById("editAllRow").style.display = "none";
 
   isParcel = false;
   editingParcelData = null; // 🔥 ESSENCIAL
