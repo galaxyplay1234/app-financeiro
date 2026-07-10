@@ -533,17 +533,23 @@ input:checked + .slider:before{transform:translateX(20px)}
   
 <!-- PARCELAMENTO -->
 <div class="parcel-buttons">
-  <button id="btnParcel" class="parcel-btn" onclick="toggleParcel()">
-    Parcelado
-  </button>
 
-  <input
-    id="parcelCount"
-    type="number"
-    min="2"
-    placeholder="Meses"
-    style="display:none; width:110px"
-  >
+    <button id="btnParcel" class="parcel-btn" onclick="toggleParcel()">
+        Parcelado
+    </button>
+
+    <button id="btnFixed" class="parcel-btn" onclick="toggleFixed()">
+        Fixa
+    </button>
+
+    <input
+        id="parcelCount"
+        type="number"
+        min="2"
+        placeholder="Meses"
+        style="display:none;width:110px"
+    >
+
 </div>
 
 <div class="switch-row">
@@ -713,9 +719,16 @@ function setType(t){
    PARCELAMENTO
 ========================= */
 let isParcel = false;
+let isFixed = false;
 
 function toggleParcel(){
   isParcel = !isParcel;
+  
+  isFixed = false;
+
+document
+    .getElementById("btnFixed")
+    .classList.remove("active");
 
   const btn = document.getElementById("btnParcel");
   const input = document.getElementById("parcelCount");
@@ -723,10 +736,38 @@ function toggleParcel(){
   btn.classList.toggle("active", isParcel);
   input.style.display = isParcel ? "block" : "none";
 
-  if(!isParcel){
+  if(!isParcel && !isFixed){
     input.value = "";
   }
 }
+
+function toggleFixed(){
+
+    isFixed = !isFixed;
+
+    const btn = document.getElementById("btnFixed");
+
+    if(isFixed){
+
+        isParcel = false;
+
+        document.getElementById("btnParcel")
+            .classList.remove("active");
+
+        document.getElementById("parcelCount")
+            .style.display = "none";
+
+        btn.classList.add("active");
+
+    }else{
+
+        btn.classList.remove("active");
+
+    }
+
+}
+
+
 
 function checkMonthTurnover(){
   const today = new Date();
@@ -888,12 +929,17 @@ rPrev += (t.value - recebido);
     <div class="item-sub">
     ${t.category}
     ${
-        t.parcel
-        ? `<span class="parcel-badge">
-              ${t.parcelIndex}/${t.parcelTotal}
-          </span>`
-        : ``
-    }
+    t.fixed
+        ? `<span class="parcel-badge">FIXA</span>`
+
+        : t.parcel
+
+            ? `<span class="parcel-badge">
+                  ${t.parcelIndex}/${t.parcelTotal}
+              </span>`
+
+            : ``
+}
 </div>
 
     ${
@@ -980,7 +1026,7 @@ const remaining = Math.max(0, valTotal - valReceived);
 
 ========================= */
 
-if(!isParcel){
+if(!isParcel && !isFixed){
 
     if(editingItem?.parcel &&
    document.getElementById("editAll").checked){
@@ -997,6 +1043,7 @@ return;
     const id = editId || Date.now().toString();
 
     const item = {
+    fixed: isFixed,
   id,
   name: title.value.trim(),
   value: valTotal,
@@ -1058,6 +1105,7 @@ return;
     const id = `${groupId}_${i+1}`;
 
     const item = {
+    fixed: isFixed,
   id,
   name: title.value.trim(),
   value: parcelValue,
@@ -1161,6 +1209,72 @@ promises.push(
     });
 
     await Promise.all(promises);
+}
+
+
+if(isFixed){
+
+    const totalParcels = 12;
+
+    const groupId = Date.now().toString();
+
+    const baseDate = new Date(baseDateStr);
+
+    for(let i=0;i<12;i++){
+
+        const d = new Date(baseDate);
+
+        d.setMonth(d.getMonth()+i);
+
+        const dateStr =
+            d.toISOString().split("T")[0];
+
+        const monthKey =
+            getMonthKeyFromDate(dateStr);
+
+        const id =
+            `${groupId}_${i+1}`;
+
+        const item={
+
+            id,
+
+            name:title.value.trim(),
+
+            value:valTotal,
+
+            receivedValue:0,
+
+            remainingValue:valTotal,
+
+            category:category.value,
+
+            date:dateStr,
+
+            type:currentType,
+
+            paid:false,
+
+            fixed:true,
+
+            parcel:false
+
+        };
+
+        firebase.database()
+
+            .ref("finance/meses/"+monthKey+"/"+id)
+
+            .set(item);
+
+    }
+
+    closeModal();
+
+    render();
+
+    return;
+
 }
 
 
