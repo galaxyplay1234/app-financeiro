@@ -1025,6 +1025,28 @@ if(currentType === "income" && paid.checked){
 const remaining = Math.max(0, valTotal - valReceived);
 
   const baseDateStr = date.value;
+  
+  const changedToFixed =
+    editingItem?.parcel && isFixed;
+
+const changedToParcel =
+    editingItem?.fixed && isParcel;
+
+const changedToNormal =
+    (editingItem?.parcel || editingItem?.fixed) &&
+    !isParcel &&
+    !isFixed;
+    
+    
+    if(changedToFixed || changedToParcel || changedToNormal){
+
+    await deleteGroup(editingItem.parcelGroupId);
+
+    editId = null;
+    editingItem = null;
+    editingParcelData = null;
+
+}
 
 /* =========================
 
@@ -1100,6 +1122,17 @@ return;
 
 if(isFixed){
 
+    if(editId){
+
+    await updateFixedGroup(valReceived, remaining);
+
+    closeModal();
+    render();
+    return;
+
+}
+
+    // continua o código atual de criar fixa...
     const groupId = Date.now().toString();
 
     const baseDate = new Date(baseDateStr);
@@ -1296,7 +1329,79 @@ promises.push(
 }
 
 
+async function updateFixedGroup(valReceived, remaining){
 
+    const snap = await firebase.database()
+        .ref("finance/meses")
+        .once("value");
+
+    const meses = snap.val() || {};
+    const promises = [];
+
+    const novoValor = Number(
+        valueInput.value
+            .replace(/\./g,"")
+            .replace(",",".")
+    );
+
+    const novoDia = new Date(date.value).getDate();
+
+    Object.keys(meses).forEach(mes=>{
+
+        Object.keys(meses[mes]).forEach(id=>{
+
+            const item = meses[mes][id];
+
+            if(
+                item.parcelGroupId === editingItem.parcelGroupId &&
+                item.fixed
+            ){
+
+                item.name = title.value.trim();
+                item.category = category.value;
+                item.value = novoValor;
+                item.type = currentType;
+
+                // altera somente o dia
+                const data = new Date(item.date);
+                data.setDate(novoDia);
+                item.date = data.toISOString().split("T")[0];
+
+                if(item.id === editingItem.id){
+
+                    item.paid = paid.checked;
+
+                    if(currentType === "income"){
+                        item.receivedValue = valReceived;
+                        item.remainingValue = remaining;
+                    }else{
+                        item.remainingValue = 0;
+                    }
+
+                }else{
+
+                    item.remainingValue = Math.max(
+                        0,
+                        novoValor - (item.receivedValue || 0)
+                    );
+
+                }
+
+                promises.push(
+                    firebase.database()
+                        .ref("finance/meses/"+mes+"/"+id)
+                        .set(item)
+                );
+
+            }
+
+        });
+
+    });
+
+    await Promise.all(promises);
+
+}
 
 
 
@@ -1429,6 +1534,40 @@ function removeParcelGroup(groupId){
         });
 
     });
+
+}
+
+
+async function deleteGroup(groupId){
+
+    const snap = await firebase.database()
+        .ref("finance/meses")
+        .once("value");
+
+    const meses = snap.val() || {};
+    const promises = [];
+
+    Object.keys(meses).forEach(mes=>{
+
+        Object.keys(meses[mes]).forEach(id=>{
+
+            const item = meses[mes][id];
+
+            if(item.parcelGroupId === groupId){
+
+                promises.push(
+                    firebase.database()
+                        .ref("finance/meses/"+mes+"/"+id)
+                        .remove()
+                );
+
+            }
+
+        });
+
+    });
+
+    await Promise.all(promises);
 
 }
 
