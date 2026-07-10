@@ -925,20 +925,31 @@ const remaining = Math.max(0, valTotal - valReceived);
 
   const baseDateStr = date.value;
 
-  /* =========================
-     NÃO PARCELADO
-  ========================= */
-  if(editingItem?.parcel){
+/* =========================
 
-    const editarTudo = confirm(
-        "OK = Editar todas as parcelas\n\nCancelar = Editar somente esta parcela."
-    );
+   NÃO PARCELADO
 
-    if(editarTudo){
-        updateParcelGroup();
-        closeModal();
-        render();
-        return;
+========================= */
+
+if(!isParcel){
+
+    if(editingItem?.parcel){
+
+        const editarTudo = confirm(
+
+            "OK = Editar todas as parcelas\n\nCancelar = Editar somente esta parcela."
+
+        );
+
+        if(editarTudo){
+
+            updateParcelGroup();
+
+            closeModal();
+
+            render();
+
+            return;
     }
 
 }
@@ -1124,26 +1135,32 @@ receivedInput.value =
 /* =========================
    DELETE
 ========================= */
-if(editingItem?.parcel){
+function remove(){
 
-    const opcao = confirm(
-        "OK = Excluir todas as parcelas\n\nCancelar = Excluir somente esta parcela."
-    );
+    if(!editId) return;
 
-    if(opcao){
-        removeParcelGroup(editingItem.parcelGroupId);
+    if(editingItem?.parcel){
+
+        const opcao = confirm(
+            "OK = Excluir todas as parcelas\n\nCancelar = Excluir somente esta parcela."
+        );
+
+        if(opcao){
+            removeParcelGroup(editingItem.parcelGroupId);
+        }else{
+            monthRef().child(editId).remove();
+        }
+
     }else{
+
         monthRef().child(editId).remove();
+
     }
 
-}else{
-
-    monthRef().child(editId).remove();
+    closeModal();
+    render();
 
 }
-
-closeModal();
-render();
 
 
 
