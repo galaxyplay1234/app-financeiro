@@ -541,16 +541,16 @@ input:checked + .slider:before{transform:translateX(20px)}
     <div style="display:flex;gap:8px">
 
         <button
-            class="delete"
-            onclick="removeParcelGroup(editingItem.parcelGroupId);closeModal();render();">
-            Excluir todas
-        </button>
+    class="delete"
+    onclick="removeAllParcels()">
+    Excluir todas
+</button>
 
         <button
-            class="delete"
-            onclick="monthRef().child(editId).remove();closeModal();render();">
-            Somente esta
-        </button>
+    class="delete"
+    onclick="removeCurrentParcel()">
+    Somente esta
+</button>
 
     </div>
 
@@ -1176,9 +1176,10 @@ function removeParcelGroup(groupId){
 
     firebase.database()
     .ref("finance/meses")
-    .once("value", snap=>{
+    .once("value",snap=>{
 
         const meses = snap.val() || {};
+        const promises = [];
 
         Object.keys(meses).forEach(mes=>{
 
@@ -1191,9 +1192,11 @@ function removeParcelGroup(groupId){
                     item.parcelIndex >= editingItem.parcelIndex
                 ){
 
-                    firebase.database()
-                    .ref("finance/meses/"+mes+"/"+id)
-                    .remove();
+                    promises.push(
+                        firebase.database()
+                        .ref("finance/meses/"+mes+"/"+id)
+                        .remove()
+                    );
 
                 }
 
@@ -1201,7 +1204,29 @@ function removeParcelGroup(groupId){
 
         });
 
+        Promise.all(promises).then(()=>{
+            closeModal();
+            render();
+        });
+
     });
+
+}
+
+
+function removeAllParcels(){
+    removeParcelGroup(editingItem.parcelGroupId);
+}
+
+function removeCurrentParcel(){
+
+    monthRef()
+        .child(editId)
+        .remove()
+        .then(()=>{
+            closeModal();
+            render();
+        });
 
 }
 
