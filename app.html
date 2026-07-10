@@ -745,8 +745,6 @@ function toggleFixed(){
 
     isFixed = !isFixed;
 
-    const btn = document.getElementById("btnFixed");
-
     if(isFixed){
 
         isParcel = false;
@@ -757,13 +755,10 @@ function toggleFixed(){
         document.getElementById("parcelCount")
             .style.display = "none";
 
-        btn.classList.add("active");
-
-    }else{
-
-        btn.classList.remove("active");
-
     }
+
+    document.getElementById("btnFixed")
+        .classList.toggle("active", isFixed);
 
 }
 
@@ -1028,7 +1023,7 @@ const remaining = Math.max(0, valTotal - valReceived);
 
 if(!isParcel && !isFixed){
 
-    if(editingItem?.parcel &&
+    if((editingItem?.parcel || editingItem?.fixed) &&
    document.getElementById("editAll").checked){
 
 
@@ -1040,6 +1035,9 @@ render();
 
 return;
 }
+
+
+
     const id = editId || Date.now().toString();
 
     const item = {
@@ -1081,6 +1079,81 @@ return;
     render();
     return;
   }
+
+
+/* =========================
+
+   FIXA
+
+========================= */
+
+if(isFixed){
+
+    const groupId = Date.now().toString();
+
+    const baseDate = new Date(baseDateStr);
+
+    for(let i = 0; i < 12; i++){
+
+        const d = new Date(baseDate);
+
+        d.setMonth(d.getMonth() + i);
+
+        const dateStr = d.toISOString().split("T")[0];
+
+        const monthKey = getMonthKeyFromDate(dateStr);
+
+        const id = `${groupId}_${i+1}`;
+
+        const item = {
+
+            id,
+
+            name: title.value.trim(),
+
+            value: valTotal,
+
+            receivedValue: 0,
+
+            remainingValue: valTotal,
+
+            category: category.value,
+
+            date: dateStr,
+
+            type: currentType,
+
+            paid: false,
+
+            fixed: true,
+
+            parcel: false,
+
+            parcelGroupId: groupId,
+
+            parcelIndex: i + 1,
+
+            parcelTotal: 12
+
+        };
+
+        await firebase.database()
+
+            .ref("finance/meses/" + monthKey + "/" + id)
+
+            .set(item);
+
+    }
+
+    closeModal();
+
+    render();
+
+    return;
+
+}
+
+
 
   /* =========================
      PARCELADO
@@ -1212,70 +1285,7 @@ promises.push(
 }
 
 
-if(isFixed){
 
-    const totalParcels = 12;
-
-    const groupId = Date.now().toString();
-
-    const baseDate = new Date(baseDateStr);
-
-    for(let i=0;i<12;i++){
-
-        const d = new Date(baseDate);
-
-        d.setMonth(d.getMonth()+i);
-
-        const dateStr =
-            d.toISOString().split("T")[0];
-
-        const monthKey =
-            getMonthKeyFromDate(dateStr);
-
-        const id =
-            `${groupId}_${i+1}`;
-
-        const item={
-
-            id,
-
-            name:title.value.trim(),
-
-            value:valTotal,
-
-            receivedValue:0,
-
-            remainingValue:valTotal,
-
-            category:category.value,
-
-            date:dateStr,
-
-            type:currentType,
-
-            paid:false,
-
-            fixed:true,
-
-            parcel:false
-
-        };
-
-        firebase.database()
-
-            .ref("finance/meses/"+monthKey+"/"+id)
-
-            .set(item);
-
-    }
-
-    closeModal();
-
-    render();
-
-    return;
-
-}
 
 
 
@@ -1292,7 +1302,7 @@ function editById(id){
       const t = snap.val();
       editingItem = t;
       document.getElementById("editAllRow").style.display =
-    t.parcel ? "flex" : "none";
+    (t.parcel || t.fixed) ? "flex" : "none";
 
 document.getElementById("editAll").checked = false;
       if(!t) return;
@@ -1314,7 +1324,7 @@ receivedInput.value =
       currentType = t.type;
 
       // 🔑 GUARDA PARCELAMENTO (se existir)
-      editingParcelData = t.parcel ? {
+      editingParcelData = (t.parcel || t.fixed) ? {
         parcelIndex: t.parcelIndex,
         parcelTotal: t.parcelTotal,
         parcelGroupId: t.parcelGroupId
@@ -1333,7 +1343,7 @@ receivedInput.value =
 ========================= */
 function remove(){
 
-    if(!editingItem?.parcel){
+    if(!editingItem?.parcel && !editingItem?.fixed){
 
         monthRef().child(editId).remove();
         closeModal();
@@ -1424,6 +1434,8 @@ function openModal(){
     setType("income");
 
     isParcel = false;
+    isFixed = false;
+document.getElementById("btnFixed").classList.remove("active");
     document.getElementById("btnParcel").classList.remove("active");
     document.getElementById("parcelCount").style.display = "none";
     document.getElementById("parcelCount").value = "";
