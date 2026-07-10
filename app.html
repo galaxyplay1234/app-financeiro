@@ -459,7 +459,26 @@ input:checked + .slider:before{transform:translateX(20px)}
 
 
 
+.fixed-badge{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
 
+    padding:2px 10px;
+
+    font-size:11px;
+    font-weight:600;
+
+    color:#7B1FA2;              /* roxo mais forte */
+
+    background:#F3E5F5;         /* roxinho bem claro */
+
+    border:1px solid #CE93D8;   /* borda vinho/roxo claro */
+
+    border-radius:999px;
+
+    width:max-content;
+}
 
 </style>
 </head>
@@ -925,7 +944,7 @@ rPrev += (t.value - recebido);
     ${t.category}
     ${
     t.fixed
-        ? `<span class="parcel-badge">FIXA</span>`
+    ? `<span class="fixed-badge">FIXA</span>`
 
         : t.parcel
 
