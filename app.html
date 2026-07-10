@@ -536,6 +536,25 @@ input:checked + .slider:before{transform:translateX(20px)}
 
 <button onclick="save()">Salvar</button>
 <button id="deleteBtn" class="delete" onclick="remove()">Excluir</button>
+<div id="parcelDeleteOptions" style="display:none;margin-top:8px">
+
+    <div style="display:flex;gap:8px">
+
+        <button
+            class="delete"
+            onclick="removeParcelGroup(editingItem.parcelGroupId);closeModal();render();">
+            Excluir todas
+        </button>
+
+        <button
+            class="delete"
+            onclick="monthRef().child(editId).remove();closeModal();render();">
+            Somente esta
+        </button>
+
+    </div>
+
+</div>
 <button class="cancel" onclick="closeModal()">Cancelar</button>
 
 </div>
@@ -1137,28 +1156,17 @@ receivedInput.value =
 ========================= */
 function remove(){
 
-    if(!editId) return;
-
-    if(editingItem?.parcel){
-
-        const opcao = confirm(
-            "OK = Excluir todas as parcelas\n\nCancelar = Excluir somente esta parcela."
-        );
-
-        if(opcao){
-            removeParcelGroup(editingItem.parcelGroupId);
-        }else{
-            monthRef().child(editId).remove();
-        }
-
-    }else{
+    if(!editingItem?.parcel){
 
         monthRef().child(editId).remove();
+        closeModal();
+        render();
+        return;
 
     }
 
-    closeModal();
-    render();
+    document.getElementById("deleteBtn").style.display="none";
+    document.getElementById("parcelDeleteOptions").style.display="block";
 
 }
 
@@ -1223,6 +1231,9 @@ function openModal(){
 
 function closeModal(){
   modal.style.display = "none";
+  
+  document.getElementById("deleteBtn").style.display="block";
+document.getElementById("parcelDeleteOptions").style.display="none";
 
   isParcel = false;
   editingParcelData = null; // 🔥 ESSENCIAL
