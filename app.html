@@ -965,7 +965,7 @@ if(!isParcel){
     if(editingItem?.parcel &&
    document.getElementById("editAll").checked){
 
-    updateParcelGroup();
+    updateParcelGroup(valReceived, remaining);
 
     closeModal();
 
@@ -1066,7 +1066,7 @@ if(!isParcel){
   render();
 }
 
-function updateParcelGroup(){
+function updateParcelGroup(valReceived, remaining){
 
     firebase.database()
     .ref("finance/meses")
@@ -1082,21 +1082,21 @@ function updateParcelGroup(){
 
                 if(item.parcelGroupId === editingItem.parcelGroupId){
 
-                    item.name = title.value.trim();
+    item.name = title.value.trim();
 
-                    item.category = category.value;
+    item.category = category.value;
 
-                    item.value = Number(
-                        valueInput.value
-                        .replace(/\./g,"")
-                        .replace(",",".")
-                    );
+    item.value = Number(
+        valueInput.value
+        .replace(/\./g,"")
+        .replace(",",".")
+    );
 
-                    firebase.database()
-                    .ref("finance/meses/"+mes+"/"+id)
-                    .set(item);
+    firebase.database()
+    .ref("finance/meses/"+mes+"/"+id)
+    .set(item);
 
-                }
+}
 
             });
 
