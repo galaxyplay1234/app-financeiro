@@ -1117,6 +1117,15 @@ async function updateParcelGroup(valReceived, remaining){
 item.category = category.value;
 item.value = novoValor;
 item.type = currentType;
+const novaData = new Date(date.value);
+
+// mantém o mês da própria parcela
+const dataParcela = new Date(item.date);
+
+// altera apenas o dia
+dataParcela.setDate(novaData.getDate());
+
+item.date = dataParcela.toISOString().split("T")[0];
 
 if(item.id === editingItem.id){
 
