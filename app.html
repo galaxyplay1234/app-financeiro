@@ -928,7 +928,20 @@ const remaining = Math.max(0, valTotal - valReceived);
   /* =========================
      NÃO PARCELADO
   ========================= */
-  if(!isParcel){
+  if(editingItem?.parcel){
+
+    const editarTudo = confirm(
+        "OK = Editar todas as parcelas\n\nCancelar = Editar somente esta parcela."
+    );
+
+    if(editarTudo){
+        updateParcelGroup();
+        closeModal();
+        render();
+        return;
+    }
+
+}
     const id = editId || Date.now().toString();
 
     const item = {
@@ -1021,6 +1034,48 @@ const remaining = Math.max(0, valTotal - valReceived);
   render();
 }
 
+function updateParcelGroup(){
+
+    firebase.database()
+    .ref("finance/meses")
+    .once("value",snap=>{
+
+        const meses = snap.val() || {};
+
+        Object.keys(meses).forEach(mes=>{
+
+            Object.keys(meses[mes]).forEach(id=>{
+
+                const item = meses[mes][id];
+
+                if(item.parcelGroupId === editingItem.parcelGroupId){
+
+                    item.name = title.value.trim();
+
+                    item.category = category.value;
+
+                    item.value = Number(
+                        valueInput.value
+                        .replace(/\./g,"")
+                        .replace(",",".")
+                    );
+
+                    firebase.database()
+                    .ref("finance/meses/"+mes+"/"+id)
+                    .set(item);
+
+                }
+
+            });
+
+        });
+
+    });
+
+}
+
+
+
 /* =========================
    EDIT
 ========================= */
@@ -1069,11 +1124,57 @@ receivedInput.value =
 /* =========================
    DELETE
 ========================= */
-function remove(){
-  if(!editId) return;
-  monthRef().child(editId).remove();
-  closeModal();
-  render();
+if(editingItem?.parcel){
+
+    const opcao = confirm(
+        "OK = Excluir todas as parcelas\n\nCancelar = Excluir somente esta parcela."
+    );
+
+    if(opcao){
+        removeParcelGroup(editingItem.parcelGroupId);
+    }else{
+        monthRef().child(editId).remove();
+    }
+
+}else{
+
+    monthRef().child(editId).remove();
+
+}
+
+closeModal();
+render();
+
+
+
+function removeParcelGroup(groupId){
+
+    firebase.database()
+    .ref("finance/meses")
+    .once("value",snap=>{
+
+        const meses = snap.val() || {};
+
+        Object.keys(meses).forEach(mes=>{
+
+            Object.keys(meses[mes]).forEach(id=>{
+
+                const item = meses[mes][id];
+
+                if(item.parcelGroupId === groupId){
+
+                    firebase.database()
+                    .ref("finance/meses/"+mes+"/"+id)
+                    .remove();
+
+                }
+
+            });
+
+        });
+
+    });
+
 }
 
 /* =========================
