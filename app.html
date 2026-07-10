@@ -1098,11 +1098,27 @@ item.category = category.value;
 item.value = novoValor;
 item.type = currentType;
 
-// mantém o status de pagamento de cada parcela
-item.remainingValue = Math.max(
-    0,
-    novoValor - (item.receivedValue || 0)
-);
+if(item.id === editingItem.id){
+
+    // Apenas a parcela atual muda o status
+    item.paid = paid.checked;
+
+    if(currentType === "income"){
+        item.receivedValue = valReceived;
+        item.remainingValue = remaining;
+    }else{
+        item.remainingValue = 0;
+    }
+
+}else{
+
+    // Parcelas futuras mantêm o status
+    item.remainingValue = Math.max(
+        0,
+        novoValor - (item.receivedValue || 0)
+    );
+
+}
 
 promises.push(
     firebase.database()
