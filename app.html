@@ -1026,27 +1026,7 @@ const remaining = Math.max(0, valTotal - valReceived);
 
   const baseDateStr = date.value;
   
-  const changedToFixed =
-    editingItem?.parcel && isFixed;
-
-const changedToParcel =
-    editingItem?.fixed && isParcel;
-
-const changedToNormal =
-    (editingItem?.parcel || editingItem?.fixed) &&
-    !isParcel &&
-    !isFixed;
-    
-    
-    if(changedToFixed || changedToParcel || changedToNormal){
-
-    await deleteGroup(editingItem.parcelGroupId);
-
-    editId = null;
-    editingItem = null;
-    editingParcelData = null;
-
-}
+  
 
 /* =========================
 
@@ -1202,6 +1182,54 @@ if(isFixed){
   /* =========================
      PARCELADO
   ========================= */
+  if(isParcel && editId){
+
+    await updateParcelGroup(valReceived, remaining);
+
+    closeModal();
+    render();
+    return;
+
+}
+
+
+// Converter Parcelado -> Fixa
+if(editingItem?.parcel && isFixed){
+
+    await deleteGroup(editingItem.parcelGroupId);
+
+    editId = null;
+    editingItem = null;
+    editingParcelData = null;
+
+}
+
+// Converter Fixa -> Parcelado
+if(editingItem?.fixed && isParcel){
+
+    await deleteGroup(editingItem.parcelGroupId);
+
+    editId = null;
+    editingItem = null;
+    editingParcelData = null;
+
+}
+
+// Converter para lançamento normal
+if(
+    (editingItem?.parcel || editingItem?.fixed) &&
+    !isParcel &&
+    !isFixed
+){
+
+    await deleteGroup(editingItem.parcelGroupId);
+
+    editId = null;
+    editingItem = null;
+    editingParcelData = null;
+
+}
+
   const totalParcels = Number(parcelCount.value || 0);
 
   if(totalParcels < 2){
