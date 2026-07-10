@@ -1176,7 +1176,7 @@ function removeParcelGroup(groupId){
 
     firebase.database()
     .ref("finance/meses")
-    .once("value",snap=>{
+    .once("value", snap=>{
 
         const meses = snap.val() || {};
 
@@ -1186,7 +1186,10 @@ function removeParcelGroup(groupId){
 
                 const item = meses[mes][id];
 
-                if(item.parcelGroupId === groupId){
+                if(
+                    item.parcelGroupId === groupId &&
+                    item.parcelIndex >= editingItem.parcelIndex
+                ){
 
                     firebase.database()
                     .ref("finance/meses/"+mes+"/"+id)
