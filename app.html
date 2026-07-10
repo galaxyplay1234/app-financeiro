@@ -1080,7 +1080,10 @@ function updateParcelGroup(valReceived, remaining){
 
                 const item = meses[mes][id];
 
-                if(item.parcelGroupId === editingItem.parcelGroupId){
+                if(
+    item.parcelGroupId === editingItem.parcelGroupId &&
+    item.parcelIndex >= editingItem.parcelIndex
+){
 
     item.name = title.value.trim();
 
@@ -1092,9 +1095,15 @@ function updateParcelGroup(valReceived, remaining){
         .replace(",",".")
     );
 
+    item.type = currentType;
+    item.paid = paid.checked;
+
+    item.receivedValue = valReceived;
+    item.remainingValue = remaining;
+
     firebase.database()
-    .ref("finance/meses/"+mes+"/"+id)
-    .set(item);
+        .ref("finance/meses/"+mes+"/"+id)
+        .set(item);
 
 }
 
