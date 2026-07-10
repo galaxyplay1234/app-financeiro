@@ -935,7 +935,7 @@ t.type === "income" &&
 /* =========================
    SAVE
 ========================= */
-function save(){
+async function save(){
   const valTotal = Number(
     valueInput.value.replace(/\./g,"").replace(",",".")
   );
@@ -967,11 +967,13 @@ if(!isParcel){
 
     alert("Entrou");
 
-    updateParcelGroup(valReceived, remaining);
+    await updateParcelGroup(valReceived, remaining);
 
-    closeModal();
-    render();
-    return;
+closeModal();
+
+render();
+
+return;
 }
     const id = editId || Date.now().toString();
 
@@ -1065,53 +1067,53 @@ if(!isParcel){
   render();
 }
 
-function updateParcelGroup(valReceived, remaining){
+async function updateParcelGroup(valReceived, remaining){
 
-    firebase.database()
-    .ref("finance/meses")
-    .once("value",snap=>{
+    const snap = await firebase.database()
+        .ref("finance/meses")
+        .once("value");
 
-        const meses = snap.val() || {};
+    const meses = snap.val() || {};
+    const promises = [];
 
-        Object.keys(meses).forEach(mes=>{
-
-            Object.keys(meses[mes]).forEach(id=>{
-
-                const item = meses[mes][id];
-
-                if(
-    item.parcelGroupId === editingItem.parcelGroupId &&
-    item.parcelIndex >= editingItem.parcelIndex
-){
-
-    item.name = title.value.trim();
-
-    item.category = category.value;
-
-    item.value = Number(
+    const novoValor = Number(
         valueInput.value
-        .replace(/\./g,"")
-        .replace(",",".")
+            .replace(/\./g,"")
+            .replace(",",".")
     );
 
-    item.type = currentType;
-    item.paid = paid.checked;
+    Object.keys(meses).forEach(mes=>{
 
-    item.receivedValue = valReceived;
-    item.remainingValue = remaining;
+        Object.keys(meses[mes]).forEach(id=>{
 
-    firebase.database()
-        .ref("finance/meses/"+mes+"/"+id)
-        .set(item);
+            const item = meses[mes][id];
 
-}
+            // somente a parcela atual e as futuras
+            if(
+                item.parcelGroupId === editingItem.parcelGroupId &&
+                item.parcelIndex >= editingItem.parcelIndex
+            ){
 
-            });
+                item.name = title.value.trim();
+                item.category = category.value;
+                item.value = novoValor;
+                item.type = currentType;
+                item.paid = paid.checked;
+                item.receivedValue = valReceived;
+                item.remainingValue = remaining;
+
+                promises.push(
+                    firebase.database()
+                        .ref("finance/meses/"+mes+"/"+id)
+                        .set(item)
+                );
+            }
 
         });
 
     });
 
+    await Promise.all(promises);
 }
 
 
