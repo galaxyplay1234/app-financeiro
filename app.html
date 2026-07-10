@@ -1231,24 +1231,35 @@ if(
     const monthKey = getMonthKeyFromDate(dateStr);
     const id = `${groupId}_${i+1}`;
 
-    const item = {
-    fixed: isFixed,
-  id,
-  name: title.value.trim(),
-  value: parcelValue,
+    const pago = (i === 0) ? paid.checked : false;
 
-  receivedValue: 0,
-  remainingValue: parcelValue,
+const item = {
 
-  category: category.value,
-  date: dateStr,
-  type: currentType,
-  paid: false,
+    fixed: false,
+    id,
+    name: title.value.trim(),
+    value: parcelValue,
 
-  parcel: true,
-  parcelIndex: i + 1,
-  parcelTotal: totalParcels,
-  parcelGroupId: groupId
+    receivedValue:
+        currentType === "income"
+            ? (pago ? parcelValue : 0)
+            : 0,
+
+    remainingValue:
+        currentType === "income"
+            ? (pago ? 0 : parcelValue)
+            : 0,
+
+    category: category.value,
+    date: dateStr,
+    type: currentType,
+
+    paid: pago,
+
+    parcel: true,
+    parcelIndex: i + 1,
+    parcelTotal: totalParcels,
+    parcelGroupId: groupId
 };
 
     firebase
