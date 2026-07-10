@@ -1340,6 +1340,27 @@ receivedInput.value =
         parcelTotal: t.parcelTotal,
         parcelGroupId: t.parcelGroupId
       } : null;
+      
+      
+      
+      // Estado Parcelado/Fixa
+isParcel = !!t.parcel;
+isFixed = !!t.fixed;
+
+document.getElementById("btnParcel")
+    .classList.toggle("active", isParcel);
+
+document.getElementById("btnFixed")
+    .classList.toggle("active", isFixed);
+
+document.getElementById("parcelCount").style.display =
+    isParcel ? "block" : "none";
+
+if(isParcel){
+    document.getElementById("parcelCount").value = t.parcelTotal;
+}else{
+    document.getElementById("parcelCount").value = "";
+}
 
       setType(currentType);
       editId = id;
@@ -1467,15 +1488,16 @@ document.getElementById("editAll").checked = false;
 document.getElementById("editAllRow").style.display = "none";
 
   isParcel = false;
-  editingParcelData = null; // 🔥 ESSENCIAL
-  editingItem = null;
+isFixed = false;
 
-  const btn = document.getElementById("btnParcel");
-  const input = document.getElementById("parcelCount");
+editingParcelData = null;
+editingItem = null;
 
-  btn.classList.remove("active");
-  input.style.display = "none";
-  input.value = "";
+document.getElementById("btnParcel").classList.remove("active");
+document.getElementById("btnFixed").classList.remove("active");
+
+document.getElementById("parcelCount").style.display = "none";
+document.getElementById("parcelCount").value = "";
 
   editId = null;
   editMonthKey = null;
