@@ -84,8 +84,28 @@ header h2{
   text-align:center;box-shadow:0 2px 6px rgba(0,0,0,.1)
 }
 .card h4{margin:0;font-size:14px;color:#666}
-.card .main{font-size:18px;font-weight:bold;margin-top:6px}
-.card .sub{font-size:13px;color:#777}
+.card .main{
+    margin-top:6px;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    white-space:nowrap;
+    overflow:hidden;
+
+    font-size:clamp(14px,3.8vw,18px);
+    font-weight:bold;
+    line-height:1;
+}
+.card .sub{
+    font-size:clamp(11px,3vw,13px);
+    color:#777;
+
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
 .saldo{border-top:4px solid #1976d2}
 .receita{border-top:4px solid #2e7d32}
 .despesa{border-top:4px solid #c62828}
@@ -179,19 +199,17 @@ header h2{
     display:inline-flex;
     align-items:center;
     justify-content:center;
-
-    padding:2px 10px;
-
+    padding:2px 8px;
     font-size:11px;
     font-weight:600;
-
-    color:#5f6670;
-
-    background:#eef2f8;
-    border:1px solid #d8dee8;
+    line-height:1;
+    color:#5F6670;
+    background:#EEF2F8;
+    border:1px solid #D8DEE8;
     border-radius:999px;
-
     width:max-content;
+    vertical-align:middle;
+    position:relative;
 }
 
 .received{
@@ -437,9 +455,22 @@ input:checked + .slider:before{transform:translateX(20px)}
 }
 
 
-
-
-
+.fixed-badge{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    padding:2px 8px;
+    font-size:11px;
+    font-weight:600;
+    line-height:1;
+    color:#7B1FA2;
+    background:#F3E5F5;
+    border:1px solid #CE93D8;
+    border-radius:999px;
+    width:max-content;
+    vertical-align:middle;
+    position:relative;
+}
 
 </style>
 </head>
@@ -513,17 +544,23 @@ input:checked + .slider:before{transform:translateX(20px)}
   
 <!-- PARCELAMENTO -->
 <div class="parcel-buttons">
-  <button id="btnParcel" class="parcel-btn" onclick="toggleParcel()">
-    Parcelado
-  </button>
 
-  <input
-    id="parcelCount"
-    type="number"
-    min="2"
-    placeholder="Meses"
-    style="display:none; width:110px"
-  >
+    <button id="btnParcel" class="parcel-btn" onclick="toggleParcel()">
+        Parcelado
+    </button>
+
+    <button id="btnFixed" class="parcel-btn" onclick="toggleFixed()">
+        Fixa
+    </button>
+
+    <input
+        id="parcelCount"
+        type="number"
+        min="2"
+        placeholder="Meses"
+        style="display:none;width:110px"
+    >
+
 </div>
 
 <div class="switch-row">
@@ -693,9 +730,16 @@ function setType(t){
    PARCELAMENTO
 ========================= */
 let isParcel = false;
+let isFixed = false;
 
 function toggleParcel(){
   isParcel = !isParcel;
+  
+  isFixed = false;
+
+document
+    .getElementById("btnFixed")
+    .classList.remove("active");
 
   const btn = document.getElementById("btnParcel");
   const input = document.getElementById("parcelCount");
@@ -703,10 +747,33 @@ function toggleParcel(){
   btn.classList.toggle("active", isParcel);
   input.style.display = isParcel ? "block" : "none";
 
-  if(!isParcel){
+  if(!isParcel && !isFixed){
     input.value = "";
   }
 }
+
+function toggleFixed(){
+
+    isFixed = !isFixed;
+
+    if(isFixed){
+
+        isParcel = false;
+
+        document.getElementById("btnParcel")
+            .classList.remove("active");
+
+        document.getElementById("parcelCount")
+            .style.display = "none";
+
+    }
+
+    document.getElementById("btnFixed")
+        .classList.toggle("active", isFixed);
+
+}
+
+
 
 function checkMonthTurnover(){
   const today = new Date();
@@ -868,12 +935,17 @@ rPrev += (t.value - recebido);
     <div class="item-sub">
     ${t.category}
     ${
-        t.parcel
-        ? `<span class="parcel-badge">
-              ${t.parcelIndex}/${t.parcelTotal}
-          </span>`
-        : ``
-    }
+    t.fixed
+    ? `<span class="fixed-badge">FIXA</span>`
+
+        : t.parcel
+
+            ? `<span class="parcel-badge">
+                  ${t.parcelIndex}/${t.parcelTotal}
+              </span>`
+
+            : ``
+}
 </div>
 
     ${
@@ -953,6 +1025,16 @@ if(currentType === "income" && paid.checked){
 const remaining = Math.max(0, valTotal - valReceived);
 
   const baseDateStr = date.value;
+  
+if(editingItem?.parcel && isFixed){
+
+    await convertParcelToFixed(valReceived, remaining);
+
+    closeModal();
+    render();
+    return;
+
+} 
 
 /* =========================
 
@@ -960,9 +1042,9 @@ const remaining = Math.max(0, valTotal - valReceived);
 
 ========================= */
 
-if(!isParcel){
+if(!isParcel && !isFixed){
 
-    if(editingItem?.parcel &&
+    if((editingItem?.parcel || editingItem?.fixed) &&
    document.getElementById("editAll").checked){
 
 
@@ -974,9 +1056,13 @@ render();
 
 return;
 }
+
+
+
     const id = editId || Date.now().toString();
 
     const item = {
+    fixed: isFixed,
   id,
   name: title.value.trim(),
   value: valTotal,
@@ -1015,9 +1101,117 @@ return;
     return;
   }
 
+
+/* =========================
+
+   FIXA
+
+========================= */
+
+if(isFixed){
+
+    // Só atualiza se já era uma fixa
+    if(editId && editingItem?.fixed){
+
+        await updateFixedGroup(valReceived, remaining);
+
+        closeModal();
+        render();
+        return;
+
+    }
+
+    // continua o código atual de criar fixa...
+    const groupId = Date.now().toString();
+
+    const baseDate = new Date(baseDateStr);
+
+    for(let i = 0; i < 12; i++){
+
+        const d = new Date(baseDate);
+
+        d.setMonth(d.getMonth() + i);
+
+        const dateStr = d.toISOString().split("T")[0];
+
+        const monthKey = getMonthKeyFromDate(dateStr);
+
+        const id = `${groupId}_${i+1}`;
+
+        const item = {
+
+            id,
+            name: title.value.trim(),
+            value: valTotal,
+            receivedValue: 0,
+            remainingValue: valTotal,
+            category: category.value,
+            date: dateStr,
+            type: currentType,
+            paid: false,
+            fixed: true,
+            parcel: false,
+            parcelGroupId: groupId,
+            parcelIndex: i + 1,
+            parcelTotal: 12
+
+        };
+
+        await firebase.database()
+            .ref("finance/meses/" + monthKey + "/" + id)
+            .set(item);
+
+    }
+
+    closeModal();
+    render();
+    return;
+}
+
+
+
   /* =========================
      PARCELADO
   ========================= */
+  if(isParcel && editId && editingItem?.parcel){
+
+    await updateParcelGroup(valReceived, remaining);
+
+    closeModal();
+    render();
+    return;
+
+}
+
+
+
+
+// Converter Fixa -> Parcelado
+if(editingItem?.fixed && isParcel){
+
+    await deleteGroup(editingItem.parcelGroupId);
+
+    editId = null;
+    editingItem = null;
+    editingParcelData = null;
+
+}
+
+// Converter para lançamento normal
+if(
+    (editingItem?.parcel || editingItem?.fixed) &&
+    !isParcel &&
+    !isFixed
+){
+
+    await deleteGroup(editingItem.parcelGroupId);
+
+    editId = null;
+    editingItem = null;
+    editingParcelData = null;
+
+}
+
   const totalParcels = Number(parcelCount.value || 0);
 
   if(totalParcels < 2){
@@ -1037,23 +1231,35 @@ return;
     const monthKey = getMonthKeyFromDate(dateStr);
     const id = `${groupId}_${i+1}`;
 
-    const item = {
-  id,
-  name: title.value.trim(),
-  value: parcelValue,
+    const pago = (i === 0) ? paid.checked : false;
 
-  receivedValue: 0,
-  remainingValue: parcelValue,
+const item = {
 
-  category: category.value,
-  date: dateStr,
-  type: currentType,
-  paid: false,
+    fixed: false,
+    id,
+    name: title.value.trim(),
+    value: parcelValue,
 
-  parcel: true,
-  parcelIndex: i + 1,
-  parcelTotal: totalParcels,
-  parcelGroupId: groupId
+    receivedValue:
+        currentType === "income"
+            ? (pago ? parcelValue : 0)
+            : 0,
+
+    remainingValue:
+        currentType === "income"
+            ? (pago ? 0 : parcelValue)
+            : 0,
+
+    category: category.value,
+    date: dateStr,
+    type: currentType,
+
+    paid: pago,
+
+    parcel: true,
+    parcelIndex: i + 1,
+    parcelTotal: totalParcels,
+    parcelGroupId: groupId
 };
 
     firebase
@@ -1097,6 +1303,15 @@ async function updateParcelGroup(valReceived, remaining){
 item.category = category.value;
 item.value = novoValor;
 item.type = currentType;
+const novaData = new Date(date.value);
+
+// mantém o mês da própria parcela
+const dataParcela = new Date(item.date);
+
+// altera apenas o dia
+dataParcela.setDate(novaData.getDate());
+
+item.date = dataParcela.toISOString().split("T")[0];
 
 if(item.id === editingItem.id){
 
@@ -1135,6 +1350,155 @@ promises.push(
 }
 
 
+async function convertParcelToFixed(valReceived, remaining){
+
+    const snap = await firebase.database()
+        .ref("finance/meses")
+        .once("value");
+
+    const meses = snap.val() || {};
+    const promises = [];
+
+    const novoValor = Number(
+        valueInput.value.replace(/\./g,"").replace(",",".")
+    );
+
+    const novoDia = new Date(date.value).getDate();
+
+    Object.keys(meses).forEach(mes=>{
+
+        Object.keys(meses[mes]).forEach(id=>{
+
+            const item = meses[mes][id];
+
+            if(
+                item.parcelGroupId === editingItem.parcelGroupId &&
+                item.parcelIndex >= editingItem.parcelIndex
+            ){
+
+                item.fixed = true;
+                item.parcel = false;
+
+                item.name = title.value.trim();
+                item.category = category.value;
+                item.value = novoValor;
+                item.type = currentType;
+
+                const data = new Date(item.date);
+                data.setDate(novoDia);
+                item.date = data.toISOString().split("T")[0];
+
+                if(item.id === editingItem.id){
+
+                    item.paid = paid.checked;
+
+                    if(currentType==="income"){
+                        item.receivedValue = valReceived;
+                        item.remainingValue = remaining;
+                    }
+
+                }else{
+
+                    item.remainingValue = Math.max(
+                        0,
+                        novoValor-(item.receivedValue||0)
+                    );
+
+                }
+
+                promises.push(
+                    firebase.database()
+                    .ref("finance/meses/"+mes+"/"+id)
+                    .set(item)
+                );
+
+            }
+
+        });
+
+    });
+
+    await Promise.all(promises);
+
+}
+
+
+
+async function updateFixedGroup(valReceived, remaining){
+
+    const snap = await firebase.database()
+        .ref("finance/meses")
+        .once("value");
+
+    const meses = snap.val() || {};
+    const promises = [];
+
+    const novoValor = Number(
+        valueInput.value
+            .replace(/\./g,"")
+            .replace(",",".")
+    );
+
+    const novoDia = new Date(date.value).getDate();
+
+    Object.keys(meses).forEach(mes=>{
+
+        Object.keys(meses[mes]).forEach(id=>{
+
+            const item = meses[mes][id];
+
+            if(
+                item.parcelGroupId === editingItem.parcelGroupId &&
+                item.fixed
+            ){
+
+                item.name = title.value.trim();
+                item.category = category.value;
+                item.value = novoValor;
+                item.type = currentType;
+
+                // altera somente o dia
+                const data = new Date(item.date);
+                data.setDate(novoDia);
+                item.date = data.toISOString().split("T")[0];
+
+                if(item.id === editingItem.id){
+
+                    item.paid = paid.checked;
+
+                    if(currentType === "income"){
+                        item.receivedValue = valReceived;
+                        item.remainingValue = remaining;
+                    }else{
+                        item.remainingValue = 0;
+                    }
+
+                }else{
+
+                    item.remainingValue = Math.max(
+                        0,
+                        novoValor - (item.receivedValue || 0)
+                    );
+
+                }
+
+                promises.push(
+                    firebase.database()
+                        .ref("finance/meses/"+mes+"/"+id)
+                        .set(item)
+                );
+
+            }
+
+        });
+
+    });
+
+    await Promise.all(promises);
+
+}
+
+
 
 /* =========================
    EDIT
@@ -1149,7 +1513,7 @@ function editById(id){
       const t = snap.val();
       editingItem = t;
       document.getElementById("editAllRow").style.display =
-    t.parcel ? "flex" : "none";
+    (t.parcel || t.fixed) ? "flex" : "none";
 
 document.getElementById("editAll").checked = false;
       if(!t) return;
@@ -1171,11 +1535,32 @@ receivedInput.value =
       currentType = t.type;
 
       // 🔑 GUARDA PARCELAMENTO (se existir)
-      editingParcelData = t.parcel ? {
+      editingParcelData = (t.parcel || t.fixed) ? {
         parcelIndex: t.parcelIndex,
         parcelTotal: t.parcelTotal,
         parcelGroupId: t.parcelGroupId
       } : null;
+      
+      
+      
+      // Estado Parcelado/Fixa
+isParcel = !!t.parcel;
+isFixed = !!t.fixed;
+
+document.getElementById("btnParcel")
+    .classList.toggle("active", isParcel);
+
+document.getElementById("btnFixed")
+    .classList.toggle("active", isFixed);
+
+document.getElementById("parcelCount").style.display =
+    isParcel ? "block" : "none";
+
+if(isParcel){
+    document.getElementById("parcelCount").value = t.parcelTotal;
+}else{
+    document.getElementById("parcelCount").value = "";
+}
 
       setType(currentType);
       editId = id;
@@ -1190,7 +1575,7 @@ receivedInput.value =
 ========================= */
 function remove(){
 
-    if(!editingItem?.parcel){
+    if(!editingItem?.parcel && !editingItem?.fixed){
 
         monthRef().child(editId).remove();
         closeModal();
@@ -1248,6 +1633,40 @@ function removeParcelGroup(groupId){
 }
 
 
+async function deleteGroup(groupId){
+
+    const snap = await firebase.database()
+        .ref("finance/meses")
+        .once("value");
+
+    const meses = snap.val() || {};
+    const promises = [];
+
+    Object.keys(meses).forEach(mes=>{
+
+        Object.keys(meses[mes]).forEach(id=>{
+
+            const item = meses[mes][id];
+
+            if(item.parcelGroupId === groupId){
+
+                promises.push(
+                    firebase.database()
+                        .ref("finance/meses/"+mes+"/"+id)
+                        .remove()
+                );
+
+            }
+
+        });
+
+    });
+
+    await Promise.all(promises);
+
+}
+
+
 function removeAllParcels(){
     removeParcelGroup(editingItem.parcelGroupId);
 }
@@ -1281,6 +1700,8 @@ function openModal(){
     setType("income");
 
     isParcel = false;
+    isFixed = false;
+document.getElementById("btnFixed").classList.remove("active");
     document.getElementById("btnParcel").classList.remove("active");
     document.getElementById("parcelCount").style.display = "none";
     document.getElementById("parcelCount").value = "";
@@ -1301,15 +1722,16 @@ document.getElementById("editAll").checked = false;
 document.getElementById("editAllRow").style.display = "none";
 
   isParcel = false;
-  editingParcelData = null; // 🔥 ESSENCIAL
-  editingItem = null;
+isFixed = false;
 
-  const btn = document.getElementById("btnParcel");
-  const input = document.getElementById("parcelCount");
+editingParcelData = null;
+editingItem = null;
 
-  btn.classList.remove("active");
-  input.style.display = "none";
-  input.value = "";
+document.getElementById("btnParcel").classList.remove("active");
+document.getElementById("btnFixed").classList.remove("active");
+
+document.getElementById("parcelCount").style.display = "none";
+document.getElementById("parcelCount").value = "";
 
   editId = null;
   editMonthKey = null;
