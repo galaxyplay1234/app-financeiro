@@ -95,13 +95,14 @@ header h2{
 }
 
 .cards{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:14px;
-  padding:18px;
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(110px,1fr));
+    gap:12px;
+    padding:16px;
 }
 
 .card{
+  min-width:0;
   background:var(--card);
   backdrop-filter:blur(20px);
   border-radius:var(--radius);
@@ -122,9 +123,11 @@ header h2{
 }
 
 .card .main{
-  margin-top:10px;
-  font-size:22px;
-  font-weight:800;
+    font-size:20px;
+    font-weight:800;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
 }
 
 .card .sub{
