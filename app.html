@@ -1,422 +1,5 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
-<title>Minhas Finanças</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#1976d2">
-
-<style>
-/* Reset Global */
-* { box-sizing: border-box; font-family: Arial, sans-serif; }
-body { margin: 0; background: #f4f6f8; overflow-x: hidden; }
-
-/* Cabeçalho Fixo */
-.top-fixed { position: sticky; top: 0; z-index: 20; background: #f4f6f8; padding-bottom: 5px; }
-header { background: #1976d2; color: #fff; padding: 12px; display: flex; flex-direction: column; }
-header h2 { margin: 0; font-size: 18px; font-weight: 600; }
-
-.cat-btn, .month-btn { background: transparent; border: none; color: #fff; font-size: 22px; cursor: pointer; padding: 4px 6px; }
-.cat-btn:active, .month-btn:active { opacity: .6; }
-
-.month-tabs { width: 100%; display: flex; justify-content: center; align-items: center; gap: 14px; margin-top: 6px; }
-#monthLabel { font-size: 14px; font-weight: 500; min-width: 140px; text-align: center; }
-
-/* Cards de Resumo */
-.cards { display: flex; gap: 10px; padding: 10px; }
-.card { flex: 1; background: #fff; padding: 12px; border-radius: 10px; text-align: center; box-shadow: 0 2px 6px rgba(0,0,0,.1); }
-.card h4 { margin: 0; font-size: 14px; color: #666; }
-.card .main { margin-top: 6px; font-size: clamp(14px, 3.8vw, 18px); font-weight: bold; }
-.card .sub { font-size: clamp(11px, 3vw, 13px); color: #777; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-
-.saldo { border-top: 4px solid #1976d2; }
-.receita { border-top: 4px solid #2e7d32; }
-.despesa { border-top: 4px solid #c62828; }
-
-/* Lista de Itens */
-.list { padding: 10px; }
-.row { display: flex; gap: 8px; margin-bottom: 8px; }
-.date-card { width: 56px; height: 64px; background: #fff; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 14px; font-weight: bold; color: #888; box-shadow: 0 1px 4px rgba(0,0,0,.1); }
-
-.item { flex: 1; background: #fff; padding: 10px; border-left: 5px solid #2196f3; box-shadow: 0 1px 4px rgba(0,0,0,.1); }
-.item:not(:last-child) { border-bottom: 0.5px solid #ececec; }
-.first-of-day { border-top-left-radius: 10px; border-top-right-radius: 10px; }
-.last-of-day { border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; }
-
-.item-top, .item-bottom { display: flex; justify-content: space-between; align-items: center; }
-.item-name { font-size: 14px; font-weight: bold; }
-.item-value { font-size: 16px; font-weight: bold; }
-.income { color: #2e7d32; }
-.expense { color: #c62828; }
-
-/* Status Cores */
-.late-item { background: #fdecea; border-left-color: #F24438; }
-.due-today-item { background: #fff4e5; border-left-color: #FD9806; }
-
-/* Badges e Tags */
-.badge { padding: 2px 8px; border-radius: 12px; color: #fff; font-size: 12px; }
-.green { background: #4EAE51; }
-.red { background: #F24438; }
-.orange { background: #FD9806; }
-.parcel-badge { display: inline-flex; padding: 2px 8px; font-size: 11px; color: #5F6670; background: #EEF2F8; border: 1px solid #D8DEE8; border-radius: 999px; }
-.fixed-badge { display: inline-flex; padding: 2px 8px; font-size: 11px; color: #7B1FA2; background: #F3E5F5; border: 1px solid #CE93D8; border-radius: 999px; }
-
-/* Modal */
-.modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 9999; justify-content: center; align-items: center; }
-.modal-content { background: #fff; width: 90%; max-width: 320px; padding: 16px; border-radius: 12px; }
-
-/* Botões do Modal */
-.type-btn, .parcel-btn { padding: 10px; border-radius: 8px; border: 1px solid #ccc; background: #fff; color: #777; font-weight: bold; cursor: pointer; }
-.type-btn.active.income { background: #2e7d32 !important; color: #fff !important; border: none; }
-.type-btn.active.expense { background: #c62828 !important; color: #fff !important; border: none; }
-.parcel-btn.active { border-color: #1976d2 !important; color: #1976d2 !important; }
-
-/* Ações Gerais */
-.fab { position: fixed; right: 20px; bottom: 20px; width: 56px; height: 56px; border-radius: 50%; background: #1976d2; color: #fff; border: none; font-size: 26px; }
-input, select, button { width: 100%; margin-top: 8px; padding: 10px; border-radius: 8px; border: 1px solid #ccc; font-size: 16px; }
-</style>
-</head>
-
-<body>
-
-<div class="top-fixed">
-
-  <header>
-    <div style="width:100%;display:flex;justify-content:space-between;align-items:center">
-  <h2>💰 Minhas Finanças</h2>
-
-  <div style="display:flex;gap:10px">
-  <button class="cat-btn" onclick="openCategoryModal()">☰</button>
-  <button class="cat-btn" onclick="goReports()">📊</button>
-</div>
-</div>
-    <div class="month-tabs">
-      <button class="month-btn" onclick="changeMonth(-1)">&#10094;</button>
-      <span id="monthLabel"></span>
-      <button class="month-btn" onclick="changeMonth(1)">&#10095;</button>
-    </div>
-  </header>
-
-  <section class="cards">
-    <div class="card saldo">
-      <h4>Saldo</h4>
-      <div class="main" id="saldoPago">R$ 0,00</div>
-      <div class="sub" id="saldoPrev">R$ 0,00</div>
-    </div>
-
-    <div class="card receita">
-      <h4>Receitas</h4>
-      <div class="main" id="recPago">R$ 0,00</div>
-      <div class="sub" id="recPrev">R$ 0,00</div>
-    </div>
-
-    <div class="card despesa">
-      <h4>Despesas</h4>
-      <div class="main" id="despPago">R$ 0,00</div>
-      <div class="sub" id="despPrev">R$ 0,00</div>
-    </div>
-  </section>
-
-</div>
-
-<section class="list" id="list"></section>
-
-<button class="fab" onclick="openModal()">+</button>
-
-<div class="modal" id="modal">
-<div class="modal-content">
-
-<div class="type-buttons">
-  <button class="type-btn income active" onclick="setType('income')">Receita</button>
-  <button class="type-btn expense" onclick="setType('expense')">Despesa</button>
-</div>
-
-<input id="title" placeholder="Nome">
-<input id="value" placeholder="Valor">
-  <div id="receivedArea" style="display:none">
-  <input id="receivedValue" placeholder="Valor recebido">
-</div>
-<select id="category">
-  <option>Geral</option>
-  <option>Alimentação</option>
-  <option>Moradia</option>
-  <option>Transporte</option>
-</select>
-<input id="date" type="date">
-  
-<!-- PARCELAMENTO -->
-<div class="parcel-buttons">
-
-    <button id="btnParcel" class="parcel-btn" onclick="toggleParcel()">
-        Parcelado
-    </button>
-
-    <button id="btnFixed" class="parcel-btn" onclick="toggleFixed()">
-        Fixa
-    </button>
-
-    <input
-        id="parcelCount"
-        type="number"
-        min="2"
-        placeholder="Meses"
-        style="display:none;width:110px"
-    >
-
-</div>
-
-<div class="switch-row">
-  <span>Pago</span>
-  <label class="switch">
-    <input type="checkbox" id="paid">
-    <span class="slider"></span>
-  </label>
-</div>
-
-
-<div class="switch-row" id="editAllRow" style="display:none">
-    <span>Editar parcelas futuras</span>
-
-    <label class="switch">
-        <input type="checkbox" id="editAll">
-        <span class="slider"></span>
-    </label>
-</div>
-
-<button onclick="save()">Salvar</button>
-<button id="deleteBtn" class="delete" onclick="remove()">Excluir</button>
-<div id="parcelDeleteOptions" style="display:none;margin-top:8px">
-
-    <div style="display:flex;gap:8px">
-
-        <button
-    class="delete"
-    onclick="removeAllParcels()">
-    Excluir todas
-</button>
-
-        <button
-    class="delete"
-    onclick="removeCurrentParcel()">
-    Somente esta
-</button>
-
-    </div>
-
-</div>
-<button class="cancel" onclick="closeModal()">Cancelar</button>
-
-</div>
-</div>
-
-<div class="modal" id="categoryModal">
-  <div class="modal-content">
-
-    <h3 style="margin:0 0 10px 0">Categorias</h3>
-
-    <input id="categoryName" placeholder="Nome da categoria">
-
-    <button onclick="saveCategory()">Salvar</button>
-
-    <div id="categoryList" style="margin-top:12px"></div>
-
-    <button class="cancel" onclick="closeCategoryModal()">Fechar</button>
-
-  </div>
-</div>
-
-<script>
-  // 🔒 Se não veio do login, volta para o login
-  if (localStorage.getItem("logged") !== "true") {
-    window.location.href = "index.html";
-  }
-
-  // 🔥 Remove o acesso imediatamente
-  // Assim, qualquer reload ou nova abertura pede o código de novo
-  localStorage.removeItem("logged");
-</script>
-
-<script>
-
-let currentMonth = new Date();
-let editId = null;
-let editMonthKey = null;
-let currentType = "income";
-let editingParcelData = null;
-let editingItem = null;
-
-const monthLabel = document.getElementById("monthLabel");
-const modal = document.getElementById("modal");
-const deleteBtn = document.getElementById("deleteBtn");
-const valueInput = document.getElementById("value");
-const receivedInput = document.getElementById("receivedValue");
-
-/* =========================
-   UTIL
-========================= */
-valueInput.addEventListener("input",()=>{
-  let v = valueInput.value.replace(/\D/g,"");
-  v = (Number(v)/100).toLocaleString("pt-BR",{minimumFractionDigits:2});
-  valueInput.value = v;
-});
-
-receivedInput.addEventListener("input",()=>{
-  let v = receivedInput.value.replace(/\D/g,"");
-  v = (Number(v)/100).toLocaleString("pt-BR",{minimumFractionDigits:2});
-  receivedInput.value = v;
-});
-
-function updateMonthLabel(){
-  const meses=["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
-  monthLabel.innerText = `${meses[currentMonth.getMonth()]} ${currentMonth.getFullYear()}`;
-}
-
-function getMonthKey(){
-  return `${currentMonth.getFullYear()}-${String(currentMonth.getMonth()+1).padStart(2,"0")}`;
-}
-
-function formatDate(d){
-  const [y,m,day]=d.split("-");
-  return `${day}/${m}`;
-}
-
-/* =========================
-   FIREBASE REFS
-========================= */
-function monthRef(){
-  return firebase.database().ref("finance/meses/"+getMonthKey());
-}
-
-function categoriesRef(){
-  return firebase.database().ref("finance/categorias");
-}
-
-/* =========================
-   MÊS
-========================= */
-function changeMonth(step){
-  currentMonth = new Date(
-    currentMonth.getFullYear(),
-    currentMonth.getMonth() + step,
-    1 // 👈 força dia 1
-  );
-
-  updateMonthLabel();
-  render();
-}
-
-/* =========================
-   TYPE
-========================= */
-function setType(t){
-
-    currentType = t;
-
-    document.querySelectorAll(".type-btn")
-        .forEach(b => b.classList.remove("active"));
-
-    document.querySelector(`.type-btn.${t}`)
-        .classList.add("active");
-
-    const area = document.getElementById("receivedArea");
-
-    if(t === "income" && !paid.checked){
-        area.style.display = "block";
-    }else{
-        area.style.display = "none";
-    }
-
-}
-
-/* =========================
-   PARCELAMENTO
-========================= */
-let isParcel = false;
-let isFixed = false;
-
-function toggleParcel(){
-  isParcel = !isParcel;
-  
-  isFixed = false;
-
-document
-    .getElementById("btnFixed")
-    .classList.remove("active");
-
-  const btn = document.getElementById("btnParcel");
-  const input = document.getElementById("parcelCount");
-
-  btn.classList.toggle("active", isParcel);
-  input.style.display = isParcel ? "block" : "none";
-
-  if(!isParcel && !isFixed){
-    input.value = "";
-  }
-}
-
-function toggleFixed(){
-
-    isFixed = !isFixed;
-
-    if(isFixed){
-
-        isParcel = false;
-
-        document.getElementById("btnParcel")
-            .classList.remove("active");
-
-        document.getElementById("parcelCount")
-            .style.display = "none";
-
-    }
-
-    document.getElementById("btnFixed")
-        .classList.toggle("active", isFixed);
-
-}
-
-
-
-function checkMonthTurnover(){
-  const today = new Date();
-  const day = today.getDate();
-
-  // 🔒 só executa no dia 1
-  if(day !== 1) return;
-
-  const currentMonthKey =
-    `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,"0")}`;
-
-  const prev = new Date(today);
-  prev.setMonth(prev.getMonth() - 1);
-
-  const prevMonthKey =
-    `${prev.getFullYear()}-${String(prev.getMonth()+1).padStart(2,"0")}`;
-
-  // evita recalcular se já existir saldo salvo
-  firebase.database()
-    .ref("finance/saldos/" + currentMonthKey)
-    .once("value", snap=>{
-    
-
-      firebase.database()
-        .ref("finance/meses/" + prevMonthKey)
-        .once("value", snapPrev=>{
-          const data = snapPrev.val() || {};
-          let saldoFinal = 0;
-
-          Object.values(data).forEach(t=>{
-            if(!t.paid) return;
-
-            if(t.type === "income"){
-              saldoFinal += t.value;
-            }else{
-              saldoFinal -= t.value;
-            }
-          });
-
-          firebase.database()
-            .ref("finance/saldos/" + currentMonthKey)
+html <!DOCTYPE html> <html lang="pt-BR"> <head> <meta charset="UTF-8"> <title>Minhas Finanças</title> <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"> <meta name="theme-color" content="#1976d2">  <style> /* Reset Global */ * {     box-sizing: border-box;     font-family: 'Roboto', sans-serif; } body {     margin: 0;     background: #f4f6f8;     overflow-x: hidden; }  /* Cabeçalho Fixo */ .top-fixed {     position: sticky;     top: 0;     z-index: 20;     background: #ffffff;     padding-bottom: 5px;     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); } header {     background: #1976d2;     color: #ffffff;     padding: 12px;     display: flex;     flex-direction: column; } header h2 {     margin: 0;     font-size: 24px;     font-weight: 600; }  /* Botões */ .cat-btn, .month-btn {     background: transparent;     border: none;     color: #ffffff;     font-size: 22px;     cursor: pointer;     padding: 4px 6px;     transition: opacity 0.3s; } .cat-btn:active, .month-btn:active {     opacity: 0.6; }  .month-tabs {     width: 100%;     display: flex;     justify-content: center;     align-items: center;     gap: 14px;     margin-top: 6px; } #monthLabel {     font-size: 16px;     font-weight: 500;     min-width: 140px;     text-align: center; }  /* Cards de Resumo */ .cards {     display: flex;     gap: 10px;     padding: 10px; } .card {     flex: 1;     background: #ffffff;     padding: 20px;     border-radius: 10px;     text-align: center;     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);     transition: transform 0.3s; } .card:hover {     transform: translateY(-5px); } .card h4 {     margin: 0;     font-size: 18px;     color: #666; } .card .main {     margin-top: 6px;     font-size: clamp(18px, 4vw, 24px);     font-weight: bold; } .card .sub {     font-size: clamp(12px, 3vw, 14px);     color: #777;     overflow: hidden;     text-overflow: ellipsis;     white-space: nowrap; }  .saldo { border-top: 4px solid #1976d2; } .receita { border-top: 4px solid #2e7d32; } .despesa { border-top: 4px solid #c62828; }  /* Lista de Itens */ .list {     padding: 10px; } .row {     display: flex;     gap: 8px;     margin-bottom: 8px; } .date-card {     width: 56px;     height: 64px;     background: #ffffff;     border-radius: 10px;     display: flex;     flex-direction: column;     align-items: center;     justify-content: center;     font-size: 14px;     font-weight: bold;     color: #888;     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1); }  .item {     flex: 1;     background: #ffffff;     padding: 10px;     border-left: 5px solid #2196f3;     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);     transition: background 0.3s; } .item:not(:last-child) {     border-bottom: 0.5px solid #ececec; } .first-of-day { border-top-left-radius: 10px; border-top-right-radius: 10px; } .last-of-day { border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; }  .item-top, .item-bottom {     display: flex;     justify-content: space-between;     align-items: center; } .item-name {     font-size: 14px;     font-weight: bold; } .item-value {     font-size: 16px;     font-weight: bold; } .income { color: #2e7d32; } .expense { color: #c62828; }  /* Status Cores */ .late-item { background: #fdecea; border-left-color: #F24438; } .due-today-item { background: #fff4e5; border-left-color: #FD9806; }  /* Badges e Tags */ .badge {     padding: 2px 8px;     border-radius: 12px;     color: #ffffff;     font-size: 12px; } .green { background: #4EAE51; } .red { background: #F24438; } .orange { background: #FD9806; } .parcel-badge {     display: inline-flex;     padding: 2px 8px;     font-size: 11px;     color: #5F6670;     background: #EEF2F8;     border: 1px solid #D8DEE8;     border-radius: 999px; } .fixed-badge {     display: inline-flex;     padding: 2px 8px;     font-size: 11px;     color: #7B1FA2;     background: #F3E5F5;     border: 1px solid #CE93D8;     border-radius: 999px; }  /* Modal */ .modal {     display: none;     position: fixed;     inset: 0;     background: rgba(0, 0, 0, 0.5);     z-index: 9999;     justify-content: center;     align-items: center; } .modal-content {     background: #ffffff;     width: 90%;     max-width: 400px;     padding: 20px;     border-radius: 12px;     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); }  /* Botões do Modal */ .type-btn, .parcel-btn {     padding: 10px;     border-radius: 8px;     border: 1px solid #ccc;     background: #ffffff;     color: #777;     font-weight: bold;     cursor: pointer;     transition: background 0.3s, color 0.3s; } .type-btn.active.income { background: #2e7d32 !important; color: #ffffff !important; border: none; } .type-btn.active.expense { background: #c62828 !important; color: #ffffff !important; border: none; } .parcel-btn.active { border-color: #1976d2 !important; color: #1976d2 !important; }  /* Ações Gerais */ .fab {     position: fixed;     right: 20px;     bottom: 20px;     width: 56px;     height: 56px;     border-radius: 50%;     background: #1976d2;     color: #ffffff;     border: none;     font-size: 26px;     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);     transition: transform 0.3s; } .fab:hover {     transform: scale(1.1); } input, select, button {     width: 100%;     margin-top: 8px;     padding: 10px;     border-radius: 8px;     border: 1px solid #ccc;     font-size: 16px;     transition: border-color 0.3s; } input:focus, select:focus, button:focus {     border-color: #1976d2;     outline: none; } </style> </head>  <body>  <div class="top-fixed">    <header>     <div style="width:100%;display:flex;justify-content:space-between;align-items:center">       <h2>💰 Minhas Finanças</h2>       <div style="display:flex;gap:10px">         <button class="cat-btn" onclick="openCategoryModal()">☰</button>         <button class="cat-btn" onclick="goReports()">📊</button>       </div>     </div>     <div class="month-tabs">       <button class="month-btn" onclick="changeMonth(-1)">&#10094;</button>       <span id="monthLabel"></span>       <button class="month-btn" onclick="changeMonth(1)">&#10095;</button>     </div>   </header>    <section class="cards">     <div class="card saldo">       <h4>Saldo</h4>       <div class="main" id="saldoPago">R$ 0,00</div>       <div class="sub" id="saldoPrev">R$ 0,00</div>     </div>      <div class="card receita">       <h4>Receitas</h4>       <div class="main" id="recPago">R$ 0,00</div>       <div class="sub" id="recPrev">R$ 0,00</div>     </div>      <div class="card despesa">       <h4>Despesas</h4>       <div class="main" id="despPago">R$ 0,00</div>       <div class="sub" id="despPrev">R$ 0,00</div>     </div>   </section>  </div>  <section class="list" id="list"></section>  <button class="fab" onclick="openModal()">+</button>  <div class="modal" id="modal">   <div class="modal-content">     <div class="type-buttons">       <button class="type-btn income active" onclick="setType('income')">Receita</button>       <button class="type-btn expense" onclick="setType('expense')">Despesa</button>     </div>      <input id="title" placeholder="Nome">     <input id="value" placeholder="Valor">     <div id="receivedArea" style="display:none">       <input id="receivedValue" placeholder="Valor recebido">     </div>     <select id="category">       <option>Geral</option>       <option>Alimentação</option>       <option>Moradia</option>       <option>Transporte</option>     </select>     <input id="date" type="date">      <!-- PARCELAMENTO -->     <div class="parcel-buttons">       <button id="btnParcel" class="parcel-btn" onclick="toggleParcel()">Parcelado</button>       <button id="btnFixed" class="parcel-btn" onclick="toggleFixed()">Fixa</button>       <input id="parcelCount" type="number" min="2" placeholder="Meses" style="display:none;width:110px">     </div>      <div class="switch-row">       <span>Pago</span>       <label class="switch">         <input type="checkbox" id="paid">         <span class="slider"></span>       </label>     </div>      <div class="switch-row" id="editAllRow" style="display:none">       <span>Editar parcelas futuras</span>       <label class="switch">         <input type="checkbox" id="editAll">         <span class="slider"></span>       </label>     </div>      <button onclick="save()">Salvar</button>     <button id="deleteBtn" class="delete" onclick="remove()">Excluir</button>     <div id="parcelDeleteOptions" style="display:none;margin-top:8px">       <div style="display:flex;gap:8px">         <button class="delete" onclick="removeAllParcels()">Excluir todas</button>         <button class="delete" onclick="removeCurrentParcel()">Somente esta</button>       </div>     </div>     <button class="cancel" onclick="closeModal()">Cancelar</button>   </div> </div>  <div class="modal" id="categoryModal">   <div class="modal-content">     <h3 style="margin:0 0 10px 0">Categorias</h3>     <input id="categoryName" placeholder="Nome da categoria">     <button onclick="saveCategory()">Salvar</button>     <div id="categoryList" style="margin-top:12px"></div>     <button class="cancel" onclick="closeCategoryModal()">Fechar</button>   </div> </div>  <script>   // 🔒 Se não veio do login, volta para o login   if (localStorage.getItem("logged") !== "true") {     window.location.href = "index.html";   }    // 🔥 Remove o acesso imediatamente   // Assim, qualquer reload ou nova abertura pede o código de novo   localStorage.removeItem("logged"); </script>  <script> let currentMonth = new Date(); let editId = null; let editMonthKey = null; let currentType = "income"; let editingParcelData = null; let editingItem = null;  const monthLabel = document.getElementById("monthLabel"); const modal = document.getElementById("modal"); const deleteBtn = document.getElementById("deleteBtn"); const valueInput = document.getElementById("value"); const receivedInput = document.getElementById("receivedValue");  /* =========================    UTIL ========================= */ valueInput.addEventListener("input", () => {   let v = valueInput.value.replace(/\D/g, "");   v = (Number(v) / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2 });   valueInput.value = v; });  receivedInput.addEventListener("input", () => {   let v = receivedInput.value.replace(/\D/g, "");   v = (Number(v) / 100).toLocaleString("pt-BR", { minimumFractionDigits: 2 });   receivedInput.value = v; });  function updateMonthLabel() {   const meses = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];   monthLabel.innerText = `${meses[currentMonth.getMonth()]} ${currentMonth.getFullYear()}`; }  function getMonthKey() {   return `${currentMonth.getFullYear()}-${String(currentMonth.getMonth() + 1).padStart(2, "0")}`; }  function formatDate(d) {   const [y, m, day] = d.split("-");   return `${day}/${m}`; }  /* =========================    FIREBASE REFS ========================= */ function monthRef() {   return firebase.database().ref("finance/meses/" + getMonthKey()); }  function categoriesRef() {   return firebase.database().ref("finance/categorias"); }  /* =========================    MÊS ========================= */ function changeMonth(step) {   currentMonth = new Date(     currentMonth.getFullYear(),     currentMonth.getMonth() + step,     1 // 👈 força dia 1   );    updateMonthLabel();   render(); }  /* =========================    TYPE ========================= */ function setType(t) {   currentType = t;    document.querySelectorAll(".type-btn")     .forEach(b => b.classList.remove("active"));    document.querySelector(`.type-btn.${t}`)     .classList.add("active");    const area = document.getElementById("receivedArea");    if (t === "income" && !paid.checked) {     area.style.display = "block";   } else {     area.style.display = "none";   } }  /* =========================    PARCELAMENTO ========================= */ let isParcel = false; let isFixed = false;  function toggleParcel() {   isParcel = !isParcel;    isFixed = false;    document.getElementById("btnFixed").classList.remove("active");    const btn = document.getElementById("btnParcel");   const input = document.getElementById("parcelCount");    btn.classList.toggle("active", isParcel);   input.style.display = isParcel ? "block" : "none";    if (!isParcel && !isFixed) {     input.value = "";   } }  function toggleFixed() {   isFixed = !isFixed;    if (isFixed) {     isParcel = false;      document.getElementById("btnParcel").classList.remove("active");      document.getElementById("parcelCount").style.display = "none";   }    document.getElementById("btnFixed").classList.toggle("active", isFixed); }  function checkMonthTurnover() {   const today = new Date();   const day = today.getDate();    // 🔒 só executa no dia 1   if (day !== 1) return;    const currentMonthKey =     `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}`;    const prev = new Date(today);   prev.setMonth(prev.getMonth() - 1);    const prevMonthKey =     `${prev.getFullYear()}-${String(prev.getMonth() + 1).padStart(2, "0")}`;    // evita recalcular se já existir saldo salvo   firebase.database()     .ref("finance/saldos/" + currentMonthKey)     .once("value", snap => {       firebase.database()         .ref("finance/meses/" + prevMonthKey)         .once("value", snapPrev => {           const data = snapPrev.val() || {};           let saldoFinal = 0;            Object.values(data).forEach(t => {             if (!t.paid) return;              if (t.type === "income") {               saldoFinal += t.value;             } else {               saldoFinal -= t.value;             }           });            firebase.database()             .ref(" html
+finance/saldos/" + currentMonthKey)
             .set(saldoFinal);
         });
     });
@@ -424,8 +7,8 @@ function checkMonthTurnover(){
 
 /* =========================
    RENDER
-========================= */
-function render(){
+========================= /
+function render() {
   const container = document.getElementById("list");
   container.innerHTML = "";
 
@@ -435,40 +18,40 @@ function render(){
   // remove listener antigo
   monthRef().off();
 
-  monthRef().on("value", async snap=>{
+  monthRef().on("value", async snap => {
     const data = snap.val() || {};
     const list = Object.values(data)
-      .sort((a,b)=>new Date(b.date)-new Date(a.date));
+      .sort((a, b) => new Date(b.date) - new Date(a.date));
 
     container.innerHTML = "";
 
     // 🔹 BUSCA SALDO DO MÊS ANTERIOR
     let saldoInicial = 0;
 
-const saldoKey = getMonthKey(); // 👈 mês exibido
+    const saldoKey = getMonthKey(); // 👈 mês exibido
 
-const snapSaldo = await firebase
-  .database()
-  .ref("finance/saldos/" + saldoKey)
-  .once("value");
+    const snapSaldo = await firebase
+      .database()
+      .ref("finance/saldos/" + saldoKey)
+      .once("value");
 
-saldoInicial = Number(snapSaldo.val() || 0);
+    saldoInicial = Number(snapSaldo.val() || 0);
 
     // ==========================
     // AGRUPA POR DATA
     // ==========================
     const groupedByDate = {};
 
-    list.forEach(t=>{
-      if(!groupedByDate[t.date]){
+    list.forEach(t => {
+      if (!groupedByDate[t.date]) {
         groupedByDate[t.date] = [];
       }
       groupedByDate[t.date].push(t);
     });
 
     Object.keys(groupedByDate)
-      .sort((a,b)=>new Date(b)-new Date(a))
-      .forEach(date=>{
+      .sort((a, b) => new Date(b) - new Date(a))
+      .forEach(date => {
 
         const row = document.createElement("div");
         row.className = "row";
@@ -482,25 +65,21 @@ saldoInicial = Number(snapSaldo.val() || 0);
         itemsWrap.style.flex = "1";
 
         groupedByDate[date]
-          .sort((a,b)=>b.value - a.value)
-          .forEach((t,index)=>{
+          .sort((a, b) => b.value - a.value)
+          .forEach((t, index) => {
 
-            if(t.type === "income"){
+            if (t.type === "income") {
+              // Valor realmente recebido
+              const recebido = t.receivedValue || (t.paid ? t.value : 0);
 
-  // Valor realmente recebido
-const recebido = t.receivedValue || (t.paid ? t.value : 0);
+              // Soma apenas o que entrou
+              rPago += recebido;
 
-// Soma apenas o que entrou
-rPago += recebido;
-
-// Soma somente o que ainda falta receber
-rPrev += (t.value - recebido);
-
-}else{
-
-    t.paid ? dPago += t.value : dPrev += t.value;
-
-}
+              // Soma somente o que ainda falta receber
+              rPrev += (t.value - recebido);
+            } else {
+              t.paid ? dPago += t.value : dPrev += t.value;
+            }
 
             const todayStr = getTodayLocalString();
             const isLate = !t.paid && t.date < todayStr;
@@ -508,80 +87,21 @@ rPrev += (t.value - recebido);
 
             const item = document.createElement("div");
             item.className = "item";
-            
 
-            if(isLate) item.classList.add("late-item");
-            else if(isDueToday) item.classList.add("due-today-item");
+            if (isLate) item.classList.add("late-item");
+            else if (isDueToday) item.classList.add("due-today-item");
 
-            if(index === 0) item.classList.add("first-of-day");
-            if(index === groupedByDate[date].length - 1)
+            if (index === 0) item.classList.add("first-of-day");
+            if (index === groupedByDate[date].length - 1)
               item.classList.add("last-of-day");
 
             item.onclick = () => editById(t.id);
 
-            item.innerHTML = `
-<div class="item-top">
-
-    <div class="item-name">
-        ${t.name}
-    </div>
-
-    <div class="item-value ${t.type}">
-        R$ ${t.value.toLocaleString("pt-BR",{minimumFractionDigits:2})}
-    </div>
-
-</div>
-
-<div class="item-bottom">
-
-    <div class="item-sub">
-    ${t.category}
-    ${
-    t.fixed
-    ? `<span class="fixed-badge">FIXA</span>`
-
-        : t.parcel
-
-            ? `<span class="parcel-badge">
-                  ${t.parcelIndex}/${t.parcelTotal}
-              </span>`
-
-            : ``
-}
-</div>
-
-    ${
-        t.paid
-        ? `<div class="badge green">${t.type==="income"?"Recebido":"Pago"}</div>`
-        : isLate
-            ? `<div class="badge red">Atrasado</div>`
-            : isDueToday
-                ? `<div class="badge orange">Vence hoje</div>`
-                : `<div></div>`
-    }
-
-</div>
-
-${
-t.type === "income" &&
-!t.paid &&
-(t.receivedValue || 0) > 0
-? `
+            item.innerHTML = <div class="item-top">     <div class="item-name">${t.name}</div>     <div class="item-value ${t.type}">R$ ${t.value.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</div> </div> <div class="item-bottom">     <div class="item-sub">         ${t.category}         ${t.fixed ?<span class="fixed-badge">FIXA</span>: t.parcel ?<span class="parcel-badge">${t.parcelIndex}/${t.parcelTotal}</span>: ``}     </div>     ${t.paid ?<div class="badge green">${t.type === "income" ? "Recebido" : "Pago"}</div>: isLate ?<div class="badge red">Atrasado</div>: isDueToday ?<div class="badge orange">Vence hoje</div>:<div></div>} </div> ${t.type === "income" && !t.paid && (t.receivedValue || 0) > 0 ? 
 <div class="received">
-
-    <div class="ok">
-        Recebido: R$ ${(t.receivedValue || 0).toLocaleString("pt-BR",{minimumFractionDigits:2})}
-    </div>
-
-    <div class="rest">
-        Falta: R$ ${((t.value || 0) - (t.receivedValue || 0)).toLocaleString("pt-BR",{minimumFractionDigits:2})}
-    </div>
-
-</div>
-`
-: ``
-}
-`;
+    <div class="ok">Recebido: R$ ${(t.receivedValue || 0).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</div>
+    <div class="rest">Falta: R$ ${((t.value || 0) - (t.receivedValue || 0)).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</div>
+</div>: ``};
             itemsWrap.appendChild(item);
           });
 
@@ -593,100 +113,83 @@ t.type === "income" &&
     // ==========================
     // TOTAIS (COM SALDO HERDADO)
     // ==========================
-    recPago.innerText = `R$ ${rPago.toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
-    recPrev.innerText = `R$ ${(rPago+rPrev).toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
-    despPago.innerText = `R$ ${dPago.toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
-    despPrev.innerText = `R$ ${(dPago+dPrev).toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
+    recPago.innerText = R$ ${rPago.toLocaleString("pt-BR", { minimumFractionDigits: 2 })};
+    recPrev.innerText = R$ ${(rPago + rPrev).toLocaleString("pt-BR", { minimumFractionDigits: 2 })};
+    despPago.innerText = R$ ${dPago.toLocaleString("pt-BR", { minimumFractionDigits: 2 })};
+    despPrev.innerText = R$ ${(dPago + dPrev).toLocaleString("pt-BR", { minimumFractionDigits: 2 })};
 
     saldoPago.innerText =
-      `R$ ${(saldoInicial + rPago - dPago).toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
+      R$ ${(saldoInicial + rPago - dPago).toLocaleString("pt-BR", { minimumFractionDigits: 2 })};
 
     saldoPrev.innerText =
-      `R$ ${(saldoInicial + rPago + rPrev - dPago - dPrev).toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
+      R$ ${(saldoInicial + rPago + rPrev - dPago - dPrev).toLocaleString("pt-BR", { minimumFractionDigits: 2 })};
   });
 }
 
-/* =========================
+/ =========================
    SAVE
-========================= */
-async function save(){
+========================= /
+async function save() {
   const valTotal = Number(
-    valueInput.value.replace(/\./g,"").replace(",",".")
+    valueInput.value.replace(/./g, "").replace(",", ".")
   );
-  
+
   let valReceived = Number(
     (receivedInput.value || "0")
-        .replace(/\./g,"")
-        .replace(",",".")
-) || 0;
+      .replace(/./g, "")
+      .replace(",", ".")
+  ) || 0;
 
-if(currentType === "income" && paid.checked){
+  if (currentType === "income" && paid.checked) {
     valReceived = valTotal;
-}
+  }
 
-const remaining = Math.max(0, valTotal - valReceived);
+  const remaining = Math.max(0, valTotal - valReceived);
 
   const baseDateStr = date.value;
-  
-if(editingItem?.parcel && isFixed){
 
+  if (editingItem?.parcel && isFixed) {
     await convertParcelToFixed(valReceived, remaining);
-
     closeModal();
     render();
     return;
+  }
 
-} 
-
-/* =========================
-
-   NÃO PARCELADO
-
-========================= */
-
-if(!isParcel && !isFixed){
-
-    if((editingItem?.parcel || editingItem?.fixed) &&
-   document.getElementById("editAll").checked){
-
-
-    await updateParcelGroup(valReceived, remaining);
-
-closeModal();
-
-render();
-
-return;
-}
-
-
+  / =========================
+     NÃO PARCELADO
+  ========================= /
+  if (!isParcel && !isFixed) {
+    if ((editingItem?.parcel || editingItem?.fixed) &&
+      document.getElementById("editAll").checked) {
+      await updateParcelGroup(valReceived, remaining);
+      closeModal();
+      render();
+      return;
+    }
 
     const id = editId || Date.now().toString();
 
     const item = {
-    fixed: isFixed,
-  id,
-  name: title.value.trim(),
-  value: valTotal,
-
-  receivedValue: valReceived,
-  remainingValue: remaining,
-
-  category: category.value,
-  date: baseDateStr,
-  type: currentType,
-  paid: paid.checked,
-
-  parcel: editingParcelData ? true : false,
-  parcelIndex: editingParcelData ? editingParcelData.parcelIndex : null,
-  parcelTotal: editingParcelData ? editingParcelData.parcelTotal : null,
-  parcelGroupId: editingParcelData ? editingParcelData.parcelGroupId : null
-};
+      fixed: isFixed,
+      id,
+      name: title.value.trim(),
+      value: valTotal,
+      receivedValue: valReceived,
+      remainingValue: remaining,
+      category: category.value,
+      date: baseDateStr,
+      type: currentType,
+      paid: paid.checked,
+      parcel: editingParcelData ? true : false,
+      parcelIndex: editingParcelData ? editingParcelData.parcelIndex : null,
+      parcelTotal: editingParcelData ? editingParcelData.parcelTotal : null,
+      parcelGroupId: editingParcelData ? editingParcelData.parcelGroupId : null
+    };
 
     const newMonthKey = getMonthKeyFromDate(item.date);
 
     // se estiver editando e mudou o mês
-    if(editId && editMonthKey && editMonthKey !== newMonthKey){
+    if (editId && editMonthKey && editMonthKey !== newMonthKey) {
       firebase
         .database()
         .ref("finance/meses/" + editMonthKey + "/" + id)
@@ -703,120 +206,90 @@ return;
     return;
   }
 
-
-/* =========================
-
-   FIXA
-
-========================= */
-
-if(isFixed){
-
+  / =========================
+     FIXA
+  ========================= /
+  if (isFixed) {
     // Só atualiza se já era uma fixa
-    if(editId && editingItem?.fixed){
-
-        await updateFixedGroup(valReceived, remaining);
-
-        closeModal();
-        render();
-        return;
-
+    if (editId && editingItem?.fixed) {
+      await updateFixedGroup(valReceived, remaining);
+      closeModal();
+      render();
+      return;
     }
 
     // continua o código atual de criar fixa...
     const groupId = Date.now().toString();
-
     const baseDate = new Date(baseDateStr);
 
-    for(let i = 0; i < 12; i++){
+    for (let i = 0; i < 12; i++) {
+      const d = new Date(baseDate);
+      d.setMonth(d.getMonth() + i);
 
-        const d = new Date(baseDate);
+      const dateStr = d.toISOString().split("T")[0];
+      const monthKey = getMonthKeyFromDate(dateStr);
+      const id = ${groupId}_${i + 1};
 
-        d.setMonth(d.getMonth() + i);
+      const item = {
+        id,
+        name: title.value.trim(),
+        value: valTotal,
+        receivedValue: 0,
+        remainingValue: valTotal,
+        category: category.value,
+        date: dateStr,
+        type: currentType,
+        paid: false,
+        fixed: true,
+        parcel: false,
+        parcelGroupId: groupId,
+        parcelIndex: i + 1,
+        parcelTotal: 12
+      };
 
-        const dateStr = d.toISOString().split("T")[0];
-
-        const monthKey = getMonthKeyFromDate(dateStr);
-
-        const id = `${groupId}_${i+1}`;
-
-        const item = {
-
-            id,
-            name: title.value.trim(),
-            value: valTotal,
-            receivedValue: 0,
-            remainingValue: valTotal,
-            category: category.value,
-            date: dateStr,
-            type: currentType,
-            paid: false,
-            fixed: true,
-            parcel: false,
-            parcelGroupId: groupId,
-            parcelIndex: i + 1,
-            parcelTotal: 12
-
-        };
-
-        await firebase.database()
-            .ref("finance/meses/" + monthKey + "/" + id)
-            .set(item);
-
+      await firebase.database()
+        .ref("finance/meses/" + monthKey + "/" + id)
+        .set(item);
     }
 
     closeModal();
     render();
     return;
-}
+  }
 
-
-
-  /* =========================
+  / =========================
      PARCELADO
-  ========================= */
-  if(isParcel && editId && editingItem?.parcel){
-
+  ========================= /
+  if (isParcel && editId && editingItem?.parcel) {
     await updateParcelGroup(valReceived, remaining);
-
     closeModal();
     render();
     return;
+  }
 
-}
-
-
-
-
-// Converter Fixa -> Parcelado
-if(editingItem?.fixed && isParcel){
-
+  // Converter Fixa -> Parcelado
+  if (editingItem?.fixed && isParcel) {
     await deleteGroup(editingItem.parcelGroupId);
-
     editId = null;
     editingItem = null;
     editingParcelData = null;
+  }
 
-}
-
-// Converter para lançamento normal
-if(
+  // Converter para lançamento normal
+  if (
     (editingItem?.parcel || editingItem?.fixed) &&
     !isParcel &&
     !isFixed
-){
-
+  ) {
     await deleteGroup(editingItem.parcelGroupId);
-
     editId = null;
     editingItem = null;
     editingParcelData = null;
-
-}
+  }
 
   const totalParcels = Number(parcelCount.value || 0);
 
-  if(totalParcels < 2){
+  if (totalParcels < 2) {
     alert("Informe a quantidade de parcelas");
     return;
   }
@@ -825,44 +298,38 @@ if(
   const groupId = Date.now().toString();
   const baseDate = new Date(baseDateStr);
 
-  for(let i = 0; i < totalParcels; i++){
+  for (let i = 0; i < totalParcels; i++) {
     const d = new Date(baseDate);
     d.setMonth(d.getMonth() + i);
 
     const dateStr = d.toISOString().split("T")[0];
     const monthKey = getMonthKeyFromDate(dateStr);
-    const id = `${groupId}_${i+1}`;
+    const id = ${groupId}_${i + 1};
 
     const pago = (i === 0) ? paid.checked : false;
 
-const item = {
-
-    fixed: false,
-    id,
-    name: title.value.trim(),
-    value: parcelValue,
-
-    receivedValue:
+    const item = {
+      fixed: false,
+      id,
+      name: title.value.trim(),
+      value: parcelValue,
+      receivedValue:
         currentType === "income"
-            ? (pago ? parcelValue : 0)
-            : 0,
-
-    remainingValue:
+          ? (pago ? parcelValue : 0)
+          : 0,
+      remainingValue:
         currentType === "income"
-            ? (pago ? 0 : parcelValue)
-            : 0,
-
-    category: category.value,
-    date: dateStr,
-    type: currentType,
-
-    paid: pago,
-
-    parcel: true,
-    parcelIndex: i + 1,
-    parcelTotal: totalParcels,
-    parcelGroupId: groupId
-};
+          ? (pago ? 0 : parcelValue)
+          : 0,
+      category: category.value,
+      date: dateStr,
+      type: currentType,
+      paid: pago,
+      parcel: true,
+      parcelIndex: i + 1,
+      parcelTotal: totalParcels,
+      parcelGroupId: groupId
+    };
 
     firebase
       .database()
@@ -874,263 +341,223 @@ const item = {
   render();
 }
 
-async function updateParcelGroup(valReceived, remaining){
+async function updateParcelGroup(valReceived, remaining) {
+  const snap = await firebase.database()
+    .ref("finance/meses")
+    .once("value");
 
-    const snap = await firebase.database()
-        .ref("finance/meses")
-        .once("value");
+  const meses = snap.val() || {};
+  const promises = [];
 
-    const meses = snap.val() || {};
-    const promises = [];
+  const novoValor = Number(
+    valueInput.value
+      .replace(/./g, "")
+      .replace(",", ".")
+  );
 
-    const novoValor = Number(
-        valueInput.value
-            .replace(/\./g,"")
-            .replace(",",".")
-    );
+  Object.keys(meses).forEach(mes => {
+    Object.keys(meses[mes]).forEach(id => {
+      const item = meses[mes][id];
 
-    Object.keys(meses).forEach(mes=>{
+      // somente a parcela atual e as futuras
+      if (
+        item.parcelGroupId === editingItem.parcelGroupId &&
+        item.parcelIndex >= editingItem.parcelIndex
+      ) {
+        item.name = title.value.trim();
+        item.category = category.value;
+        item.value = novoValor;
+        item.type = currentType;
+        const novaData = new Date(date.value);
 
-        Object.keys(meses[mes]).forEach(id=>{
+        // mantém o mês da própria parcela
+        const dataParcela = new Date(item.date);
 
-            const item = meses[mes][id];
+        // altera apenas o dia
+        dataParcela.setDate(novaData.getDate());
+        item.date = dataParcela.toISOString().split("T")[0];
 
-            // somente a parcela atual e as futuras
-            if(
-                item.parcelGroupId === editingItem.parcelGroupId &&
-                item.parcelIndex >= editingItem.parcelIndex
-            ){
+        if (item.id === editingItem.id) {
+          // Apenas a parcela atual muda o status
+          item.paid = paid.checked;
 
-                item.name = title.value.trim();
-item.category = category.value;
-item.value = novoValor;
-item.type = currentType;
-const novaData = new Date(date.value);
+          if (currentType === "income") {
+            item.receivedValue = valReceived;
+            item.remainingValue = remaining;
+          } else {
+            item.remainingValue = 0;
+          }
+        } else {
+          // Parcelas futuras mantêm o status
+          item.remainingValue = Math.max(
+            0,
+            novoValor - (item.receivedValue || 0)
+          );
+        }
 
-// mantém o mês da própria parcela
-const dataParcela = new Date(item.date);
-
-// altera apenas o dia
-dataParcela.setDate(novaData.getDate());
-
-item.date = dataParcela.toISOString().split("T")[0];
-
-if(item.id === editingItem.id){
-
-    // Apenas a parcela atual muda o status
-    item.paid = paid.checked;
-
-    if(currentType === "income"){
-        item.receivedValue = valReceived;
-        item.remainingValue = remaining;
-    }else{
-        item.remainingValue = 0;
-    }
-
-}else{
-
-    // Parcelas futuras mantêm o status
-    item.remainingValue = Math.max(
-        0,
-        novoValor - (item.receivedValue || 0)
-    );
-
-}
-
-promises.push(
-    firebase.database()
-        .ref("finance/meses/"+mes+"/"+id)
-        .set(item)
-);
-            }
-
-        });
-
+        promises.push(
+          firebase.database()
+            .ref("finance/meses/" + mes + "/" + id)
+            .set(item)
+        );
+      }
     });
+  });
 
-    await Promise.all(promises);
+  await Promise.all(promises);
 }
 
+async function convertParcelToFixed(valReceived, remaining) {
+  const snap = await firebase.database()
+    .ref("finance/meses")
+    .once("value");
 
-async function convertParcelToFixed(valReceived, remaining){
+  const meses = snap.val() || {};
+  const promises = [];
 
-    const snap = await firebase.database()
-        .ref("finance/meses")
-        .once("value");
+  const novoValor = Number(
+    valueInput.value.replace(/./g, "").replace(",", ".")
+  );
 
-    const meses = snap.val() || {};
-    const promises = [];
+  const novoDia = new Date(date.value).getDate();
 
-    const novoValor = Number(
-        valueInput.value.replace(/\./g,"").replace(",",".")
-    );
+  Object.keys(meses).forEach(mes => {
+    Object.keys(meses[mes]).forEach(id => {
+      const item = meses[mes][id];
 
-    const novoDia = new Date(date.value).getDate();
+      if (
+        item.parcelGroupId === editingItem.parcelGroupId &&
+        item.parcelIndex >= editingItem.parcelIndex
+      ) {
+        item.fixed = true;
+        item.parcel = false;
 
-    Object.keys(meses).forEach(mes=>{
+        item.name = title.value.trim();
+        item.category = category.value;
+        item.value = novoValor;
+        item.type = currentType;
 
-        Object.keys(meses[mes]).forEach(id=>{
+        const data = new Date(item.date);
+        data.setDate(novoDia);
+        item.date = data.toISOString().split("T")[0];
 
-            const item = meses[mes][id];
+        if (item.id === editingItem.id) {
+          item.paid = paid.checked;
 
-            if(
-                item.parcelGroupId === editingItem.parcelGroupId &&
-                item.parcelIndex >= editingItem.parcelIndex
-            ){
+          if (currentType === "income") {
+            item.receivedValue = valReceived;
+            item.remainingValue = remaining;
+          }
+        } else {
+          item.remainingValue = Math.max(
+            0,
+            novoValor - (item.receivedValue || 0)
+          );
+        }
 
-                item.fixed = true;
-                item.parcel = false;
-
-                item.name = title.value.trim();
-                item.category = category.value;
-                item.value = novoValor;
-                item.type = currentType;
-
-                const data = new Date(item.date);
-                data.setDate(novoDia);
-                item.date = data.toISOString().split("T")[0];
-
-                if(item.id === editingItem.id){
-
-                    item.paid = paid.checked;
-
-                    if(currentType==="income"){
-                        item.receivedValue = valReceived;
-                        item.remainingValue = remaining;
-                    }
-
-                }else{
-
-                    item.remainingValue = Math.max(
-                        0,
-                        novoValor-(item.receivedValue||0)
-                    );
-
-                }
-
-                promises.push(
-                    firebase.database()
-                    .ref("finance/meses/"+mes+"/"+id)
-                    .set(item)
-                );
-
-            }
-
-        });
-
+        promises.push(
+          firebase.database()
+            .ref("finance/meses/" + mes + "/" + id)
+            .set(item)
+        );
+      }
     });
+  });
 
-    await Promise.all(promises);
-
+  await Promise.all(promises);
 }
 
+async function updateFixedGroup(valReceived, remaining) {
+  const snap = await firebase.database()
+    .ref("finance/meses")
+    .once("value");
 
+  const meses = snap.val() || {};
+  const promises = [];
 
-async function updateFixedGroup(valReceived, remaining){
+  const novoValor = Number(
+    valueInput.value
+      .replace(/./g, "")
+      .replace(",", ".")
+  );
 
-    const snap = await firebase.database()
-        .ref("finance/meses")
-        .once("value");
+  const novoDia = new Date(date.value).getDate();
 
-    const meses = snap.val() || {};
-    const promises = [];
+  Object.keys(meses).forEach(mes => {
+    Object.keys(meses[mes]).forEach(id => {
+      const item = meses[mes][id];
 
-    const novoValor = Number(
-        valueInput.value
-            .replace(/\./g,"")
-            .replace(",",".")
-    );
+      if (
+        item.parcelGroupId === editingItem.parcelGroupId &&
+        item.fixed
+      ) {
+        item.name = title.value.trim();
+        item.category = category.value;
+        item.value = novoValor;
+        item.type = currentType;
 
-    const novoDia = new Date(date.value).getDate();
+        // altera somente o dia
+        const data = new Date(item.date);
+        data.setDate(novoDia);
+        item.date = data.toISOString().split("T")[0];
 
-    Object.keys(meses).forEach(mes=>{
+        if (item.id === editingItem.id) {
+          item.paid = paid.checked;
 
-        Object.keys(meses[mes]).forEach(id=>{
+          if (currentType === "income") {
+            item.receivedValue = valReceived;
+            item.remainingValue = remaining;
+          } else {
+            item.remainingValue = 0;
+          }
+        } else {
+          item.remainingValue = Math.max(
+            0,
+            novoValor - (item.receivedValue || 0)
+          );
+        }
 
-            const item = meses[mes][id];
-
-            if(
-                item.parcelGroupId === editingItem.parcelGroupId &&
-                item.fixed
-            ){
-
-                item.name = title.value.trim();
-                item.category = category.value;
-                item.value = novoValor;
-                item.type = currentType;
-
-                // altera somente o dia
-                const data = new Date(item.date);
-                data.setDate(novoDia);
-                item.date = data.toISOString().split("T")[0];
-
-                if(item.id === editingItem.id){
-
-                    item.paid = paid.checked;
-
-                    if(currentType === "income"){
-                        item.receivedValue = valReceived;
-                        item.remainingValue = remaining;
-                    }else{
-                        item.remainingValue = 0;
-                    }
-
-                }else{
-
-                    item.remainingValue = Math.max(
-                        0,
-                        novoValor - (item.receivedValue || 0)
-                    );
-
-                }
-
-                promises.push(
-                    firebase.database()
-                        .ref("finance/meses/"+mes+"/"+id)
-                        .set(item)
-                );
-
-            }
-
-        });
-
+        promises.push(
+          firebase.database()
+            .ref("finance/meses/" + mes + "/" + id)
+            .set(item)
+        );
+      }
     });
+  });
 
-    await Promise.all(promises);
-
+  await Promise.all(promises);
 }
 
-
-
-/* =========================
+/ =========================
    EDIT
 ========================= */
-function editById(id){
+function editById(id) {
   const originalMonthKey = getMonthKey();
 
   firebase
     .database()
     .ref("finance/meses/" + originalMonthKey + "/" + id)
-    .once("value", snap=>{
+    .once("value", snap => {
       const t = snap.val();
       editingItem = t;
       document.getElementById("editAllRow").style.display =
-    (t.parcel || t.fixed) ? "flex" : "none";
+        (t.parcel || t.fixed) ? "flex" : "none";
 
-document.getElementById("editAll").checked = false;
-      if(!t) return;
+      document.getElementById("editAll").checked = false;
+      if (!t) return;
 
       title.value = t.name;
-      valueInput.value = t.value.toLocaleString("pt-BR",{minimumFractionDigits:2});
+      valueInput.value = t.value.toLocaleString("pt-BR", { minimumFractionDigits: 2 });
       const area = document.getElementById("receivedArea");
 
-if(t.type === "income" && !t.paid){
-    area.style.display = "block";
-}else{
-    area.style.display = "none";
-}
-receivedInput.value =
-  (t.receivedValue || 0).toLocaleString("pt-BR",{minimumFractionDigits:2});
+      if (t.type === "income" && !t.paid) {
+        area.style.display = "block";
+      } else {
+        area.style.display = "none";
+      }
+      receivedInput.value =
+        (t.receivedValue || 0).toLocaleString("pt-BR", { minimumFractionDigits: 2 });
       category.value = t.category;
       date.value = t.date;
       paid.checked = t.paid;
@@ -1142,366 +569,10 @@ receivedInput.value =
         parcelTotal: t.parcelTotal,
         parcelGroupId: t.parcelGroupId
       } : null;
-      
-      
-      
+
       // Estado Parcelado/Fixa
-isParcel = !!t.parcel;
-isFixed = !!t.fixed;
-
-document.getElementById("btnParcel")
-    .classList.toggle("active", isParcel);
-
-document.getElementById("btnFixed")
-    .classList.toggle("active", isFixed);
-
-document.getElementById("parcelCount").style.display =
-    isParcel ? "block" : "none";
-
-if(isParcel){
-    document.getElementById("parcelCount").value = t.parcelTotal;
-}else{
-    document.getElementById("parcelCount").value = "";
-}
-
-      setType(currentType);
-      editId = id;
-      editMonthKey = originalMonthKey;
-      deleteBtn.style.display = "block";
-      openModal();
-    });
-}
-
-/* =========================
-   DELETE
-========================= */
-function remove(){
-
-    if(!editingItem?.parcel && !editingItem?.fixed){
-
-        monthRef().child(editId).remove();
-        closeModal();
-        render();
-        return;
-
-    }
-
-    document.getElementById("deleteBtn").style.display="none";
-    document.getElementById("parcelDeleteOptions").style.display="block";
-
-}
-
-
-
-function removeParcelGroup(groupId){
-
-    firebase.database()
-    .ref("finance/meses")
-    .once("value",snap=>{
-
-        const meses = snap.val() || {};
-        const promises = [];
-
-        Object.keys(meses).forEach(mes=>{
-
-            Object.keys(meses[mes]).forEach(id=>{
-
-                const item = meses[mes][id];
-
-                if(
-                    item.parcelGroupId === groupId &&
-                    item.parcelIndex >= editingItem.parcelIndex
-                ){
-
-                    promises.push(
-                        firebase.database()
-                        .ref("finance/meses/"+mes+"/"+id)
-                        .remove()
-                    );
-
-                }
-
-            });
-
-        });
-
-        Promise.all(promises).then(()=>{
-            closeModal();
-            render();
-        });
-
-    });
-
-}
-
-
-async function deleteGroup(groupId){
-
-    const snap = await firebase.database()
-        .ref("finance/meses")
-        .once("value");
-
-    const meses = snap.val() || {};
-    const promises = [];
-
-    Object.keys(meses).forEach(mes=>{
-
-        Object.keys(meses[mes]).forEach(id=>{
-
-            const item = meses[mes][id];
-
-            if(item.parcelGroupId === groupId){
-
-                promises.push(
-                    firebase.database()
-                        .ref("finance/meses/"+mes+"/"+id)
-                        .remove()
-                );
-
-            }
-
-        });
-
-    });
-
-    await Promise.all(promises);
-
-}
-
-
-function removeAllParcels(){
-    removeParcelGroup(editingItem.parcelGroupId);
-}
-
-function removeCurrentParcel(){
-
-    monthRef()
-        .child(editId)
-        .remove()
-        .then(()=>{
-            closeModal();
-            render();
-        });
-
-}
-
-/* =========================
-   MODAL
-========================= */
-function openModal(){
-  modal.style.display="flex";
-  if(editId===null){
-    title.value="";
-    valueInput.value="";
-    receivedInput.value=""; // 👈 NOVO
-    document.getElementById("receivedArea").style.display="none"; // 👈 NOVO
-
-    category.value="";
-    paid.checked=false;
-    document.getElementById("receivedArea").style.display = "block";
-    setType("income");
-
-    isParcel = false;
-    isFixed = false;
-document.getElementById("btnFixed").classList.remove("active");
-    document.getElementById("btnParcel").classList.remove("active");
-    document.getElementById("parcelCount").style.display = "none";
-    document.getElementById("parcelCount").value = "";
-
-    const hoje=new Date();
-    date.value=`${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2,"0")}-${String(hoje.getDate()).padStart(2,"0")}`;
-    deleteBtn.style.display="none";
-  }
-}
-
-function closeModal(){
-  modal.style.display = "none";
-  
-  document.getElementById("deleteBtn").style.display="block";
-document.getElementById("parcelDeleteOptions").style.display="none";
-
-document.getElementById("editAll").checked = false;
-document.getElementById("editAllRow").style.display = "none";
-
-  isParcel = false;
-isFixed = false;
-
-editingParcelData = null;
-editingItem = null;
-
-document.getElementById("btnParcel").classList.remove("active");
-document.getElementById("btnFixed").classList.remove("active");
-
-document.getElementById("parcelCount").style.display = "none";
-document.getElementById("parcelCount").value = "";
-
-  editId = null;
-  editMonthKey = null;
-}
-
-/* =========================
-   CATEGORIAS
-========================= */
-function openCategoryModal(){
-  document.getElementById("categoryModal").style.display="flex";
-  renderCategories();
-}
-
-function closeCategoryModal(){
-  document.getElementById("categoryModal").style.display="none";
-}
-
-function saveCategory(){
-  const input=document.getElementById("categoryName");
-  const name=input.value.trim();
-  if(!name) return;
-
-  categoriesRef().child(name).set(true);
-  input.value="";
-  renderCategories();
-  updateCategorySelect();
-}
-
-function deleteCategory(name){
-  categoriesRef().child(name).remove();
-  renderCategories();
-  updateCategorySelect();
-}
-
-function renderCategories(){
-  const container=document.getElementById("categoryList");
-  container.innerHTML="";
-
-  categoriesRef().once("value", snap=>{
-    const data = snap.val() || {};
-    Object.keys(data)
-      .sort((a,b)=>a.localeCompare(b,'pt-BR'))
-      .forEach(c=>{
-        const div=document.createElement("div");
-        div.className="category-item";
-        div.innerHTML=`<span>${c}</span><button onclick="deleteCategory('${c}')">✕</button>`;
-        container.appendChild(div);
-      });
-  });
-}
-
-function updateCategorySelect(){
-  const select = document.getElementById("category");
-  select.innerHTML="";
-
-  categoriesRef().once("value", snap=>{
-    const data = snap.val() || {};
-    Object.keys(data).forEach(c=>{
-      const opt=document.createElement("option");
-      opt.value=c;
-      opt.innerText=c;
-      select.appendChild(opt);
-    });
-  });
-}
-
-function goReports(){
-  window.location.href = "relatorios.html";
-}
-
-function getMonthKeyFromDate(dateStr){
-  const [year, month] = dateStr.split("-");
-  return `${year}-${month}`;
-}
-
-function getTodayLocalString(){
-  const now = new Date();
-  return `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}-${String(now.getDate()).padStart(2,"0")}`;
-}
-
-function getPreviousMonthKeyForRender(){
-  const today = new Date();
-
-  // só no dia 1
-  if(today.getDate() !== 1){
-    return null;
-  }
-
-  // mês exibido
-  const renderYear = currentMonth.getFullYear();
-  const renderMonth = currentMonth.getMonth();
-
-  // mês real atual
-  const realYear = today.getFullYear();
-  const realMonth = today.getMonth();
-
-  // 🔒 só herda se estiver exibindo o mês atual real
-  if(renderYear !== realYear || renderMonth !== realMonth){
-    return null;
-  }
-
-  // mês anterior real
-  const prev = new Date(realYear, realMonth - 1, 1);
-
-  return `${prev.getFullYear()}-${String(prev.getMonth()+1).padStart(2,"0")}`;
-}
-
-document.getElementById("paid").addEventListener("change", function(){
-
-    const area = document.getElementById("receivedArea");
-
-    if(currentType !== "income"){
-        area.style.display = "none";
-        return;
-    }
-
-    if(this.checked){
-        area.style.display = "none";
-        receivedInput.value = valueInput.value;
-    }else{
-        area.style.display = "block";
-    }
-
-});
-
-
-</script>
-
-<!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-
-<script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyAd-ttfpK460D4fyfoNZY6DJRhzuItpHe0",
-    authDomain: "box-financeiro.firebaseapp.com",
-    databaseURL: "https://box-financeiro-default-rtdb.firebaseio.com",
-    projectId: "box-financeiro",
-    storageBucket: "box-financeiro.firebasestorage.app",
-    messagingSenderId: "249966609723",
-    appId: "1:249966609723:web:12339b100df393031ea31e"
-  };
-
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.database();
-  
-  /* =========================
-   INIT
-========================= */
-updateMonthLabel();
-checkMonthTurnover(); // 👈 NOVO
-render();
-updateCategorySelect();
-</script>
-
-<script>
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("sw.js");
-}
-</script>
-
-</body>
-</html>
-
-
-
-
-
-
-
-
+      isParcel = !!t.parcel;
+      isFixed = !!t.fixed;
+
+      document.getElementById("btnParcel")
+        .classList.toggle("active", is html Parcel);        document.getElementById("btnFixed")         .classList.toggle("active", isFixed);        document.getElementById("parcelCount").style.display =         isParcel ? "block" : "none";        if (isParcel) {         document.getElementById("parcelCount").value = t.parcelTotal;       } else {         document.getElementById("parcelCount").value = "";       }        setType(currentType);       editId = id;       editMonthKey = originalMonthKey;       deleteBtn.style.display = "block";       openModal();     }); }  /* =========================    DELETE ========================= */ function remove() {   if (!editingItem?.parcel && !editingItem?.fixed) {     monthRef().child(editId).remove();     closeModal();     render();     return;   }    document.getElementById("deleteBtn").style.display = "none";   document.getElementById("parcelDeleteOptions").style.display = "block"; }  function removeParcelGroup(groupId) {   firebase.database()     .ref("finance/meses")     .once("value", snap => {       const meses = snap.val() || {};       const promises = [];        Object.keys(meses).forEach(mes => {         Object.keys(meses[mes]).forEach(id => {           const item = meses[mes][id];            if (             item.parcelGroupId === groupId &&             item.parcelIndex >= editingItem.parcelIndex           ) {             promises.push(               firebase.database()                 .ref("finance/meses/" + mes + "/" + id)                 .remove()             );           }         });       });        Promise.all(promises).then(() => {         closeModal();         render();       });     }); }  async function deleteGroup(groupId) {   const snap = await firebase.database()     .ref("finance/meses")     .once("value");    const meses = snap.val() || {};   const promises = [];    Object.keys(meses).forEach(mes => {     Object.keys(meses[mes]).forEach(id => {       const item = meses[mes][id];        if (item.parcelGroupId === groupId) {         promises.push(           firebase.database()             .ref("finance/meses/" + mes + "/" + id)             .remove()         );       }     });   });    await Promise.all(promises); }  function removeAllParcels() {   removeParcelGroup(editingItem.parcelGroupId); }  function removeCurrentParcel() {   monthRef()     .child(editId)     .remove()     .then(() => {       closeModal();       render();     }); }  /* =========================    MODAL ========================= */ function openModal() {   modal.style.display = "flex";   if (editId === null) {     title.value = "";     valueInput.value = "";     receivedInput.value = ""; // 👈 NOVO     document.getElementById("receivedArea").style.display = "none"; // 👈 NOVO      category.value = "";     paid.checked = false;     document.getElementById("receivedArea").style.display = "block";     setType("income");      isParcel = false;     isFixed = false;     document.getElementById("btnFixed").classList.remove("active");     document.getElementById("btnParcel").classList.remove("active");     document.getElementById("parcelCount").style.display = "none";     document.getElementById("parcelCount").value = "";      const hoje = new Date();     date.value = `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, "0")}-${String(hoje.getDate()).padStart(2, "0")}`;     deleteBtn.style.display = "none";   } }  function closeModal() {   modal.style.display = "none";    document.getElementById("deleteBtn").style.display = "block";   document.getElementById("parcelDeleteOptions").style.display = "none";    document.getElementById("editAll").checked = false;   document.getElementById("editAllRow").style.display = "none";    isParcel = false;   isFixed = false;    editingParcelData = null;   editingItem = null;    document.getElementById("btnParcel").classList.remove("active");   document.getElementById("btnFixed").classList.remove("active");    document.getElementById("parcelCount").style.display = "none";   document.getElementById("parcelCount").value = "";    editId = null;   editMonthKey = null; }  /* =========================    CATEGORIAS ========================= */ function openCategoryModal() {   document.getElementById("categoryModal").style.display = "flex";   renderCategories(); }  function closeCategoryModal() {   document.getElementById("categoryModal").style.display = "none"; }  function saveCategory() {   const input = document.getElementById("categoryName");   const name = input.value.trim();   if (!name) return;    categoriesRef().child(name).set(true);   input.value = "";   renderCategories();   updateCategorySelect(); }  function deleteCategory(name) {   categoriesRef().child(name).remove();   renderCategories();   updateCategorySelect(); }  function renderCategories() {   const container = document.getElementById("categoryList");   container.innerHTML = "";    categoriesRef().once("value", snap => {     const data = snap.val() || {};     Object.keys(data)       .sort((a, b) => a.localeCompare(b, 'pt-BR'))       .forEach(c => {         const div = document.createElement("div");         div.className = "category-item";         div.innerHTML = `<span>${c}</span><button onclick="deleteCategory('${c}')">✕</button>`;         container.appendChild(div);       });   }); }  function updateCategorySelect() {   const select = document.getElementById("category");   select.innerHTML = "";    categoriesRef().once("value", snap => {     const data = snap.val() || {};     Object.keys(data).forEach(c => {       const opt = document.createElement("option");       opt.value = c;       opt.innerText = c;       select.appendChild(opt);     });   }); }  function goReports() {   window.location.href = "relatorios.html"; }  function getMonthKeyFromDate(dateStr) {   const [year, month] = dateStr.split("-");   return `${year}-${month}`; }  function getTodayLocalString() {   const now = new Date();   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`; }  function getPreviousMonthKeyForRender() {   const today = new Date();    // só no dia 1   if (today.getDate() !== 1) {     return null;   }    // mês exibido   const renderYear = currentMonth.getFullYear();   const renderMonth = currentMonth.getMonth();    // mês real atual   const realYear = today.getFullYear();   const realMonth = today.getMonth();    // 🔒 só herda se estiver exibindo o mês atual real   if (renderYear !== realYear || renderMonth !== realMonth) {     return null;   }    // mês anterior real   const prev = new Date(realYear, realMonth - 1, 1);    return `${prev.getFullYear()}-${String(prev.getMonth() + 1).padStart(2, "0")}`; }  document.getElementById("paid").addEventListener("change", function () {   const area = document.getElementById("receivedArea");    if (currentType !== "income") {     area.style.display = "none";     return;   }    if (this.checked) {     area.style.display = "none";     receivedInput.value = valueInput.value;   } else {     area.style.display = "block";   } }); </script>  <!-- Firebase --> <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script> <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>  <script>   const firebaseConfig = {     apiKey: "AIzaSyAd-ttfpK460D4fyfoNZY6DJRhzuItpHe0",     authDomain: "box-financeiro.firebaseapp.com",     databaseURL: "https://box-financeiro-default-rtdb.firebaseio.com",     projectId: "box-financeiro",     storageBucket: "box-financeiro.firebasestorage.app",     messagingSenderId: "249966609723",     appId: "1:249966609723:web:12339b100df393031ea31e"   };    firebase.initializeApp(firebaseConfig);   const db = firebase.database();      /* =========================    INIT ========================= */ updateMonthLabel(); checkMonthTurnover(); // 👈 NOVO render(); updateCategorySelect(); </script>  <script> if ("serviceWorker" in navigator) {   navigator.serviceWorker.register("sw.js"); } </script>  </body> </html> 
