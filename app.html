@@ -4,677 +4,651 @@
 <meta charset="UTF-8">
 <title>Minhas Finanças</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#6366F1">
+<meta name="theme-color" content="#0F172A">
 
 <style>
 :root {
-  --roxo: #6366F1;
-  --roxo-escuro: #4F46E5;
-  --verde: #10B981;
-  --verde-claro: #ECFDF5;
-  --verde-grad: linear-gradient(135deg, #10B981, #059669);
-  --vermelho: #EF4444;
-  --vermelho-claro: #FEF2F2;
-  --vermelho-grad: linear-gradient(135deg, #EF4444, #DC2626);
-  --laranja: #F59E0B;
-  --laranja-claro: #FFFBEB;
-  --fundo: #F8FAFC;
-  --texto: #1E293B;
-  --texto-claro: #94A3B8;
-  --branco: #FFFFFF;
-  --sombra-suave: 0 2px 12px rgba(0, 0, 0, 0.04);
-  --sombra-card: 0 8px 28px rgba(99, 102, 241, 0.1);
-  --raio: 20px;
-  --raio-pequeno: 12px;
+  --fundo-tela: #F5F7FA;
+  --fundo-card: #FFFFFF;
+  --fundo-header: linear-gradient(180deg, #0F172A 0%, #1E293B 100%);
+  --cor-saldo: #2563EB;
+  --cor-receita: #059669;
+  --fundo-receita: #D1FAE5;
+  --cor-despesa: #DC2626;
+  --fundo-despesa: #FEE2E2;
+  --cor-alerta: #D97706;
+  --texto-principal: #1E293B;
+  --texto-secundario: #94A3B8;
+  --borda-suave: #E2E8F0;
+  --etiqueta-fundo: #F1F5F9;
+
+  --sombra-suave: 0 2px 12px rgba(15, 23, 42, 0.05);
+  --raio-card: 16px;
+  --raio-botao: 14px;
+  --transicao: all 0.2s ease;
 }
 
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
 body {
-  background: linear-gradient(180deg, #F0F4FF 0%, var(--fundo) 40%);
-  min-height: 100vh;
-  color: var(--texto);
+  background: var(--fundo-tela);
+  color: var(--texto-principal);
+  padding-top: 200px;
 }
 
-/* CABEÇALHO */
-.topo {
-  background: linear-gradient(135deg, var(--roxo) 0%, var(--roxo-escuro) 100%);
-  padding: 24px 20px 48px;
-  border-bottom-left-radius: 36px;
-  border-bottom-right-radius: 36px;
-  box-shadow: 0 12px 40px rgba(99, 102, 241, 0.3);
-  position: relative;
+/* CABEÇALHO FIXO */
+.top-fixed {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 40;
+  background: var(--fundo-header);
+  padding: 24px 20px 40px;
+  border-bottom-left-radius: 28px;
+  border-bottom-right-radius: 28px;
+  color: white;
 }
 
-.barra-superior {
+header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 24px;
 }
 
-.topo h2 {
-  color: var(--branco);
-  font-size: 24px;
-  font-weight: 800;
+header h2 {
+  font-size: 28px;
+  font-weight: 700;
 }
 
-.botoes-topo {
+.header-actions {
   display: flex;
   gap: 12px;
 }
 
-.btn-icone {
-  width: 44px;
-  height: 44px;
-  background: rgba(255,255,255,0.22);
-  border: none;
+.cat-btn {
+  width: 48px;
+  height: 48px;
   border-radius: 14px;
+  background: rgba(255,255,255,0.12);
+  border: none;
   color: white;
   font-size: 20px;
   cursor: pointer;
-  backdrop-filter: blur(8px);
-  transition: all 0.3s ease;
+  transition: var(--transicao);
 }
 
-.btn-icone:hover {
-  background: rgba(255,255,255,0.35);
-  transform: translateY(-3px);
+.cat-btn:hover {
+  background: rgba(255,255,255,0.2);
+  transform: translateY(-2px);
 }
 
-.navegacao-mes {
+.month-tabs {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 24px;
+  gap: 32px;
 }
 
-.btn-mes {
-  width: 40px;
-  height: 40px;
-  background: rgba(255,255,255,0.28);
-  border: none;
+.month-btn {
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
+  background: rgba(255,255,255,0.1);
+  border: none;
   color: white;
-  font-size: 20px;
+  font-size: 22px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: var(--transicao);
 }
 
-.btn-mes:hover {
-  background: rgba(255,255,255,0.45);
+.month-btn:hover {
+  background: rgba(255,255,255,0.2);
+}
+
+#monthLabel {
+  font-size: 20px;
+  font-weight: 600;
+  min-width: 180px;
+  text-align: center;
+}
+
+/* CARDS DE RESUMO FIXOS */
+.cards {
+  position: fixed;
+  top: 160px;
+  left: 16px;
+  right: 16px;
+  z-index: 30;
+  display: flex;
+  gap: 12px;
+}
+
+.card {
+  flex: 1;
+  background: var(--fundo-card);
+  border-radius: var(--raio-card);
+  padding: 16px 12px;
+  text-align: center;
+  box-shadow: var(--sombra-suave);
+  position: relative;
+  overflow: hidden;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+}
+
+.card h4 {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--texto-secundario);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.main {
+  font-size: 18px;
+  font-weight: 800;
+  margin-bottom: 2px;
+}
+
+.sub {
+  font-size: 11px;
+  color: var(--texto-secundario);
+}
+
+.saldo::before { background: var(--cor-saldo); }
+.saldo .main { color: var(--cor-saldo); }
+
+.receita::before { background: var(--cor-receita); }
+.receita .main { color: var(--cor-receita); }
+
+.despesa::before { background: var(--cor-despesa); }
+.despesa .main { color: var(--cor-despesa); }
+
+/* LISTA DE TRANSAÇÕES */
+.list {
+  padding: 20px 16px 100px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.date-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0 4px;
+}
+
+.date-header span {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--texto-secundario);
+}
+
+.date-header::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--borda-suave);
+}
+
+/* CARD DE TRANSAÇÃO */
+.transaction-card {
+  background: var(--fundo-card);
+  border-radius: var(--raio-card);
+  padding: 18px 20px;
+  box-shadow: var(--sombra-suave);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  position: relative;
+  overflow: hidden;
+  transition: var(--transicao);
+}
+
+.transaction-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 5px;
+}
+
+.transaction-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.08);
+}
+
+.type-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.icon-income {
+  background: var(--fundo-receita);
+  color: var(--cor-receita);
+}
+
+.icon-expense {
+  background: var(--fundo-despesa);
+  color: var(--cor-despesa);
+}
+
+.trans-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.trans-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.trans-name {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--texto-principal);
+}
+
+.trans-value {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.trans-value.income { color: var(--cor-receita); }
+.trans-value.expense { color: var(--cor-despesa); }
+
+.trans-bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-start;
+}
+
+.trans-details {
+  font-size: 14px;
+  color: var(--texto-secundario);
+  font-weight: 500;
+}
+
+.parcel-tag {
+  padding: 4px 10px;
+  background: var(--etiqueta-fundo);
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--texto-principal);
+  border: 1px solid var(--borda-suave);
+}
+
+.trans-status {
+  align-self: flex-end;
+}
+
+.trans-badge {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  color: white;
+  text-transform: uppercase;
+}
+
+.badge-paid, .badge-received { background: var(--cor-receita); }
+.badge-late { background: var(--cor-despesa); }
+.badge-today { background: var(--cor-alerta); }
+
+.card-income::before { background: var(--cor-receita); }
+.card-expense::before { background: var(--cor-despesa); }
+.card-late { background: rgba(220, 38, 38, 0.05); }
+.card-today { background: rgba(217, 119, 6, 0.05); }
+
+/* BOTÃO FLUTUANTE */
+.fab {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--cor-saldo);
+  color: white;
+  border: none;
+  font-size: 32px;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.35);
+  transition: var(--transicao);
+  z-index: 50;
+}
+
+.fab:hover {
   transform: scale(1.1);
 }
 
-#nomeMes {
-  color: white;
-  font-size: 18px;
-  font-weight: 700;
-}
-
-/* CARDS DE SALDO */
-.cards-saldos {
-  display: flex;
-  gap: 14px;
-  padding: 0 18px;
-  margin-top: -28px;
-  position: relative;
-  z-index: 10;
-}
-
-.card-saldo {
-  flex: 1;
-  padding: 20px 14px;
-  border-radius: var(--raio);
-  text-align: center;
-  color: white;
-  box-shadow: var(--sombra-card);
-  transition: all 0.4s ease;
-}
-
-.card-saldo:hover {
-  transform: translateY(-6px);
-}
-
-.card-saldo h4 {
-  font-size: 13px;
-  font-weight: 600;
-  margin-bottom: 8px;
-  opacity: 0.9;
-}
-
-.valor-principal {
-  font-size: clamp(18px, 5vw, 22px);
-  font-weight: 900;
-  margin-bottom: 4px;
-}
-
-.valor-secundario {
-  font-size: 12px;
-  opacity: 0.85;
-}
-
-.saldo {
-  background: linear-gradient(145deg, #8B5CF6 0%, #6366F1 100%);
-}
-
-.receitas {
-  background: var(--verde-grad);
-}
-
-.despesas {
-  background: var(--vermelho-grad);
-}
-
-/* LISTA DE LANÇAMENTOS - DESIGN NOVO */
-.lista {
-  padding: 32px 18px 100px;
-}
-
-.grupo-data {
-  margin-bottom: 28px;
-}
-
-.etiqueta-data {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: linear-gradient(135deg, var(--roxo-claro) 0%, #DDD6FE 100%);
-  color: var(--roxo-escuro);
-  padding: 8px 18px;
-  border-radius: 30px;
-  font-size: 14px;
-  font-weight: 700;
-  margin-bottom: 14px;
-  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.1);
-}
-
-/* CARD LANÇAMENTO */
-.item-lancamento {
-  background: var(--branco);
-  border-radius: var(--raio);
-  padding: 18px 20px;
-  margin-bottom: 14px;
-  box-shadow: var(--sombra-suave);
-  border: 1px solid rgba(226, 232, 240, 0.6);
-  transition: all 0.35s ease;
-  cursor: pointer; /* MOSTRA QUE É CLICÁVEL */
-  position: relative;
-  overflow: hidden;
-}
-
-/* INDICADOR LATERAL */
-.item-lancamento::after {
-  content: '';
-  position: absolute;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 4px;
-  height: 0;
-  border-radius: 4px 0 0 4px;
-  transition: all 0.3s ease;
-}
-
-.item-lancamento:hover {
-  transform: translateY(-3px) translateX(4px);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
-  border-color: rgba(99, 102, 241, 0.15);
-}
-
-.item-lancamento:hover::after {
-  height: 60%;
-}
-
-/* CORES POR TIPO */
-.item-receita { background: linear-gradient(135deg, var(--verde-claro) 0%, #FFFFFF 22%); }
-.item-receita::after { background: var(--verde); }
-
-.item-despesa { background: linear-gradient(135deg, var(--vermelho-claro) 0%, #FFFFFF 22%); }
-.item-despesa::after { background: var(--vermelho); }
-
-.item-atrasado { background: linear-gradient(135deg, #FEE2E2 0%, #FFFFFF 22%); }
-.item-atrasado::after { background: #B91C1C; }
-
-.item-hoje { background: linear-gradient(135deg, var(--laranja-claro) 0%, #FFFFFF 22%); }
-.item-hoje::after { background: var(--laranja); }
-
-.conteudo-card {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.icone-tipo {
-  width: 52px;
-  height: 52px;
-  border-radius: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
-  flex-shrink: 0;
-}
-
-.item-receita .icone-tipo { background: var(--verde-claro); color: var(--verde); }
-.item-despesa .icone-tipo { background: var(--vermelho-claro); color: var(--vermelho); }
-
-.info-principal {
-  flex: 1;
-  min-width: 0;
-}
-
-.nome-item {
-  font-size: 16px;
-  font-weight: 700;
-  margin-bottom: 5px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.categoria-item {
-  font-size: 13px;
-  color: var(--texto-claro);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.valor-status {
-  text-align: right;
-  flex-shrink: 0;
-}
-
-.valor-item {
-  font-size: 20px;
-  font-weight: 800;
-  margin-bottom: 5px;
-}
-
-.receita { color: var(--verde); }
-.despesa { color: var(--vermelho); }
-
-.status-tags {
-  display: flex;
-  gap: 4px;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-}
-
-.status-tag {
-  display: inline-block;
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 11px;
-  font-weight: 600;
-}
-
-.status-tag.pago { background: var(--verde-claro); color: #065F46; }
-.status-tag.recebido { background: var(--verde-claro); color: #065F46; }
-.status-tag.atrasado { background: var(--vermelho-claro); color: #991B1B; }
-.status-tag.hoje { background: var(--laranja-claro); color: #92400E; }
-.status-tag.fixa { background: #F3E8FF; color: #7C3AED; }
-.status-tag.parcelado { background: #E0E7FF; color: var(--roxo-escuro); }
-
-.dados-recebimento {
-  margin-top: 14px;
-  padding-top: 14px;
-  border-top: 1px dashed #E2E8F0;
-  display: flex;
-  justify-content: space-between;
-  font-size: 13px;
-}
-
-.recebido { color: var(--verde); font-weight: 600; }
-.falta { color: var(--vermelho); font-weight: 600; }
-
-/* BOTÃO ADICIONAR */
-.botao-add {
-  position: fixed;
-  bottom: 28px;
-  right: 28px;
-  width: 68px;
-  height: 68px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--roxo) 0%, var(--roxo-escuro) 100%);
-  border: none;
-  color: white;
-  font-size: 32px;
-  box-shadow: 0 14px 45px rgba(99, 102, 241, 0.45);
-  cursor: pointer;
-  transition: all 0.4s ease;
-  z-index: 30;
-}
-
-.botao-add:hover {
-  transform: scale(1.15) rotate(90deg);
-}
-
 /* MODAL */
-.janela-modal {
+.modal {
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.65);
-  backdrop-filter: blur(10px);
-  align-items: center;
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(6px);
   justify-content: center;
-  padding: 20px;
-  z-index: 9999;
+  align-items: flex-end;
+  z-index: 100;
 }
 
-.conteudo-modal {
-  background: var(--branco);
+.modal-content {
   width: 100%;
-  max-width: 380px;
-  border-radius: 32px;
-  padding: 32px 26px;
-  box-shadow: 0 24px 70px rgba(0,0,0,0.25);
-  animation: surgir 0.4s ease;
+  max-width: 480px;
+  background: var(--fundo-card);
+  border-radius: 28px 28px 0 0;
+  padding: 32px 24px 48px;
+  box-shadow: 0 -4px 24px rgba(15, 23, 42, 0.1);
+  animation: modalUp 0.3s ease;
 }
 
-@keyframes surgir {
-  from { opacity: 0; transform: translateY(40px) scale(0.92); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+@keyframes modalUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
 }
 
-.tipo-lancamento {
+.type-buttons {
   display: flex;
-  gap: 12px;
-  margin-bottom: 22px;
+  gap: 16px;
+  margin-bottom: 24px;
 }
 
-.btn-tipo {
+.type-btn {
   flex: 1;
-  padding: 14px;
-  border: 2px solid #E2E8F0;
+  padding: 16px;
+  border-radius: var(--raio-botao);
+  border: 2px solid var(--borda-suave);
   background: transparent;
-  border-radius: 16px;
-  font-weight: 800;
-  font-size: 16px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.btn-tipo.ativo.receita {
-  background: var(--verde-grad);
-  border-color: transparent;
-  color: white;
-  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.35);
-}
-
-.btn-tipo.ativo.despesa {
-  background: var(--vermelho-grad);
-  border-color: transparent;
-  color: white;
-  box-shadow: 0 6px 16px rgba(239, 68, 68, 0.35);
-}
-
-.campo {
-  width: 100%;
-  padding: 16px 18px;
-  margin-top: 14px;
-  border: 2px solid #E2E8F0;
-  border-radius: 14px;
-  font-size: 16px;
-  transition: all 0.3s ease;
-  background: #FAFBFC;
-}
-
-.campo:focus {
-  outline: none;
-  border-color: var(--roxo);
-  background: white;
-  box-shadow: 0 0 0 6px rgba(99, 102, 241, 0.1);
-}
-
-.opcoes-parcelamento {
-  display: flex;
-  gap: 12px;
-  margin-top: 16px;
-  flex-wrap: wrap;
-}
-
-.btn-opcao {
-  padding: 12px 18px;
-  border: 2px solid #E2E8F0;
-  background: white;
-  border-radius: 14px;
+  font-size: 18px;
   font-weight: 700;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: var(--transicao);
+  color: var(--texto-principal);
 }
 
-.btn-opcao.ativo {
-  border-color: var(--roxo);
-  background: linear-gradient(135deg, var(--roxo-claro) 0%, #DDD6FE 100%);
-  color: var(--roxo-escuro);
+.type-btn.income { color: var(--cor-receita); border-color: var(--cor-receita); }
+.type-btn.expense { color: var(--cor-despesa); border-color: var(--cor-despesa); }
+
+.type-btn.active.income {
+  background: var(--cor-receita);
+  color: white;
+  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
 }
 
-.linha-chave {
+.type-btn.active.expense {
+  background: var(--cor-despesa);
+  color: white;
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+}
+
+.modal-content input,
+.modal-content select {
+  width: 100%;
+  padding: 16px 18px;
+  margin-top: 12px;
+  border: 2px solid var(--borda-suave);
+  border-radius: var(--raio-botao);
+  font-size: 17px;
+  font-weight: 500;
+  background: white;
+  color: var(--texto-principal);
+  text-align: left;
+  direction: ltr;
+  transition: var(--transicao);
+}
+
+.modal-content input:focus,
+.modal-content select:focus {
+  outline: none;
+  border-color: var(--cor-saldo);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+}
+
+.parcel-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+  align-items: center;
+}
+
+.parcel-btn {
+  flex: 1;
+  padding: 16px !important;
+  margin: 0 !important;
+  border: 2px solid var(--borda-suave) !important;
+  background: white !important;
+  color: var(--texto-principal) !important;
+  font-weight: 600 !important;
+}
+
+.parcel-btn.active {
+  border-color: var(--cor-saldo) !important;
+  background: rgba(37, 99, 235, 0.05) !important;
+  color: var(--cor-saldo) !important;
+}
+
+#parcelCount { width: 120px !important; margin: 0 !important; display: none; }
+
+.switch-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 18px;
-  font-size: 16px;
+  margin-top: 24px;
+  font-size: 18px;
   font-weight: 600;
+  color: var(--texto-principal);
 }
 
-.interruptor {
-  position: relative;
-  width: 56px;
-  height: 30px;
-}
-
-.interruptor input { display: none; }
-
-.alavanca {
+.switch { position: relative; width: 56px; height: 30px; }
+.switch input { display: none; }
+.slider {
   position: absolute;
   inset: 0;
-  background: #CBD5E1;
+  background: var(--borda-suave);
   border-radius: 30px;
-  transition: 0.35s ease;
-  cursor: pointer;
+  transition: var(--transicao);
 }
-
-.alavanca::before {
+.slider:before {
   content: '';
   position: absolute;
   width: 24px;
   height: 24px;
+  left: 3px;
+  top: 3px;
   background: white;
   border-radius: 50%;
-  top: 3px;
-  left: 3px;
-  transition: 0.35s ease;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.18);
+  transition: var(--transicao);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
+input:checked + .slider { background: var(--cor-receita); }
+input:checked + .slider:before { transform: translateX(26px); }
 
-input:checked + .alavanca {
-  background: var(--verde-grad);
-}
-
-input:checked + .alavanca::before {
-  transform: translateX(26px);
-}
-
-.botoes-acao {
-  margin-top: 22px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.btn {
-  padding: 16px;
+.modal-content button {
+  width: 100%;
+  padding: 18px;
+  margin-top: 12px;
   border: none;
-  border-radius: 14px;
-  font-size: 16px;
+  border-radius: var(--raio-botao);
+  font-size: 18px;
   font-weight: 700;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: var(--transicao);
 }
 
-.btn.salvar {
-  background: linear-gradient(135deg, var(--roxo), var(--roxo-escuro));
+.modal-content button:hover { transform: translateY(-2px); }
+
+.modal-content button:not(.cancel):not(.delete) {
+  background: var(--cor-saldo);
   color: white;
-  box-shadow: 0 6px 18px rgba(99, 102, 241, 0.3);
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
 }
 
-.btn.excluir {
-  background: var(--vermelho-grad);
+.modal-content button.cancel {
+  background: var(--borda-suave);
+  color: var(--texto-principal);
+}
+
+.modal-content button.delete {
+  background: var(--cor-despesa);
   color: white;
-  box-shadow: 0 6px 18px rgba(239, 68, 68, 0.25);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.25);
+  display: none;
 }
 
-.btn.cancelar {
-  background: #F1F5F9;
-  color: var(--texto);
-}
-
-.btn:hover { transform: translateY(-3px); }
-
-.lista-categorias {
-  margin-top: 16px;
-  max-height: 280px;
-  overflow-y: auto;
-}
-
-.item-categoria {
+.category-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 14px 16px;
   background: #F8FAFC;
-  border-radius: 12px;
-  margin-bottom: 10px;
+  border-radius: var(--raio-card);
+  margin-top: 8px;
+  font-size: 15px;
   font-weight: 500;
+  transition: var(--transicao);
 }
+
+.category-item:hover { background: #F1F5F9; }
+
+.category-item button {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  margin: 0;
+  border-radius: 50%;
+  background: var(--fundo-despesa);
+  color: var(--cor-despesa);
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+}
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-thumb { background: var(--borda-suave); border-radius: 3px; }
 </style>
 </head>
 
 <body>
 
-<div class="topo">
-  <div class="barra-superior">
+<div class="top-fixed">
+  <header>
     <h2>💰 Minhas Finanças</h2>
-    <div class="botoes-topo">
-      <button class="btn-icone" onclick="openCategoryModal()">☰</button>
-      <button class="btn-icone" onclick="goReports()">📊</button>
+    <div class="header-actions">
+      <button class="cat-btn" onclick="openCategoryModal()">☰</button>
+      <button class="cat-btn" onclick="goReports()">📊</button>
     </div>
-  </div>
-
-  <div class="navegacao-mes">
-    <button class="btn-mes" onclick="changeMonth(-1)">&#10094;</button>
-    <span id="nomeMes"></span>
-    <button class="btn-mes" onclick="changeMonth(1)">&#10095;</button>
+  </header>
+  <div class="month-tabs">
+    <button class="month-btn" onclick="changeMonth(-1)">‹</button>
+    <span id="monthLabel"></span>
+    <button class="month-btn" onclick="changeMonth(1)">›</button>
   </div>
 </div>
 
-<div class="cards-saldos">
-  <div class="card-saldo saldo">
-    <h4>Saldo Atual</h4>
-    <div class="valor-principal" id="saldoPago">R$ 0,00</div>
-    <div class="valor-secundario" id="saldoPrev">Previsto: R$ 0,00</div>
+<section class="cards">
+  <div class="card saldo">
+    <h4>Saldo</h4>
+    <div class="main" id="saldoPago">R$ 0,00</div>
+    <div class="sub" id="saldoPrev">R$ 0,00</div>
   </div>
-  <div class="card-saldo receitas">
+  <div class="card receita">
     <h4>Receitas</h4>
-    <div class="valor-principal" id="recPago">R$ 0,00</div>
-    <div class="valor-secundario" id="recPrev">Total: R$ 0,00</div>
+    <div class="main" id="recPago">R$ 0,00</div>
+    <div class="sub" id="recPrev">R$ 0,00</div>
   </div>
-  <div class="card-saldo despesas">
+  <div class="card despesa">
     <h4>Despesas</h4>
-    <div class="valor-principal" id="despPago">R$ 0,00</div>
-    <div class="valor-secundario" id="despPrev">Total: R$ 0,00</div>
+    <div class="main" id="despPago">R$ 0,00</div>
+    <div class="sub" id="despPrev">R$ 0,00</div>
   </div>
+</section>
+
+<section class="list" id="list"></section>
+
+<button class="fab" onclick="openModal()">+</button>
+
+<div class="modal" id="modal">
+<div class="modal-content">
+  <div class="type-buttons">
+    <button class="type-btn income active" onclick="setType('income')">Receita</button>
+    <button class="type-btn expense" onclick="setType('expense')">Despesa</button>
+  </div>
+  <input id="title" placeholder="Nome da transação">
+  <input id="value" placeholder="Valor">
+  <select id="category">
+    <option>Geral</option>
+    <option>Alimentação</option>
+    <option>Moradia</option>
+    <option>Transporte</option>
+  </select>
+  <input id="date" type="date">
+  <div class="parcel-buttons">
+    <button id="btnParcel" class="parcel-btn" onclick="toggleParcel()">Parcelado</button>
+    <input id="parcelCount" type="number" min="2" placeholder="Qtd.">
+  </div>
+  <div class="switch-row">
+    <span>Já foi pago?</span>
+    <label class="switch">
+      <input type="checkbox" id="paid">
+      <span class="slider"></span>
+    </label>
+  </div>
+  <button onclick="save()">Salvar transação</button>
+  <button id="deleteBtn" class="delete" onclick="remove()">Excluir</button>
+  <button class="cancel" onclick="closeModal()">Cancelar</button>
+</div>
 </div>
 
-<section class="lista" id="list"></section>
-
-<button class="botao-add" onclick="openModal()">+</button>
-
-<!-- MODAL PRINCIPAL -->
-<div class="janela-modal" id="modal">
-  <div class="conteudo-modal">
-    <div class="tipo-lancamento">
-      <button class="btn-tipo receita ativo" onclick="setType('income')">Receita</button>
-      <button class="btn-tipo despesa" onclick="setType('expense')">Despesa</button>
-    </div>
-
-    <input class="campo" id="title" placeholder="Nome do lançamento">
-    <input class="campo" id="value" placeholder="Valor" inputmode="decimal">
-
-    <div id="receivedArea" style="display:none">
-      <input class="campo" id="receivedValue" placeholder="Valor recebido" inputmode="decimal">
-    </div>
-
-    <select class="campo" id="category">
-      <option>Geral</option>
-      <option>Alimentação</option>
-      <option>Moradia</option>
-      <option>Transporte</option>
-    </select>
-
-    <input class="campo" id="date" type="date">
-
-    <div class="opcoes-parcelamento">
-      <button class="btn-opcao" id="btnParcel" onclick="toggleParcel()">Parcelado</button>
-      <button class="btn-opcao" id="btnFixed" onclick="toggleFixed()">Fixa</button>
-      <input class="campo" id="parcelCount" type="number" min="2" placeholder="Qtd. meses" style="display:none; width: 130px; margin:0;">
-    </div>
-
-    <div class="linha-chave">
-      <span>Já pago/recebido?</span>
-      <label class="interruptor">
-        <input type="checkbox" id="paid">
-        <span class="alavanca"></span>
-      </label>
-    </div>
-
-    <div class="linha-chave" id="editAllRow" style="display:none">
-      <span>Editar todas</span>
-      <label class="interruptor">
-        <input type="checkbox" id="editAll">
-        <span class="alavanca"></span>
-      </label>
-    </div>
-
-    <div class="botoes-acao">
-      <button class="btn salvar" onclick="save()">Salvar lançamento</button>
-      <button class="btn excluir" id="deleteBtn" onclick="remove()" style="display:none">Excluir</button>
-      
-      <div id="parcelDeleteOptions" style="display:none;">
-        <div style="display:flex; gap:10px">
-          <button class="btn excluir" onclick="removeAllParcels()">Todas</button>
-          <button class="btn excluir" onclick="removeCurrentParcel()">Apenas esta</button>
-        </div>
-      </div>
-
-      <button class="btn cancelar" onclick="closeModal()">Cancelar</button>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL CATEGORIAS -->
-<div class="janela-modal" id="categoryModal">
-  <div class="conteudo-modal">
-    <h3 style="margin-bottom:20px; font-weight:800">Categorias</h3>
-    <input class="campo" id="categoryName" placeholder="Nova categoria">
-    <button class="btn salvar" style="margin-top:10px" onclick="saveCategory()">Cadastrar</button>
-    <div class="lista-categorias" id="categoryList"></div>
-    <button class="btn cancelar" onclick="closeCategoryModal()">Fechar</button>
+<div class="modal" id="categoryModal">
+  <div class="modal-content">
+    <h3 style="text-align:center; margin-bottom:20px;">Gerenciar Categorias</h3>
+    <input id="categoryName" placeholder="Nome da categoria">
+    <button onclick="saveCategory()">Adicionar</button>
+    <div id="categoryList"></div>
+    <button class="cancel" onclick="closeCategoryModal()">Fechar</button>
   </div>
 </div>
 
 <script>
-  if (localStorage.getItem("logged") !== "true") window.location.href = "index.html";
+  if (localStorage.getItem("logged") !== "true") {
+    window.location.href = "index.html";
+  }
   localStorage.removeItem("logged");
 </script>
 
@@ -684,39 +658,41 @@ let editId = null;
 let editMonthKey = null;
 let currentType = "income";
 let editingParcelData = null;
-let editingItem = null;
 
-const monthLabel = document.getElementById("nomeMes");
+const monthLabel = document.getElementById("monthLabel");
 const modal = document.getElementById("modal");
 const deleteBtn = document.getElementById("deleteBtn");
 const valueInput = document.getElementById("value");
-const receivedInput = document.getElementById("receivedValue");
 
 valueInput.addEventListener("input",()=>{
   let v = valueInput.value.replace(/\D/g,"");
   v = (Number(v)/100).toLocaleString("pt-BR",{minimumFractionDigits:2});
   valueInput.value = v;
 });
-receivedInput.addEventListener("input",()=>{
-  let v = receivedInput.value.replace(/\D/g,"");
-  v = (Number(v)/100).toLocaleString("pt-BR",{minimumFractionDigits:2});
-  receivedInput.value = v;
-});
 
 function updateMonthLabel(){
   const meses=["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
   monthLabel.innerText = `${meses[currentMonth.getMonth()]} ${currentMonth.getFullYear()}`;
 }
+
 function getMonthKey(){
   return `${currentMonth.getFullYear()}-${String(currentMonth.getMonth()+1).padStart(2,"0")}`;
 }
+
 function formatDate(d){
   const [y,m,day]=d.split("-");
-  return `${day}/${m}`;
+  const data = new Date(d + "T00:00:00");
+  const diasSemana = ["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"];
+  return `${day}/${m} · ${diasSemana[data.getDay()]}`;
 }
 
-function monthRef(){return firebase.database().ref("finance/meses/"+getMonthKey())}
-function categoriesRef(){return firebase.database().ref("finance/categorias")}
+function monthRef(){
+  return firebase.database().ref("finance/meses/"+getMonthKey());
+}
+
+function categoriesRef(){
+  return firebase.database().ref("finance/categorias");
+}
 
 function changeMonth(step){
   currentMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + step, 1);
@@ -725,45 +701,46 @@ function changeMonth(step){
 }
 
 function setType(t){
-  currentType = t;
-  document.querySelectorAll(".btn-tipo").forEach(b => b.classList.remove("ativo"));
-  document.querySelector(`.btn-tipo.${t}`).classList.add("ativo");
-  document.getElementById("receivedArea").style.display = t === "income" && !paid.checked ? "block" : "none";
+  currentType=t;
+  document.querySelectorAll(".type-btn").forEach(b=>b.classList.remove("active"));
+  document.querySelector(`.type-btn.${t}`).classList.add("active");
 }
 
-let isParcel = false, isFixed = false;
+let isParcel = false;
 function toggleParcel(){
-  isParcel = !isParcel; isFixed = false;
-  document.getElementById("btnFixed").classList.remove("ativo");
-  document.getElementById("btnParcel").classList.toggle("ativo", isParcel);
-  document.getElementById("parcelCount").style.display = isParcel ? "block" : "none";
-  if(!isParcel) document.getElementById("parcelCount").value = "";
-}
-function toggleFixed(){
-  isFixed = !isFixed; isParcel = false;
-  document.getElementById("btnParcel").classList.remove("ativo");
-  document.getElementById("parcelCount").style.display = "none";
-  document.getElementById("btnFixed").classList.toggle("ativo", isFixed);
+  isParcel = !isParcel;
+  const btn = document.getElementById("btnParcel");
+  const input = document.getElementById("parcelCount");
+  btn.classList.toggle("active", isParcel);
+  input.style.display = isParcel ? "block" : "none";
+  if(!isParcel) input.value = "";
 }
 
-async function checkMonthTurnover(){
-  if(new Date().getDate() !== 1) return;
-  const curr = getMonthKey(), prev = getMonthKeyFromDate(new Date(Date.now()-86400000).toISOString());
-  const snap = await firebase.database().ref("finance/saldos/"+curr).once("value");
-  if(snap.exists()) return;
-  const prevSnap = await firebase.database().ref("finance/meses/"+prev).once("value");
-  let saldo = 0;
-  Object.values(prevSnap.val()||{}).forEach(t=>{
-    if(!t.paid) return;
-    saldo += t.type==="income" ? t.value : -t.value;
+function checkMonthTurnover(){
+  const today = new Date();
+  if(today.getDate() !== 1) return;
+  const currentMonthKey = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,"0")}`;
+  const prev = new Date(today);
+  prev.setMonth(prev.getMonth() - 1);
+  const prevMonthKey = `${prev.getFullYear()}-${String(prev.getMonth()+1).padStart(2,"0")}`;
+
+  firebase.database().ref("finance/saldos/" + currentMonthKey).once("value", snap=>{
+    firebase.database().ref("finance/meses/" + prevMonthKey).once("value", snapPrev=>{
+      const data = snapPrev.val() || {};
+      let saldoFinal = 0;
+      Object.values(data).forEach(t=>{
+        if(!t.paid) return;
+        saldoFinal += t.type === "income" ? t.value : -t.value;
+      });
+      firebase.database().ref("finance/saldos/" + currentMonthKey).set(saldoFinal);
+    });
   });
-  await firebase.database().ref("finance/saldos/"+curr).set(saldo);
 }
 
-async function render(){
+function render(){
   const container = document.getElementById("list");
   container.innerHTML = "";
-  let rPago=0, rPrev=0, dPago=0, dPrev=0;
+  let rPago = 0, rPrev = 0, dPago = 0, dPrev = 0;
 
   monthRef().off();
   monthRef().on("value", async snap=>{
@@ -771,311 +748,197 @@ async function render(){
     const list = Object.values(data).sort((a,b)=>new Date(b.date)-new Date(a.date));
     container.innerHTML = "";
 
-    const saldoSnap = await firebase.database().ref("finance/saldos/"+getMonthKey()).once("value");
-    let saldoInicial = Number(saldoSnap.val()||0);
+    let saldoInicial = 0;
+    const saldoKey = getMonthKey();
+    const snapSaldo = await firebase.database().ref("finance/saldos/" + saldoKey).once("value");
+    saldoInicial = Number(snapSaldo.val() || 0);
 
-    const grouped = {};
-    list.forEach(t=>grouped[t.date] ? grouped[t.date].push(t) : grouped[t.date]=[t]);
+    const groupedByDate = {};
+    list.forEach(t=>{
+      if(!groupedByDate[t.date]) groupedByDate[t.date] = [];
+      groupedByDate[t.date].push(t);
+    });
 
-    Object.keys(grouped).sort((a,b)=>new Date(b)-new Date(a)).forEach(date=>{
-      
-      const grupoData = document.createElement("div");
-      grupoData.className = "grupo-data";
-      
-      const dataLinha = document.createElement("div");
-      dataLinha.className = "etiqueta-data";
-      dataLinha.innerHTML = `<span>📅</span> ${formatDate(date)}`;
-      grupoData.appendChild(dataLinha);
+    Object.keys(groupedByDate).sort((a,b)=>new Date(b)-new Date(a)).forEach(date=>{
+      const dateHeader = document.createElement("div");
+      dateHeader.className = "date-header";
+      dateHeader.innerHTML = `<span>${formatDate(date)}</span>`;
+      container.appendChild(dateHeader);
 
-      grouped[date].sort((a,b)=>b.value-a.value).forEach(t=>{
-        
-        if(t.type==="income"){
-          const rec = t.receivedValue || (t.paid?t.value:0);
-          rPago += rec; rPrev += (t.value - rec);
-        }else t.paid ? dPago += t.value : dPrev += t.value;
+      groupedByDate[date].sort((a,b)=>b.value - a.value).forEach(t=>{
+        if(t.type==="income"){ t.paid ? rPago+=t.value : rPrev+=t.value; }
+        else{ t.paid ? dPago+=t.value : dPrev+=t.value; }
 
-        const today = getTodayLocalString();
-        const isLate = !t.paid && t.date < today;
-        const isDueToday = !t.paid && t.date === today;
+        const todayStr = getTodayLocalString();
+        const isLate = !t.paid && t.date < todayStr;
+        const isDueToday = !t.paid && t.date === todayStr;
 
-        const item = document.createElement("div");
-        item.className = `item-lancamento ${t.type==="income"?"item-receita":"item-despesa"} ${isLate?"item-atrasado":""} ${isDueToday?"item-hoje":""}`;
-        
-        // ✅ FUNÇÃO DE CLIQUE PARA EDITAR - GARANTIDA E FUNCIONAL
-        item.onclick = () => editById(t.id);
+        const card = document.createElement("div");
+        card.className = `transaction-card card-${t.type}`;
+        if(isLate) card.classList.add("card-late");
+        if(isDueToday) card.classList.add("card-today");
+        card.onclick = () => editById(t.id);
 
-        // Ícones e status
-        const icone = t.type === "income" ? "⬆️" : "⬇️";
-        let statusHtml = "";
-        if(t.paid) statusHtml += `<span class="status-tag ${t.type==="income"?"recebido":"pago"}">${t.type==="income"?"Recebido":"Pago"}</span>`;
-        else if(isLate) statusHtml += `<span class="status-tag atrasado">Atrasado</span>`;
-        else if(isDueToday) statusHtml += `<span class="status-tag hoje">Vence Hoje</span>`;
-        
-        if(t.fixed) statusHtml += `<span class="status-tag fixa">Fixa</span>`;
-        if(t.parcel) statusHtml += `<span class="status-tag parcelado">${t.parcelIndex}/${t.parcelTotal}</span>`;
+        const icone = t.type === "income" ? "↑" : "↓";
+        const classeIcone = t.type === "income" ? "icon-income" : "icon-expense";
+        const sinal = t.type === "income" ? "+ " : "- ";
 
-        item.innerHTML = `
-          <div class="conteudo-card">
-            <div class="icone-tipo">${icone}</div>
-            <div class="info-principal">
-              <div class="nome-item">${t.name}</div>
-              <div class="categoria-item">🏷️ ${t.category}</div>
+        let badge = "";
+        if(t.paid) badge = `<span class="trans-badge ${t.type==='income'?'badge-received':'badge-paid'}">${t.type==='income'?'Recebido':'Pago'}</span>`;
+        else if(isLate) badge = `<span class="trans-badge badge-late">Atrasado</span>`;
+        else if(isDueToday) badge = `<span class="trans-badge badge-today">Vence hoje</span>`;
+
+        let parcelHtml = "";
+        if(t.parcel) parcelHtml = `<span class="parcel-tag">${t.parcelIndex} de ${t.parcelTotal}</span>`;
+
+        card.innerHTML = `
+          <div class="type-icon ${classeIcone}">${icone}</div>
+          <div class="trans-content">
+            <div class="trans-top">
+              <span class="trans-name">${t.name}</span>
+              <span class="trans-value ${t.type}">${sinal}R$ ${t.value.toLocaleString("pt-BR",{minimumFractionDigits:2})}</span>
             </div>
-            <div class="valor-status">
-              <div class="valor-item ${t.type}">R$ ${t.value.toLocaleString("pt-BR",{minimumFractionDigits:2})}</div>
-              <div class="status-tags">${statusHtml}</div>
+            <div class="trans-bottom">
+              <span class="trans-details">${t.category}</span>
+              ${parcelHtml}
             </div>
           </div>
-
-          ${t.type==="income"&&!t.paid&&(t.receivedValue||0)>0?`
-            <div class="dados-recebimento">
-              <span class="recebido">✅ Recebido: R$ ${(t.receivedValue||0).toLocaleString("pt-BR",{minimumFractionDigits:2})}</span>
-              <span class="falta">❌ Falta: R$ ${((t.value||0)-(t.receivedValue||0)).toLocaleString("pt-BR",{minimumFractionDigits:2})}</span>
-            </div>`:''}
+          <div class="trans-status">${badge}</div>
         `;
-        grupoData.appendChild(item);
+        container.appendChild(card);
       });
-      container.appendChild(grupoData);
     });
 
     recPago.innerText = `R$ ${rPago.toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
     recPrev.innerText = `R$ ${(rPago+rPrev).toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
     despPago.innerText = `R$ ${dPago.toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
     despPrev.innerText = `R$ ${(dPago+dPrev).toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
-    saldoPago.innerText = `R$ ${(saldoInicial+rPago-dPago).toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
-    saldoPrev.innerText = `R$ ${(saldoInicial+rPago+rPrev-dPago-dPrev).toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
+    saldoPago.innerText = `R$ ${(saldoInicial + rPago - dPago).toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
+    saldoPrev.innerText = `R$ ${(saldoInicial + rPago + rPrev - dPago - dPrev).toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
   });
 }
 
-async function save(){
+function save(){
   const valTotal = Number(valueInput.value.replace(/\./g,"").replace(",","."));
-  let valReceived = Number((receivedInput.value||"0").replace(/\./g,"").replace(",","."))||0;
-  if(currentType==="income"&&paid.checked) valReceived = valTotal;
-  const remaining = Math.max(0, valTotal - valReceived);
-  const baseDate = date.value;
+  const baseDateStr = date.value;
 
-  if(editingItem?.parcel && isFixed){
-    await convertParcelToFixed(valReceived, remaining);
-    closeModal(); render(); return;
-  }
-
-  if(!isParcel && !isFixed){
-    if((editingItem?.parcel||editingItem?.fixed)&&document.getElementById("editAll").checked){
-      await updateParcelGroup(valReceived, remaining);
-      closeModal(); render(); return;
+  if(!isParcel){
+    const id = editId || Date.now().toString();
+    const item = {
+      id, name: title.value.trim(), value: valTotal, category: category.value, date: baseDateStr,
+      type: currentType, paid: paid.checked,
+      parcel: editingParcelData ? true : false,
+      parcelIndex: editingParcelData ? editingParcelData.parcelIndex : null,
+      parcelTotal: editingParcelData ? editingParcelData.parcelTotal : null,
+      parcelGroupId: editingParcelData ? editingParcelData.parcelGroupId : null
+    };
+    const newMonthKey = getMonthKeyFromDate(item.date);
+    if(editId && editMonthKey && editMonthKey !== newMonthKey){
+      firebase.database().ref("finance/meses/" + editMonthKey + "/" + id).remove();
     }
-    const id = editId||Date.now().toString();
-    const item = {id,name:title.value.trim(),value:valTotal,receivedValue:valReceived,remainingValue:remaining,
-      category:category.value,date:baseDate,type:currentType,paid:paid.checked,
-      fixed:isFixed,parcel:!!editingParcelData,parcelIndex:editingParcelData?.parcelIndex,
-      parcelTotal:editingParcelData?.parcelTotal,parcelGroupId:editingParcelData?.parcelGroupId};
-    const newMonth = getMonthKeyFromDate(item.date);
-    if(editId&&editMonthKey!==newMonth) await firebase.database().ref("finance/meses/"+editMonthKey+"/"+id).remove();
-    await firebase.database().ref("finance/meses/"+newMonth+"/"+id).set(item);
+    firebase.database().ref("finance/meses/" + newMonthKey + "/" + id).set(item);
     closeModal(); render(); return;
   }
 
-  if(isFixed){
-    if(editId&&editingItem?.fixed){await updateFixedGroup(valReceived,remaining); closeModal();render();return}
-    const groupId = Date.now().toString();
-    for(let i=0;i<12;i++){
-      const d = new Date(baseDate); d.setMonth(d.getMonth()+i);
-      const ds = d.toISOString().split("T")[0], mk = getMonthKeyFromDate(ds), id = `${groupId}_${i+1}`;
-      await firebase.database().ref("finance/meses/"+mk+"/"+id).set({id,name:title.value.trim(),value:valTotal,
-        receivedValue:0,remainingValue:valTotal,category:category.value,date:ds,type:currentType,
-        paid:false,fixed:true,parcel:false,parcelGroupId:groupId,parcelIndex:i+1,parcelTotal:12});
-    }
-    closeModal(); render(); return;
-  }
-
-  if(isParcel && editId && editingItem?.parcel){await updateParcelGroup(valReceived,remaining); closeModal();render();return}
-  if(editingItem?.fixed && isParcel){await deleteGroup(editingItem.parcelGroupId); editId=editingItem=editingParcelData=null}
-  if((editingItem?.parcel||editingItem?.fixed)&&!isParcel&&!isFixed){await deleteGroup(editingItem.parcelGroupId); editId=editingItem=editingParcelData=null}
-
-  const totalParc = Number(parcelCount.value);
-  if(totalParc<2){alert("Informe a quantidade de parcelas");return}
+  const totalParcels = Number(parcelCount.value || 0);
+  if(totalParcels < 2){ alert("Informe a quantidade de parcelas"); return; }
+  const parcelValue = valTotal;
   const groupId = Date.now().toString();
-  for(let i=0;i<totalParc;i++){
-    const d = new Date(baseDate); d.setMonth(d.getMonth()+i);
-    const ds = d.toISOString().split("T")[0], mk = getMonthKeyFromDate(ds), id = `${groupId}_${i+1}`, pago = i===0?paid.checked:false;
-    await firebase.database().ref("finance/meses/"+mk+"/"+id).set({id,name:title.value.trim(),value:valTotal,
-      receivedValue:currentType==="income"&&pago?valTotal:0,remainingValue:currentType==="income"&&pago?0:valTotal,
-      category:category.value,date:ds,type:currentType,paid:pago,parcel:true,
-      parcelIndex:i+1,parcelTotal:totalParc,parcelGroupId:groupId});
+  const baseDate = new Date(baseDateStr);
+  for(let i = 0; i < totalParcels; i++){
+    const d = new Date(baseDate); d.setMonth(d.getMonth() + i);
+    const dateStr = d.toISOString().split("T")[0];
+    const monthKey = getMonthKeyFromDate(dateStr);
+    const id = `${groupId}_${i+1}`;
+    const item = {
+      id, name: title.value.trim(), value: parcelValue, category: category.value, date: dateStr,
+      type: currentType, paid: false, parcel: true, parcelIndex: i+1, parcelTotal: totalParcels, parcelGroupId: groupId
+    };
+    firebase.database().ref("finance/meses/" + monthKey + "/" + id).set(item);
   }
   closeModal(); render();
 }
 
-async function updateParcelGroup(valReceived,remaining){
-  const snap = await firebase.database().ref("finance/meses").once("value");
-  const meses = snap.val()||{}, novoVal = Number(valueInput.value.replace(/\./g,"").replace(",","."));
-  const promises = [], novoDia = new Date(date.value).getDate();
-  Object.entries(meses).forEach(([mk,items])=>{
-    Object.entries(items).forEach(([id,item])=>{
-      if(item.parcelGroupId===editingItem.parcelGroupId && item.parcelIndex>=editingItem.parcelIndex){
-        item.name=title.value.trim();item.category=category.value;item.value=novoVal;item.type=currentType;
-        const d = new Date(item.date); d.setDate(novoDia); item.date = d.toISOString().split("T")[0];
-        if(item.id===editingItem.id){
-          item.paid=paid.checked;
-          if(currentType==="income"){item.receivedValue=valReceived;item.remainingValue=remaining}
-        }else item.remainingValue = Math.max(0, novoVal - (item.receivedValue||0));
-        promises.push(firebase.database().ref("finance/meses/"+mk+"/"+id).set(item));
-      }
-    })
-  });
-  await Promise.all(promises);
-}
-
-async function convertParcelToFixed(valReceived,remaining){
-  const snap = await firebase.database().ref("finance/meses").once("value");
-  const meses = snap.val()||{}, novoVal = Number(valueInput.value.replace(/\./g,"").replace(",","."));
-  const promises = [], novoDia = new Date(date.value).getDate();
-  Object.entries(meses).forEach(([mk,items])=>{
-    Object.entries(items).forEach(([id,item])=>{
-      if(item.parcelGroupId===editingItem.parcelGroupId && item.parcelIndex>=editingItem.parcelIndex){
-        item.fixed=true;item.parcel=false;item.name=title.value.trim();item.category=category.value;
-        item.value=novoVal;item.type=currentType;
-        const d = new Date(item.date); d.setDate(novoDia); item.date = d.toISOString().split("T")[0];
-        if(item.id===editingItem.id){item.paid=paid.checked; if(currentType==="income"){item.receivedValue=valReceived;item.remainingValue=remaining}}
-        else item.remainingValue = Math.max(0, novoVal - (item.receivedValue||0));
-        promises.push(firebase.database().ref("finance/meses/"+mk+"/"+id).set(item));
-      }
-    })
-  });
-  await Promise.all(promises);
-}
-
-async function updateFixedGroup(valReceived,remaining){
-  const snap = await firebase.database().ref("finance/meses").once("value");
-  const meses = snap.val()||{}, novoVal = Number(valueInput.value.replace(/\./g,"").replace(",","."));
-  const promises = [], novoDia = new Date(date.value).getDate();
-  Object.entries(meses).forEach(([mk,items])=>{
-    Object.entries(items).forEach(([id,item])=>{
-      if(item.parcelGroupId===editingItem.parcelGroupId && item.fixed){
-        item.name=title.value.trim();item.category=category.value;item.value=novoVal;item.type=currentType;
-        const d = new Date(item.date); d.setDate(novoDia); item.date = d.toISOString().split("T")[0];
-        if(item.id===editingItem.id){item.paid=paid.checked; if(currentType==="income"){item.receivedValue=valReceived;item.remainingValue=remaining}}
-        else item.remainingValue = Math.max(0, novoVal - (item.receivedValue||0));
-        promises.push(firebase.database().ref("finance/meses/"+mk+"/"+id).set(item));
-      }
-    })
-  });
-  await Promise.all(promises);
-}
-
-// ✅ FUNÇÃO DE EDIÇÃO - MANTIDA E 100% FUNCIONAL
 function editById(id){
-  const mk = getMonthKey();
-  firebase.database().ref("finance/meses/"+mk+"/"+id).once("value",snap=>{
-    const t = snap.val(); editingItem = t;
-    document.getElementById("editAllRow").style.display = (t.parcel||t.fixed)?"flex":"none";
-    document.getElementById("editAll").checked = false;
-    title.value=t.name; valueInput.value=t.value.toLocaleString("pt-BR",{minimumFractionDigits:2});
-    receivedInput.value=(t.receivedValue||0).toLocaleString("pt-BR",{minimumFractionDigits:2});
-    document.getElementById("receivedArea").style.display = t.type==="income"&&!t.paid?"block":"none";
-    category.value=t.category; date.value=t.date; paid.checked=t.paid; currentType=t.type;
-    editingParcelData = (t.parcel||t.fixed)?{parcelIndex:t.parcelIndex,parcelTotal:t.parcelTotal,parcelGroupId:t.parcelGroupId}:null;
-    isParcel=!!t.parcel; isFixed=!!t.fixed;
-    document.getElementById("btnParcel").classList.toggle("ativo",isParcel);
-    document.getElementById("btnFixed").classList.toggle("ativo",isFixed);
-    document.getElementById("parcelCount").style.display=isParcel?"block":"none";
-    document.getElementById("parcelCount").value = t.parcelTotal||"";
-    setType(currentType); editId=id; editMonthKey=mk; deleteBtn.style.display="block"; openModal();
-  })
+  const originalMonthKey = getMonthKey();
+  firebase.database().ref("finance/meses/" + originalMonthKey + "/" + id).once("value", snap=>{
+    const t = snap.val(); if(!t) return;
+    title.value = t.name;
+    valueInput.value = t.value.toLocaleString("pt-BR",{minimumFractionDigits:2});
+    category.value = t.category; date.value = t.date; paid.checked = t.paid; currentType = t.type;
+    editingParcelData = t.parcel ? {parcelIndex:t.parcelIndex,parcelTotal:t.parcelTotal,parcelGroupId:t.parcelGroupId} : null;
+    setType(currentType); editId = id; editMonthKey = originalMonthKey; deleteBtn.style.display = "block"; openModal();
+  });
 }
 
-function remove(){
-  if(!editingItem?.parcel && !editingItem?.fixed){monthRef().child(editId).remove();closeModal();render();return}
-  deleteBtn.style.display="none"; document.getElementById("parcelDeleteOptions").style.display="block";
-}
-function removeParcelGroup(gid){
-  firebase.database().ref("finance/meses").once("value",snap=>{
-    const meses = snap.val()||[], prom=[];
-    Object.entries(meses).forEach(([mk,items])=>{
-      Object.entries(items).forEach(([id,item])=>{
-        if(item.parcelGroupId===gid && item.parcelIndex>=editingItem.parcelIndex)
-          prom.push(firebase.database().ref("finance/meses/"+mk+"/"+id).remove());
-      })
-    });
-    Promise.all(prom).then(()=>{closeModal();render()})
-  })
-}
-async function deleteGroup(gid){
-  const snap = await firebase.database().ref("finance/meses").once("value");
-  const meses = snap.val()||[], prom=[];
-  Object.entries(meses).forEach(([mk,items])=>{
-    Object.entries(items).forEach(([id,item])=>{
-      if(item.parcelGroupId===gid) prom.push(firebase.database().ref("finance/meses/"+mk+"/"+id).remove());
-    })
-  });
-  await Promise.all(prom);
-}
-function removeAllParcels(){removeParcelGroup(editingItem.parcelGroupId)}
-function removeCurrentParcel(){monthRef().child(editId).remove().then(()=>{closeModal();render()})}
+function remove(){ if(!editId) return; monthRef().child(editId).remove(); closeModal(); render(); }
 
 function openModal(){
   modal.style.display="flex";
   if(editId===null){
-    title.value=valueInput.value=receivedInput.value="";
-    setType("income"); isParcel=isFixed=false;
-    document.getElementById("btnParcel").classList.remove("ativo");
-    document.getElementById("btnFixed").classList.remove("ativo");
-    document.getElementById("parcelCount").style.display="none";
-    document.getElementById("editAllRow").style.display="none";
-    paid.checked=false;
-    const hoje = new Date();
-    date.value = `${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2,"0")}-${String(hoje.getDate()).padStart(2,"0")}`;
-    deleteBtn.style.display="none"; document.getElementById("parcelDeleteOptions").style.display="none";
+    title.value=""; valueInput.value=""; category.value=""; paid.checked=false; setType("income");
+    isParcel=false; document.getElementById("btnParcel").classList.remove("active");
+    document.getElementById("parcelCount").style.display="none"; document.getElementById("parcelCount").value="";
+    const hoje=new Date(); date.value=`${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2,"0")}-${String(hoje.getDate()).padStart(2,"0")}`;
+    deleteBtn.style.display="none";
   }
 }
+
 function closeModal(){
-  modal.style.display="none"; editId=editMonthKey=editingItem=editingParcelData=null;
-  isParcel=isFixed=false;
-  document.getElementById("btnParcel").classList.remove("ativo");
-  document.getElementById("btnFixed").classList.remove("ativo");
-  document.getElementById("parcelCount").style.display="none";
-  document.getElementById("parcelDeleteOptions").style.display="none";
-  deleteBtn.style.display="block";
+  modal.style.display="none"; isParcel=false; editingParcelData=null;
+  const btn=document.getElementById("btnParcel"); const input=document.getElementById("parcelCount");
+  btn.classList.remove("active"); input.style.display="none"; input.value="";
+  editId=null; editMonthKey=null;
 }
 
-function openCategoryModal(){document.getElementById("categoryModal").style.display="flex";renderCategories()}
-function closeCategoryModal(){document.getElementById("categoryModal").style.display="none"}
+function openCategoryModal(){ document.getElementById("categoryModal").style.display="flex"; renderCategories(); }
+function closeCategoryModal(){ document.getElementById("categoryModal").style.display="none"; }
 function saveCategory(){
-  const n = document.getElementById("categoryName").value.trim();
-  if(!n) return; categoriesRef().child(n).set(true);
-  document.getElementById("categoryName").value=""; renderCategories(); updateCategorySelect();
+  const input=document.getElementById("categoryName"); const name=input.value.trim(); if(!name) return;
+  categoriesRef().child(name).set(true); input.value=""; renderCategories(); updateCategorySelect();
 }
-function deleteCategory(n){categoriesRef().child(n).remove();renderCategories();updateCategorySelect()}
+function deleteCategory(name){ categoriesRef().child(name).remove(); renderCategories(); updateCategorySelect(); }
 function renderCategories(){
-  const c = document.getElementById("categoryList"); c.innerHTML="";
-  categoriesRef().once("value",snap=>{
-    Object.keys(snap.val()||{}).sort((a,b)=>a.localeCompare(b,'pt-BR')).forEach(n=>{
-      const d = document.createElement("div"); d.className="item-categoria";
-      d.innerHTML = `<span>${n}</span><button style="background:none;border:none;color:#EF4444;font-size:20px;cursor:pointer">×</button>`;
-      d.querySelector("button").onclick = ()=>deleteCategory(n);
-      c.appendChild(d);
-    })
-  })
+  const container=document.getElementById("categoryList"); container.innerHTML="";
+  categoriesRef().once("value", snap=>{
+    const data=snap.val()||{};
+    Object.keys(data).sort((a,b)=>a.localeCompare(b,'pt-BR')).forEach(c=>{
+      const div=document.createElement("div"); div.className="category-item";
+      div.innerHTML=`<span>${c}</span><button onclick="deleteCategory('${c}')">✕</button>`;
+      container.appendChild(div);
+    });
+  });
 }
 function updateCategorySelect(){
-  const s = document.getElementById("category"); s.innerHTML="";
-  categoriesRef().once("value",snap=>{
-    Object.keys(snap.val()||{}).forEach(n=>{
-      const o = document.createElement("option"); o.value=o.innerText=n; s.appendChild(o);
-    })
-  })
+  const select=document.getElementById("category"); select.innerHTML="";
+  categoriesRef().once("value", snap=>{
+    const data=snap.val()||{};
+    Object.keys(data).forEach(c=>{
+      const opt=document.createElement("option"); opt.value=c; opt.innerText=c; select.appendChild(opt);
+    });
+  });
 }
-function goReports(){window.location.href="relatorios.html"}
-function getMonthKeyFromDate(s){const [y,m]=s.split("-");return `${y}-${m}`}
-function getTodayLocalString(){const n=new Date();return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,"0")}-${String(n.getDate()).padStart(2,"0")}`}
 
-document.getElementById("paid").addEventListener("change",function(){
-  const a = document.getElementById("receivedArea");
-  if(currentType!=="income"){a.style.display="none";return}
-  if(this.checked){a.style.display="none";receivedInput.value=valueInput.value}
-  else a.style.display="block";
-});
+function goReports(){ window.location.href="relatorios.html"; }
+function getMonthKeyFromDate(dateStr){ const [y,m]=dateStr.split("-"); return `${y}-${m}`; }
+function getTodayLocalString(){ const n=new Date(); return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,"0")}-${String(n.getDate()).padStart(2,"0")}`; }
 </script>
 
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyAd-ttfpK460D4fyfoNZY6DJRhzuItpHe0",
+    authDomain: "box-financeiro.firebaseapp.com",
+    databaseURL: "https://box-financeiro-default-rtdb.firebaseio.com",
+    projectId: "box-financeiro",
+    storageBucket: "box-financeiro.firebasestorage.app",
+    messagingSenderId: "249966609723",
+    appId: "1:249966609723:web:12339b100df393031ea31e"
+  };
+  firebase.initializeApp(firebaseConfig);
+  updateMonthLabel(); checkMonthTurnover(); render(); updateCategorySelect();
+</script>
+<script>if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");</script>
+</body>
+</html>
