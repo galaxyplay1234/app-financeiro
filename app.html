@@ -436,6 +436,11 @@ input:checked + .slider:before{transform:translateX(20px)}
   border-left-color:#FD9806;    /* laranja */
 }
 
+/* ITEM PAGO / RECEBIDO */
+.paid-item{
+    border-left-color:#4EAE51; /* mesma cor do badge verde */
+}
+
 .badge.orange{
     background:#FD9806;
 }
@@ -906,11 +911,15 @@ rPrev += (t.value - recebido);
             const isDueToday = !t.paid && t.date === todayStr;
 
             const item = document.createElement("div");
-            item.className = "item";
-            
+item.className = "item";
 
-            if(isLate) item.classList.add("late-item");
-            else if(isDueToday) item.classList.add("due-today-item");
+if(t.paid){
+    item.classList.add("paid-item");
+}else if(isLate){
+    item.classList.add("late-item");
+}else if(isDueToday){
+    item.classList.add("due-today-item");
+}
 
             if(index === 0) item.classList.add("first-of-day");
             if(index === groupedByDate[date].length - 1)
