@@ -542,13 +542,10 @@ input:checked + .slider:before{transform:translateX(20px)}
     <input id="receivedValue" placeholder="Valor recebido">
 </div>
 
-<div id="interestArea">
+<div id="paidValueArea" style="display:none">
     <input
-        id="interestRate"
-        type="number"
-        min="0"
-        step="0.1"
-        placeholder="Juros (% ao mês)"
+        id="paidValue"
+        placeholder="Valor pago"
     >
 </div>
 
@@ -667,6 +664,8 @@ const modal = document.getElementById("modal");
 const deleteBtn = document.getElementById("deleteBtn");
 const valueInput = document.getElementById("value");
 const receivedInput = document.getElementById("receivedValue");
+const paidValueInput = document.getElementById("paidValue");
+
 
 /* =========================
    UTIL
@@ -682,6 +681,19 @@ receivedInput.addEventListener("input",()=>{
   v = (Number(v)/100).toLocaleString("pt-BR",{minimumFractionDigits:2});
   receivedInput.value = v;
 });
+
+paidValueInput.addEventListener("input",()=>{
+
+    let v = paidValueInput.value.replace(/\D/g,"");
+
+    v = (Number(v)/100).toLocaleString("pt-BR",{
+        minimumFractionDigits:2
+    });
+
+    paidValueInput.value = v;
+
+});
+
 
 function updateMonthLabel(){
   const meses=["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
@@ -736,12 +748,25 @@ function setType(t){
         .classList.add("active");
 
     const area = document.getElementById("receivedArea");
+    const paidArea = document.getElementById("paidValueArea");
 
-    if(t === "income" && !paid.checked){
+
+    if(t === "income"){
+
+    paidArea.style.display = "none";
+
+    if(!paid.checked){
         area.style.display = "block";
     }else{
         area.style.display = "none";
     }
+
+}else{
+
+    area.style.display = "none";
+    paidArea.style.display = "block";
+
+}
 
 }
 
@@ -924,6 +949,28 @@ rPrev += (t.value - recebido);
             const isLate = !t.paid && t.date < todayStr;
             const isDueToday = !t.paid && t.date === todayStr;
 
+        let daysLate = 0;
+let interestValue = 0;
+
+if(
+    t.type === "expense" &&
+    t.paid &&
+    (t.paidValue || 0) > t.value
+){
+
+    const vencimento = new Date(t.date + "T00:00:00");
+    const pagamento = new Date();
+
+    daysLate = Math.max(
+        0,
+        Math.floor((pagamento - vencimento) / 86400000)
+    );
+
+    interestValue = (t.paidValue || 0) - t.value;
+
+}
+
+
             const item = document.createElement("div");
 item.className = "item";
 
@@ -1003,6 +1050,35 @@ t.type === "income" &&
 `
 : ``
 }
+${
+t.type === "expense" &&
+t.paid &&
+(t.paidValue || 0) > 0
+? `
+<div class="received">
+
+    <div class="ok">
+        Pago: R$ ${(t.paidValue || 0).toLocaleString("pt-BR",{minimumFractionDigits:2})}
+    </div>
+
+    ${
+        interestValue > 0
+        ? `
+        <div class="rest">
+            Juros: R$ ${interestValue.toLocaleString("pt-BR",{minimumFractionDigits:2})}
+        </div>
+
+        <div class="rest">
+            ${daysLate} dias de atraso
+        </div>
+        `
+        : ``
+    }
+
+</div>
+`
+: ``
+}
 `;
             itemsWrap.appendChild(item);
           });
@@ -1037,6 +1113,13 @@ async function save(){
   const valTotal = Number(
     valueInput.value.replace(/\./g,"").replace(",",".")
   );
+  
+  const paidValue = Number(
+    (paidValueInput.value || "0")
+        .replace(/\./g,"")
+        .replace(",",".")
+) || 0;
+  
   
   let valReceived = Number(
     (receivedInput.value || "0")
@@ -1119,6 +1202,7 @@ if(
   id,
   name: title.value.trim(),
   value: valTotal,
+  paidValue,
 
   receivedValue: valReceived,
   remainingValue: remaining,
@@ -1196,6 +1280,7 @@ if(isFixed){
             id,
             name: title.value.trim(),
             value: valTotal,
+            paidValue: 0,
             receivedValue: 0,
             remainingValue: valTotal,
             category: category.value,
@@ -1287,6 +1372,8 @@ const item = {
     id,
     name: title.value.trim(),
     value: parcelValue,
+    paidValue: 0,
+
 
     receivedValue:
         currentType === "income"
@@ -1609,6 +1696,10 @@ if(t.type === "income" && !t.paid){
 }
 receivedInput.value =
   (t.receivedValue || 0).toLocaleString("pt-BR",{minimumFractionDigits:2});
+  paidValueInput.value =
+    (t.paidValue || 0)
+        ? (t.paidValue).toLocaleString("pt-BR",{minimumFractionDigits:2})
+        : "";
   document.getElementById("interestRate").value =
     t.interestRate || "";
       category.value = t.category;
@@ -1773,6 +1864,7 @@ function openModal(){
   if(editId===null){
     title.value="";
     valueInput.value="";
+    paidValueInput.value = "";
     receivedInput.value=""; // 👈 NOVO
     document.getElementById("receivedArea").style.display="none"; // 👈 NOVO
 
@@ -1924,6 +2016,38 @@ function getPreviousMonthKeyForRender(){
 }
 
 document.getElementById("paid").addEventListener("change", function(){
+
+    const area = document.getElementById("receivedArea");
+    const paidArea = document.getElementById("paidValueArea");
+
+    if(currentType === "income"){
+
+        paidArea.style.display = "none";
+
+        if(this.checked){
+            area.style.display = "none";
+            receivedInput.value = valueInput.value;
+        }else{
+            area.style.display = "block";
+        }
+
+    }else{
+
+        area.style.display = "none";
+
+        if(this.checked){
+
+            if(!paidValueInput.value.trim()){
+                paidValueInput.value = valueInput.value;
+            }
+
+        }
+
+        paidArea.style.display = "block";
+
+    }
+
+});
 
     const area = document.getElementById("receivedArea");
 
