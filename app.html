@@ -754,6 +754,7 @@ document
   input.style.display = isParcel ? "block" : "none";
 
   if(!isParcel && !isFixed){
+    
     input.value = "";
   }
 }
@@ -1053,18 +1054,38 @@ if(editingItem?.parcel && isFixed){
 ========================= */
 
 if(!isParcel && !isFixed){
+  
+  if(
+    editingItem?.parcel &&
+    !document.getElementById("editAll").checked
+){
+    await updateCurrentParcel(valReceived, remaining);
 
-    if((editingItem?.parcel || editingItem?.fixed) &&
-   document.getElementById("editAll").checked){
+    closeModal();
+    render();
+    return;
+}
 
-
+    if(
+    editingItem?.parcel &&
+    document.getElementById("editAll").checked
+){
     await updateParcelGroup(valReceived, remaining);
 
-closeModal();
+    closeModal();
+    render();
+    return;
+}
 
-render();
+if(
+    editingItem?.fixed &&
+    document.getElementById("editAll").checked
+){
+    await updateFixedGroup(valReceived, remaining);
 
-return;
+    closeModal();
+    render();
+    return;
 }
 
 
@@ -1183,20 +1204,7 @@ if(isFixed){
   /* =========================
      PARCELADO
   ========================= */
-  if(
-    isParcel &&
-    editId &&
-    editingItem?.parcel &&
-    document.getElementById("editAll").checked
-){
-
-    await updateParcelGroup(valReceived, remaining);
-
-    closeModal();
-    render();
-    return;
-
-}
+ 
 
 
 
@@ -1286,6 +1294,37 @@ const item = {
   closeModal();
   render();
 }
+
+async function updateCurrentParcel(valReceived, remaining){
+
+    const item = {
+        ...editingItem,
+
+        name: title.value.trim(),
+        value: Number(
+            valueInput.value.replace(/\./g,"").replace(",",".")
+        ),
+        category: category.value,
+        date: date.value,
+        type: currentType,
+        paid: paid.checked,
+        receivedValue: currentType === "income" ? valReceived : 0,
+        remainingValue: currentType === "income" ? remaining : 0
+    };
+
+    const newMonth = getMonthKeyFromDate(item.date);
+
+    if(editMonthKey !== newMonth){
+        await firebase.database()
+            .ref("finance/meses/"+editMonthKey+"/"+editId)
+            .remove();
+    }
+
+    await firebase.database()
+        .ref("finance/meses/"+newMonth+"/"+editId)
+        .set(item);
+}
+
 
 async function updateParcelGroup(valReceived, remaining){
 
