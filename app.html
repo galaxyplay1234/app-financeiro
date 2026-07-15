@@ -1019,6 +1019,14 @@ t.type === "income" &&
    SAVE
 ========================= */
 async function save(){
+  
+  console.log("SAVE", {
+    editId,
+    editingItem,
+    isParcel,
+    isFixed
+});
+
   const valTotal = Number(
     valueInput.value.replace(/\./g,"").replace(",",".")
   );
