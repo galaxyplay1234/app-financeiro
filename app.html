@@ -1183,7 +1183,12 @@ if(isFixed){
   /* =========================
      PARCELADO
   ========================= */
-  if(isParcel && editId && editingItem?.parcel){
+  if(
+    isParcel &&
+    editId &&
+    editingItem?.parcel &&
+    document.getElementById("editAll").checked
+){
 
     await updateParcelGroup(valReceived, remaining);
 
