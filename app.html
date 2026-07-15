@@ -1046,6 +1046,32 @@ const remaining = Math.max(0, valTotal - valReceived);
 
   const baseDateStr = date.value;
   
+  // Editar somente esta parcela
+if(
+    isParcel &&
+    editingItem?.parcel &&
+    !document.getElementById("editAll").checked
+){
+    await updateCurrentParcel(valReceived, remaining);
+
+    closeModal();
+    render();
+    return;
+}
+
+// Editar esta e futuras
+if(
+    isParcel &&
+    editingItem?.parcel &&
+    document.getElementById("editAll").checked
+){
+    await updateParcelGroup(valReceived, remaining);
+
+    closeModal();
+    render();
+    return;
+}
+  
 if(editingItem?.parcel && isFixed){
 
     await convertParcelToFixed(valReceived, remaining);
@@ -1063,32 +1089,7 @@ if(editingItem?.parcel && isFixed){
 ========================= */
 
 if(!isParcel && !isFixed){
-  
-  if(
-    editingItem?.parcel &&
-    !document.getElementById("editAll").checked
-){
-    alert("UPDATE CURRENT");
 
-    await updateCurrentParcel(valReceived, remaining);
-
-    closeModal();
-    render();
-    return;
-}
-
-if(
-    editingItem?.parcel &&
-    document.getElementById("editAll").checked
-){
-    alert("UPDATE GROUP");
-
-    await updateParcelGroup(valReceived, remaining);
-
-    closeModal();
-    render();
-    return;
-}
 
 if(
     editingItem?.fixed &&
