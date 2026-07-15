@@ -1145,7 +1145,7 @@ if(
     editingItem?.parcel &&
     !document.getElementById("editAll").checked
 ){
-    await updateCurrentParcel(valReceived, remaining);
+    await updateCurrentParcel(valReceived, remaining, paidValue);
 
     closeModal();
     render();
@@ -1409,7 +1409,7 @@ const item = {
   render();
 }
 
-async function updateCurrentParcel(valReceived, remaining){
+async function updateCurrentParcel(valReceived, remaining, paidValue){
 
     const item = {
     ...editingItem,
@@ -1441,7 +1441,7 @@ async function updateCurrentParcel(valReceived, remaining){
 }
 
 
-async function updateParcelGroup(valReceived, remaining){
+async function updateParcelGroup(valReceived, remaining, paidValue){
 
     const snap = await firebase.database()
         .ref("finance/meses")
@@ -1472,6 +1472,7 @@ async function updateParcelGroup(valReceived, remaining){
 item.category = category.value;
 item.value = novoValor;
 item.type = currentType;
+item.paidValue = currentType === "expense" ? paidValue : 0;
 const novaData = new Date(date.value);
 
 // mantém o mês da própria parcela
@@ -1519,7 +1520,7 @@ promises.push(
 }
 
 
-async function convertParcelToFixed(valReceived, remaining){
+async async function convertParcelToFixed(valReceived, remaining, paidValue){
 
     const snap = await firebase.database()
         .ref("finance/meses")
@@ -1552,6 +1553,7 @@ async function convertParcelToFixed(valReceived, remaining){
                 item.category = category.value;
                 item.value = novoValor;
                 item.type = currentType;
+                item.paidValue = currentType === "expense" ? paidValue : 0;
 
                 const data = new Date(item.date);
                 data.setDate(novoDia);
@@ -1593,7 +1595,7 @@ async function convertParcelToFixed(valReceived, remaining){
 
 
 
-async function updateFixedGroup(valReceived, remaining){
+async async function updateFixedGroup(valReceived, remaining, paidValue){
 
     const snap = await firebase.database()
         .ref("finance/meses")
@@ -1625,6 +1627,7 @@ async function updateFixedGroup(valReceived, remaining){
                 item.category = category.value;
                 item.value = novoValor;
                 item.type = currentType;
+                item.paidValue = currentType === "expense" ? paidValue : 0;
 
                 // altera somente o dia
                 const data = new Date(item.date);
