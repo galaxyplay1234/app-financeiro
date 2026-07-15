@@ -540,6 +540,9 @@ input:checked + .slider:before{transform:translateX(20px)}
   <div id="receivedArea" style="display:none">
   <input id="receivedValue" placeholder="Valor recebido">
 </div>
+<div id="paidArea" style="display:none">
+    <input id="paidValue" placeholder="Valor pago">
+</div>
 <select id="category">
   <option>Geral</option>
   <option>Alimentação</option>
@@ -654,6 +657,7 @@ const modal = document.getElementById("modal");
 const deleteBtn = document.getElementById("deleteBtn");
 const valueInput = document.getElementById("value");
 const receivedInput = document.getElementById("receivedValue");
+const paidInput = document.getElementById("paidValue");
 
 /* =========================
    UTIL
@@ -669,6 +673,13 @@ receivedInput.addEventListener("input",()=>{
   v = (Number(v)/100).toLocaleString("pt-BR",{minimumFractionDigits:2});
   receivedInput.value = v;
 });
+
+paidInput.addEventListener("input",()=>{
+  let v = paidInput.value.replace(/\D/g,"");
+  v = (Number(v)/100).toLocaleString("pt-BR",{minimumFractionDigits:2});
+  paidInput.value = v;
+});
+
 
 function updateMonthLabel(){
   const meses=["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
@@ -902,7 +913,15 @@ rPrev += (t.value - recebido);
 
 }else{
 
-    t.paid ? dPago += t.value : dPrev += t.value;
+    if(t.paid){
+
+        dPago += (t.paidValue || t.value);
+
+    }else{
+
+        dPrev += t.value;
+
+    }
 
 }
 
@@ -989,6 +1008,34 @@ t.type === "income" &&
 `
 : ``
 }
+
+${
+t.type === "expense" &&
+t.paid &&
+((t.interest || 0) > 0 || getLateDays(t) > 0)
+? `
+<div class="received">
+
+    ${
+    (t.interest || 0) > 0
+    ? `<div class="rest">
+          Juros: R$ ${(t.interest || 0).toLocaleString("pt-BR",{minimumFractionDigits:2})}
+       </div>`
+    : ``
+    }
+
+    ${
+    getLateDays(t) > 0
+    ? `<div class="rest">
+          ${getLateDays(t)} dia${getLateDays(t)>1?"s":""} de atraso
+       </div>`
+    : ``
+    }
+
+</div>
+`
+: ``
+}
 `;
             itemsWrap.appendChild(item);
           });
@@ -1028,8 +1075,32 @@ async function save(){
         .replace(",",".")
 ) || 0;
 
+
+let valPaid = Number(
+    (paidInput.value || "0")
+        .replace(/\./g,"")
+        .replace(",",".")
+) || 0;
+
 if(currentType === "income" && paid.checked){
     valReceived = valTotal;
+}
+
+if(currentType === "expense" && paid.checked){
+
+    // se não informou o valor pago, usa o valor original
+    if(valPaid === 0){
+        valPaid = valTotal;
+    }
+
+}
+
+let interest = 0;
+
+if(currentType === "expense"){
+
+    interest = Math.max(0, valPaid - valTotal);
+
 }
 
 const remaining = Math.max(0, valTotal - valReceived);
@@ -1079,7 +1150,16 @@ return;
 
   receivedValue: valReceived,
   remainingValue: remaining,
+  
+  paidValue: currentType === "expense" ? valPaid : (editingItem?.paidValue || 0),
 
+interest: currentType === "expense" ? interest : (editingItem?.interest || 0),
+
+paidDate: paid.checked
+    ? (editingItem?.paidDate || paidDate)
+    : null,
+    
+    
   category: category.value,
   date: baseDateStr,
   type: currentType,
@@ -1539,6 +1619,8 @@ if(t.type === "income" && !t.paid){
 }
 receivedInput.value =
   (t.receivedValue || 0).toLocaleString("pt-BR",{minimumFractionDigits:2});
+  paidInput.value =
+    (t.paidValue || 0).toLocaleString("pt-BR",{minimumFractionDigits:2});
       category.value = t.category;
       date.value = t.date;
       paid.checked = t.paid;
@@ -1703,6 +1785,8 @@ function openModal(){
     valueInput.value="";
     receivedInput.value=""; // 👈 NOVO
     document.getElementById("receivedArea").style.display="none"; // 👈 NOVO
+    paidInput.value = "";
+document.getElementById("paidArea").style.display = "none";
 
     category.value="";
     paid.checked=false;
@@ -1821,6 +1905,24 @@ function getTodayLocalString(){
   const now = new Date();
   return `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}-${String(now.getDate()).padStart(2,"0")}`;
 }
+
+function getLateDays(item){
+
+    if(!item.paid || !item.paidDate) return 0;
+
+    const vencimento = new Date(item.date);
+    const pagamento = new Date(item.paidDate);
+
+    const diff = pagamento - vencimento;
+
+    return Math.max(
+        0,
+        Math.floor(diff / (1000 * 60 * 60 * 24))
+    );
+
+}
+
+
 
 function getPreviousMonthKeyForRender(){
   const today = new Date();
