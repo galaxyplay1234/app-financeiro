@@ -1132,7 +1132,7 @@ if(currentType === "income" && paid.checked){
 
 const remaining = Math.max(0, valTotal - valReceived);
 const interestRate =
-    Number(document.getElementById("interestRate").value) || 0;
+    
   const baseDateStr = date.value;
   
   // Editar somente esta parcela
@@ -1699,8 +1699,7 @@ receivedInput.value =
     (t.paidValue || 0)
         ? (t.paidValue).toLocaleString("pt-BR",{minimumFractionDigits:2})
         : "";
-  document.getElementById("interestRate").value =
-    t.interestRate || "";
+  
       category.value = t.category;
       date.value = t.date;
       paid.checked = t.paid;
@@ -1878,7 +1877,7 @@ document.getElementById("btnFixed").classList.remove("active");
     document.getElementById("btnParcel").classList.remove("active");
     document.getElementById("parcelCount").style.display = "none";
     document.getElementById("parcelCount").value = "";
-    document.getElementById("interestRate").value = "";
+    
 
     const hoje=new Date();
     date.value=`${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2,"0")}-${String(hoje.getDate()).padStart(2,"0")}`;
@@ -1906,7 +1905,7 @@ document.getElementById("btnFixed").classList.remove("active");
 
 document.getElementById("parcelCount").style.display = "none";
 document.getElementById("parcelCount").value = "";
-document.getElementById("interestRate").value = "";
+
 
   editId = null;
   editMonthKey = null;
