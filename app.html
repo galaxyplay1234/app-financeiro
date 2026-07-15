@@ -537,9 +537,22 @@ input:checked + .slider:before{transform:translateX(20px)}
 
 <input id="title" placeholder="Nome">
 <input id="value" placeholder="Valor">
-  <div id="receivedArea" style="display:none">
-  <input id="receivedValue" placeholder="Valor recebido">
+
+<div id="receivedArea" style="display:none">
+    <input id="receivedValue" placeholder="Valor recebido">
 </div>
+
+<div id="interestArea">
+    <input
+        id="interestRate"
+        type="number"
+        min="0"
+        step="0.1"
+        placeholder="Juros (% ao mês)"
+    >
+</div>
+
+<select id="category">
 <select id="category">
   <option>Geral</option>
   <option>Alimentação</option>
@@ -1036,7 +1049,8 @@ if(currentType === "income" && paid.checked){
 }
 
 const remaining = Math.max(0, valTotal - valReceived);
-
+const interestRate =
+    Number(document.getElementById("interestRate").value) || 0;
   const baseDateStr = date.value;
   
   // Editar somente esta parcela
@@ -1101,6 +1115,7 @@ if(
 
     const item = {
     fixed: isFixed,
+    interestRate,
   id,
   name: title.value.trim(),
   value: valTotal,
@@ -1177,7 +1192,7 @@ if(isFixed){
         const id = `${groupId}_${i+1}`;
 
         const item = {
-
+            interestRate,
             id,
             name: title.value.trim(),
             value: valTotal,
@@ -1268,6 +1283,7 @@ alert("CRIANDO NOVO PARCELAMENTO");
 const item = {
 
     fixed: false,
+    interestRate,
     id,
     name: title.value.trim(),
     value: parcelValue,
@@ -1307,6 +1323,7 @@ const item = {
 async function updateCurrentParcel(valReceived, remaining){
 
     const item = {
+          interestRate,
         ...editingItem,
 
         name: title.value.trim(),
@@ -1592,6 +1609,8 @@ if(t.type === "income" && !t.paid){
 }
 receivedInput.value =
   (t.receivedValue || 0).toLocaleString("pt-BR",{minimumFractionDigits:2});
+  document.getElementById("interestRate").value =
+    t.interestRate || "";
       category.value = t.category;
       date.value = t.date;
       paid.checked = t.paid;
@@ -1768,6 +1787,7 @@ document.getElementById("btnFixed").classList.remove("active");
     document.getElementById("btnParcel").classList.remove("active");
     document.getElementById("parcelCount").style.display = "none";
     document.getElementById("parcelCount").value = "";
+    document.getElementById("interestRate").value = "";
 
     const hoje=new Date();
     date.value=`${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2,"0")}-${String(hoje.getDate()).padStart(2,"0")}`;
@@ -1795,6 +1815,7 @@ document.getElementById("btnFixed").classList.remove("active");
 
 document.getElementById("parcelCount").style.display = "none";
 document.getElementById("parcelCount").value = "";
+document.getElementById("interestRate").value = "";
 
   editId = null;
   editMonthKey = null;
