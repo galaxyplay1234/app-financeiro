@@ -940,7 +940,11 @@ rPrev += (t.value - recebido);
 
 }else{
 
-    t.paid ? dPago += t.value : dPrev += t.value;
+    if(t.paid){
+        dPago += (t.paidValue || t.value);
+    }else{
+        dPrev += t.value;
+    }
 
 }
 
@@ -1408,20 +1412,20 @@ const item = {
 async function updateCurrentParcel(valReceived, remaining){
 
     const item = {
-          
-        ...editingItem,
+    ...editingItem,
 
-        name: title.value.trim(),
-        value: Number(
-            valueInput.value.replace(/\./g,"").replace(",",".")
-        ),
-        category: category.value,
-        date: date.value,
-        type: currentType,
-        paid: paid.checked,
-        receivedValue: currentType === "income" ? valReceived : 0,
-        remainingValue: currentType === "income" ? remaining : 0
-    };
+    name: title.value.trim(),
+    value: Number(
+        valueInput.value.replace(/\./g,"").replace(",",".")
+    ),
+    paidValue: currentType === "expense" ? paidValue : 0,
+    category: category.value,
+    date: date.value,
+    type: currentType,
+    paid: paid.checked,
+    receivedValue: currentType === "income" ? valReceived : 0,
+    remainingValue: currentType === "income" ? remaining : 0
+};
 
     const newMonth = getMonthKeyFromDate(item.date);
 
