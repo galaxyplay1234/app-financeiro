@@ -524,11 +524,11 @@ input:checked + .slider:before{transform:translateX(20px)}
   </div>
 
   <div
-      class="sub"
-      id="despAtrasadas"
-      style="color:#F24438;font-weight:bold;">
-      Atrasadas: R$ 0,00
-  </div>
+    class="sub"
+    id="despAtrasadas"
+    style="color:#F24438;font-weight:bold;">
+    R$ 0,00
+</div>
 </div>
   </section>
 
@@ -1025,7 +1025,7 @@ t.type === "income" &&
     despPago.innerText = `R$ ${dPago.toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
     despPrev.innerText = `R$ ${(dPago+dPrev).toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
     document.getElementById("despAtrasadas").innerText =
-    `Atrasadas: R$ ${dAtrasadas.toLocaleString("pt-BR",{
+    `R$ ${dAtrasadas.toLocaleString("pt-BR",{
         minimumFractionDigits:2
     })}`;
 
