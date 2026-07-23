@@ -515,10 +515,21 @@ input:checked + .slider:before{transform:translateX(20px)}
     </div>
 
     <div class="card despesa">
-      <h4>Despesas</h4>
-      <div class="main" id="despPago">R$ 0,00</div>
-      <div class="sub" id="despPrev">R$ 0,00</div>
-    </div>
+  <h4>Despesas</h4>
+
+  <div class="main" id="despPago">R$ 0,00</div>
+
+  <div class="sub" id="despPrev">
+    R$ 0,00
+  </div>
+
+  <div
+      class="sub"
+      id="despAtrasadas"
+      style="color:#F24438;font-weight:bold;">
+      Atrasadas: R$ 0,00
+  </div>
+</div>
   </section>
 
 </div>
@@ -834,7 +845,11 @@ function render(){
   const container = document.getElementById("list");
   container.innerHTML = "";
 
-  let rPago = 0, rPrev = 0, dPago = 0, dPrev = 0;
+  let rPago = 0,
+    rPrev = 0,
+    dPago = 0,
+    dPrev = 0,
+    dAtrasadas = 0;
   let saldoInicial = 0;
 
   // remove listener antigo
@@ -909,6 +924,9 @@ rPrev += (t.value - recebido);
 
             const todayStr = getTodayLocalString();
             const isLate = !t.paid && t.date < todayStr;
+            if (t.type === "expense" && isLate) {
+    dAtrasadas += t.value;
+}
             const isDueToday = !t.paid && t.date === todayStr;
 
             const item = document.createElement("div");
@@ -1006,6 +1024,10 @@ t.type === "income" &&
     recPrev.innerText = `R$ ${(rPago+rPrev).toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
     despPago.innerText = `R$ ${dPago.toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
     despPrev.innerText = `R$ ${(dPago+dPrev).toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
+    document.getElementById("despAtrasadas").innerText =
+    `Atrasadas: R$ ${dAtrasadas.toLocaleString("pt-BR",{
+        minimumFractionDigits:2
+    })}`;
 
     saldoPago.innerText =
       `R$ ${(saldoInicial + rPago - dPago).toLocaleString("pt-BR",{minimumFractionDigits:2})}`;
