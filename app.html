@@ -195,7 +195,6 @@ header h2{
     gap:4px;
 }
 
-
 .parcel-badge{
     display:inline-flex;
     align-items:center;
@@ -415,8 +414,6 @@ input:checked + .slider:before{transform:translateX(20px)}
   max-height:260px;
 }
 
-
-
 /* remove espaço entre itens do mesmo dia */
 .day-items{
   display:flex;
@@ -459,7 +456,6 @@ input:checked + .slider:before{transform:translateX(20px)}
 .rest{
     color:#F24438;
 }
-
 
 .fixed-badge{
     display:inline-flex;
@@ -587,7 +583,6 @@ input:checked + .slider:before{transform:translateX(20px)}
     <span class="slider"></span>
   </label>
 </div>
-
 
 <div class="switch-row" id="editAllRow" style="display:none">
     <span>Editar parcelas futuras</span>
@@ -791,8 +786,6 @@ function toggleFixed(){
         .classList.toggle("active", isFixed);
 
 }
-
-
 
 function checkMonthTurnover(){
   const today = new Date();
@@ -1112,7 +1105,6 @@ if(editingItem?.parcel && isFixed){
 
 if(!isParcel && !isFixed){
 
-
 if(
     editingItem?.fixed &&
     document.getElementById("editAll").checked
@@ -1123,8 +1115,6 @@ if(
     render();
     return;
 }
-
-
 
     const id = editId || Date.now().toString();
 
@@ -1175,7 +1165,6 @@ if(
 
 return;
   }
-
 
 /* =========================
 
@@ -1243,15 +1232,10 @@ if(isFixed){
     return;
 }
 
-
-
   /* =========================
      PARCELADO
   ========================= */
  
-
-
-
 
 // Converter Fixa -> Parcelado
 if(editingItem?.fixed && isParcel){
@@ -1371,7 +1355,6 @@ async function updateCurrentParcel(valReceived, remaining){
         .set(item);
 }
 
-
 async function updateParcelGroup(valReceived, remaining){
 
     const snap = await firebase.database()
@@ -1449,7 +1432,6 @@ promises.push(
     await Promise.all(promises);
 }
 
-
 async function convertParcelToFixed(valReceived, remaining){
 
     const snap = await firebase.database()
@@ -1521,8 +1503,6 @@ async function convertParcelToFixed(valReceived, remaining){
     await Promise.all(promises);
 
 }
-
-
 
 async function updateFixedGroup(valReceived, remaining){
 
@@ -1597,8 +1577,6 @@ async function updateFixedGroup(valReceived, remaining){
     await Promise.all(promises);
 
 }
-
-
 
 /* =========================
    EDIT
@@ -1709,9 +1687,6 @@ async function remove(){
     document.getElementById("parcelDeleteOptions").style.display = "block";
 }
 
-
-
-
 function removeParcelGroup(groupId){
 
     firebase.database()
@@ -1753,7 +1728,6 @@ function removeParcelGroup(groupId){
 
 }
 
-
 async function deleteGroup(groupId){
 
     const snap = await firebase.database()
@@ -1786,7 +1760,6 @@ async function deleteGroup(groupId){
     await Promise.all(promises);
 
 }
-
 
 function removeAllParcels(){
     removeParcelGroup(editingItem.parcelGroupId);
@@ -1977,7 +1950,6 @@ document.getElementById("paid").addEventListener("change", function(){
     }
 
 });
-
 
 </script>
 
