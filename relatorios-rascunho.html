@@ -129,8 +129,12 @@ function monthRef(){
 
 /* ================= MÊS ================= */
 function changeMonth(step){
-  currentMonth.setMonth(currentMonth.getMonth()+step);
-  openIndex = null;
+  currentMonth = new Date(
+    currentMonth.getFullYear(),
+    currentMonth.getMonth() + step,
+    1 // 👈 força dia 1
+  );
+
   updateMonthLabel();
   render();
 }
@@ -220,6 +224,14 @@ function render(){
 updateMonthLabel();
 render();
 </script>
+
+<script>
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("sw.js");
+}
+</script>
+
+
 
 </body>
 </html>
