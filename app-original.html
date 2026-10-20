@@ -659,6 +659,7 @@ let editMonthKey = null;
 let currentType = "income";
 let editingParcelData = null;
 let editingItem = null;
+let activeMonthRef = null;
 
 const monthLabel = document.getElementById("monthLabel");
 const modal = document.getElementById("modal");
@@ -845,27 +846,33 @@ function render(){
   const container = document.getElementById("list");
   container.innerHTML = "";
 
-  let rPago = 0,
-    rPrev = 0,
-    dPago = 0,
-    dPrev = 0,
-    dAtrasadas = 0;
-  let saldoInicial = 0;
+  // Remove o listener do mês anterior
+  if (activeMonthRef) {
+    activeMonthRef.off("value");
+  }
 
-  // remove listener antigo
-  monthRef().off();
+  // Guarda a referência do mês atual
+  activeMonthRef = monthRef();
 
-  monthRef().on("value", async snap=>{
+  activeMonthRef.on("value", async snap => {
     const data = snap.val() || {};
+
+    // Zera os totais a cada atualização do Firebase
+    let rPago = 0,
+        rPrev = 0,
+        dPago = 0,
+        dPrev = 0,
+        dAtrasadas = 0;
+
     const list = Object.values(data)
       .sort((a,b)=>new Date(b.date)-new Date(a.date));
 
     container.innerHTML = "";
 
-    // 🔹 BUSCA SALDO DO MÊS ANTERIOR
+    // BUSCA SALDO DO MÊS ANTERIOR
     let saldoInicial = 0;
 
-const saldoKey = getMonthKey(); // 👈 mês exibido
+    const saldoKey = getMonthKey(); // mês exibido
 
 const snapSaldo = await firebase
   .database()
@@ -1143,22 +1150,30 @@ if(
 
     const newMonthKey = getMonthKeyFromDate(item.date);
 
-    // se estiver editando e mudou o mês
-    if(editId && editMonthKey && editMonthKey !== newMonthKey){
-      firebase
-        .database()
-        .ref("finance/meses/" + editMonthKey + "/" + id)
-        .remove();
-    }
+    try {
+  const db = firebase.database();
 
-    firebase
-      .database()
-      .ref("finance/meses/" + newMonthKey + "/" + id)
-      .set(item);
+  // Se mudou de mês, remove o lançamento do mês antigo primeiro
+  if (editId && editMonthKey && editMonthKey !== newMonthKey) {
+    await db
+      .ref("finance/meses/" + editMonthKey + "/" + id)
+      .remove();
+  }
 
-    closeModal();
-    render();
-    return;
+  // Salva o lançamento atualizado
+  await db
+    .ref("finance/meses/" + newMonthKey + "/" + id)
+    .set(item);
+
+  closeModal();
+  render();
+
+} catch (error) {
+  console.error("Erro ao salvar lançamento:", error);
+  alert("Erro ao salvar. Verifique sua conexão e tente novamente.");
+}
+
+return;
   }
 
 
@@ -1596,12 +1611,18 @@ function editById(id){
     .ref("finance/meses/" + originalMonthKey + "/" + id)
     .once("value", snap=>{
       const t = snap.val();
-      editingItem = t;
-      document.getElementById("editAllRow").style.display =
+
+if (!t) {
+  alert("Este lançamento não foi encontrado.");
+  return;
+}
+
+editingItem = t;
+
+document.getElementById("editAllRow").style.display =
     (t.parcel || t.fixed) ? "flex" : "none";
 
 document.getElementById("editAll").checked = false;
-      if(!t) return;
 
       title.value = t.name;
       valueInput.value = t.value.toLocaleString("pt-BR",{minimumFractionDigits:2});
@@ -1658,21 +1679,36 @@ if(isParcel){
 /* =========================
    DELETE
 ========================= */
-function remove(){
+
+async function remove(){
 
     if(!editingItem?.parcel && !editingItem?.fixed){
 
-        monthRef().child(editId).remove();
-        closeModal();
-        render();
-        return;
+        if(!editId || !editMonthKey){
+            alert("Não foi possível identificar o lançamento.");
+            return;
+        }
 
+        try {
+            await firebase.database()
+                .ref("finance/meses/" + editMonthKey + "/" + editId)
+                .remove();
+
+            closeModal();
+            render();
+
+        } catch(error) {
+            console.error("Erro ao excluir lançamento:", error);
+            alert("Não foi possível excluir. Verifique sua conexão.");
+        }
+
+        return;
     }
 
-    document.getElementById("deleteBtn").style.display="none";
-    document.getElementById("parcelDeleteOptions").style.display="block";
-
+    document.getElementById("deleteBtn").style.display = "none";
+    document.getElementById("parcelDeleteOptions").style.display = "block";
 }
+
 
 
 
