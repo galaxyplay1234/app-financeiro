@@ -845,27 +845,28 @@ function render(){
   const container = document.getElementById("list");
   container.innerHTML = "";
 
-  let rPago = 0,
-    rPrev = 0,
-    dPago = 0,
-    dPrev = 0,
-    dAtrasadas = 0;
-  let saldoInicial = 0;
-
   // remove listener antigo
   monthRef().off();
 
   monthRef().on("value", async snap=>{
     const data = snap.val() || {};
+
+    // Zera os totais a cada atualização do Firebase
+    let rPago = 0,
+        rPrev = 0,
+        dPago = 0,
+        dPrev = 0,
+        dAtrasadas = 0;
+
     const list = Object.values(data)
       .sort((a,b)=>new Date(b.date)-new Date(a.date));
 
     container.innerHTML = "";
 
-    // 🔹 BUSCA SALDO DO MÊS ANTERIOR
+    // BUSCA SALDO DO MÊS ANTERIOR
     let saldoInicial = 0;
 
-const saldoKey = getMonthKey(); // 👈 mês exibido
+    const saldoKey = getMonthKey(); // mês exibido
 
 const snapSaldo = await firebase
   .database()
