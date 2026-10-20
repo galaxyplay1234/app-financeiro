@@ -1144,22 +1144,30 @@ if(
 
     const newMonthKey = getMonthKeyFromDate(item.date);
 
-    // se estiver editando e mudou o mês
-    if(editId && editMonthKey && editMonthKey !== newMonthKey){
-      firebase
-        .database()
-        .ref("finance/meses/" + editMonthKey + "/" + id)
-        .remove();
-    }
+    try {
+  const db = firebase.database();
 
-    firebase
-      .database()
-      .ref("finance/meses/" + newMonthKey + "/" + id)
-      .set(item);
+  // Se mudou de mês, remove o lançamento do mês antigo primeiro
+  if (editId && editMonthKey && editMonthKey !== newMonthKey) {
+    await db
+      .ref("finance/meses/" + editMonthKey + "/" + id)
+      .remove();
+  }
 
-    closeModal();
-    render();
-    return;
+  // Salva o lançamento atualizado
+  await db
+    .ref("finance/meses/" + newMonthKey + "/" + id)
+    .set(item);
+
+  closeModal();
+  render();
+
+} catch (error) {
+  console.error("Erro ao salvar lançamento:", error);
+  alert("Erro ao salvar. Verifique sua conexão e tente novamente.");
+}
+
+return;
   }
 
 
@@ -1597,12 +1605,18 @@ function editById(id){
     .ref("finance/meses/" + originalMonthKey + "/" + id)
     .once("value", snap=>{
       const t = snap.val();
-      editingItem = t;
-      document.getElementById("editAllRow").style.display =
+
+if (!t) {
+  alert("Este lançamento não foi encontrado.");
+  return;
+}
+
+editingItem = t;
+
+document.getElementById("editAllRow").style.display =
     (t.parcel || t.fixed) ? "flex" : "none";
 
 document.getElementById("editAll").checked = false;
-      if(!t) return;
 
       title.value = t.name;
       valueInput.value = t.value.toLocaleString("pt-BR",{minimumFractionDigits:2});
