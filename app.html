@@ -659,6 +659,7 @@ let editMonthKey = null;
 let currentType = "income";
 let editingParcelData = null;
 let editingItem = null;
+let activeMonthRef = null;
 
 const monthLabel = document.getElementById("monthLabel");
 const modal = document.getElementById("modal");
@@ -845,10 +846,15 @@ function render(){
   const container = document.getElementById("list");
   container.innerHTML = "";
 
-  // remove listener antigo
-  monthRef().off();
+  // Remove o listener do mês anterior
+  if (activeMonthRef) {
+    activeMonthRef.off("value");
+  }
 
-  monthRef().on("value", async snap=>{
+  // Guarda a referência do mês atual
+  activeMonthRef = monthRef();
+
+  activeMonthRef.on("value", async snap => {
     const data = snap.val() || {};
 
     // Zera os totais a cada atualização do Firebase
