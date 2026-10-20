@@ -409,9 +409,9 @@ function renderAnnual(year){
       </div>
 
       <div class="year-summary">
-        <span class="detail-income">↑ ${money(result.income)}</span>
-        <span style="color:#c62828">↓ ${money(result.expense)}</span>
-      </div>
+  <span class="detail-income">${money(result.income)}</span>
+  <span style="color:#c62828">${money(result.expense)}</span>
+</div>
 
       <div class="balance-bar" aria-label="Proporção de receitas e despesas">
         <div class="bar-income" style="width:${incomePercent}%"></div>
