@@ -1679,21 +1679,36 @@ if(isParcel){
 /* =========================
    DELETE
 ========================= */
-function remove(){
+
+async function remove(){
 
     if(!editingItem?.parcel && !editingItem?.fixed){
 
-        monthRef().child(editId).remove();
-        closeModal();
-        render();
-        return;
+        if(!editId || !editMonthKey){
+            alert("Não foi possível identificar o lançamento.");
+            return;
+        }
 
+        try {
+            await firebase.database()
+                .ref("finance/meses/" + editMonthKey + "/" + editId)
+                .remove();
+
+            closeModal();
+            render();
+
+        } catch(error) {
+            console.error("Erro ao excluir lançamento:", error);
+            alert("Não foi possível excluir. Verifique sua conexão.");
+        }
+
+        return;
     }
 
-    document.getElementById("deleteBtn").style.display="none";
-    document.getElementById("parcelDeleteOptions").style.display="block";
-
+    document.getElementById("deleteBtn").style.display = "none";
+    document.getElementById("parcelDeleteOptions").style.display = "block";
 }
+
 
 
 
