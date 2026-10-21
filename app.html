@@ -1141,7 +1141,12 @@ async function save() {
     }
 
     async function createSeries(fixed) {
-        const total = fixed ? 12 : Number(parcelCount.value || 0);
+        const ano = Number(baseDateStr.slice(0, 4));
+const mes = Number(baseDateStr.slice(5, 7));
+
+const total = fixed
+    ? (ano + 2) * 12 - (ano * 12 + mes - 1) + 12
+    : Number(parcelCount.value || 0);
 
         if (!fixed && (!Number.isInteger(total) || total < 2)) {
             alert("Informe a quantidade de parcelas (mínimo 2).");
