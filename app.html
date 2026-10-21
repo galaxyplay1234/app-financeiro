@@ -1240,7 +1240,9 @@ async function save() {
             return;
         }
 
-        // 4. Conta fixa vira parcelamento: preserva as anteriores.
+        
+        // 4. Conta fixa vira parcelamento:
+        // preserva o histórico anterior e cria exatamente a quantidade escolhida.
         if (editingItem?.fixed && isParcel) {
             const total = Number(parcelCount.value || 0);
 
@@ -1250,72 +1252,102 @@ async function save() {
             }
 
             const months = await getAllMonths();
-            const updates = {};
-            const groupId = Date.now().toString() +
-                "_" + Math.random().toString(36).slice(2, 7);
+            const oldGroupId = editingItem.parcelGroupId;
+            const startIndex = Number(editingItem.parcelIndex);
+            const oldItems = [];
 
-            let index = 0;
-
-            // Mantém os registros anteriores e transforma
-            // somente a conta atual e as futuras.
+            // Localiza a conta atual e as contas fixas futuras.
             Object.keys(months).forEach(month => {
                 Object.keys(months[month] || {}).forEach(id => {
                     const item = months[month][id];
 
                     if (
-                        item.parcelGroupId === editingItem.parcelGroupId &&
+                        item.parcelGroupId === oldGroupId &&
                         item.fixed &&
-                        Number(item.parcelIndex) >=
-                            Number(editingItem.parcelIndex)
+                        Number(item.parcelIndex) >= startIndex
                     ) {
-                        index++;
-
-                        const dateStr = makeDate(baseDateStr, index - 1);
-                        const newId = `${groupId}_${index}`;
-                        const isCurrent = id === editId;
-                        const recebido = isCurrent
-                            ? valReceived
-                            : Number(item.receivedValue || 0);
-
-                        updates[`finance/meses/${month}/${id}`] = null;
-
-                        const newItem = {
-                            ...item,
-                            id: newId,
-                            name: title.value.trim(),
-                            value: valTotal,
-                            category: category.value,
-                            date: dateStr,
-                            type: currentType,
-                            paid: isCurrent ? paid.checked : item.paid,
-                            receivedValue: currentType === "income"
-                                ? recebido
-                                : 0,
-                            remainingValue: currentType === "income"
-                                ? Math.max(0, valTotal - recebido)
-                                : 0,
-                            fixed: false,
-                            parcel: true,
-                            parcelIndex: index,
-                            parcelTotal: total,
-                            parcelGroupId: groupId
-                        };
-
-                        const newMonth = getMonthKeyFromDate(dateStr);
-                        updates[`finance/meses/${newMonth}/${newId}`] = newItem;
+                        oldItems.push({
+                            month,
+                            id,
+                            item
+                        });
                     }
                 });
             });
 
-            if (index === 0) {
-                throw new Error("Nenhuma conta futura foi encontrada.");
+            oldItems.sort(
+                (a, b) =>
+                    Number(a.item.parcelIndex) -
+                    Number(b.item.parcelIndex)
+            );
+
+            if (!oldItems.length) {
+                alert("Não encontrei a conta fixa atual e as futuras.");
+                return;
             }
 
+            const newGroupId = Date.now().toString() +
+                "_" + Math.random().toString(36).slice(2, 7);
+
+            const updates = {};
+
+            // Remove todas as contas fixas atuais e futuras antigas.
+            // As contas anteriores à selecionada ficam intactas.
+            oldItems.forEach(({ month, id }) => {
+                updates[`finance/meses/${month}/${id}`] = null;
+            });
+
+            // Cria somente a quantidade escolhida, por exemplo, 3 parcelas.
+            for (let i = 0; i < total; i++) {
+                const old = oldItems[i]?.item;
+                const dateStr = makeDate(baseDateStr, i);
+                const id = `${newGroupId}_${i + 1}`;
+                const isCurrent = i === 0;
+
+                const recebido = isCurrent
+                    ? valReceived
+                    : Number(old?.receivedValue || 0);
+
+                const item = {
+                    id,
+                    name: title.value.trim(),
+                    value: valTotal,
+                    category: category.value,
+                    date: dateStr,
+                    type: currentType,
+
+                    paid: isCurrent
+                        ? paid.checked
+                        : Boolean(old?.paid),
+
+                    receivedValue: currentType === "income"
+                        ? recebido
+                        : 0,
+
+                    remainingValue: currentType === "income"
+                        ? Math.max(0, valTotal - recebido)
+                        : 0,
+
+                    fixed: false,
+                    parcel: true,
+                    parcelIndex: i + 1,
+                    parcelTotal: total,
+                    parcelGroupId: newGroupId
+                };
+
+                const monthKey = getMonthKeyFromDate(dateStr);
+
+                updates[`finance/meses/${monthKey}/${id}`] = item;
+            }
+
+            // Salva as exclusões e as novas parcelas na mesma operação.
             await db.ref().update(updates);
+
             closeModal();
             render();
             return;
         }
+
 
         // 5. Parcelado/fixo vira lançamento normal:
         // preserva o histórico anterior e substitui o trecho atual/futuro.
