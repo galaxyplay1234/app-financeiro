@@ -1040,289 +1040,458 @@ t.type === "income" &&
 /* =========================
    SAVE
 ========================= */
-async function save(){
-  
 
-  const valTotal = Number(
-    valueInput.value.replace(/\./g,"").replace(",",".")
-  );
-  
-  let valReceived = Number(
-    (receivedInput.value || "0")
-        .replace(/\./g,"")
-        .replace(",",".")
-) || 0;
+async function save() {
+    const db = firebase.database();
 
-if(currentType === "income" && paid.checked){
-    valReceived = valTotal;
-}
+    const valTotal = Number(
+        valueInput.value.replace(/\./g, "").replace(",", ".")
+    );
 
-const remaining = Math.max(0, valTotal - valReceived);
+    let valReceived = Number(
+        (receivedInput.value || "0")
+            .replace(/\./g, "")
+            .replace(",", ".")
+    ) || 0;
 
-  const baseDateStr = date.value;
-  
-  // Editar somente esta parcela
-if(
-    isParcel &&
-    editingItem?.parcel &&
-    !document.getElementById("editAll").checked
-){
-    await updateCurrentParcel(valReceived, remaining);
+    const baseDateStr = date.value;
 
-    closeModal();
-    render();
-    return;
-}
-
-// Editar esta e futuras
-if(
-    isParcel &&
-    editingItem?.parcel &&
-    document.getElementById("editAll").checked
-){
-    await updateParcelGroup(valReceived, remaining);
-
-    closeModal();
-    render();
-    return;
-}
-  
-if(editingItem?.parcel && isFixed){
-
-    await convertParcelToFixed(valReceived, remaining);
-
-    closeModal();
-    render();
-    return;
-
-} 
-
-/* =========================
-
-   NÃO PARCELADO
-
-========================= */
-
-if(!isParcel && !isFixed){
-
-if(
-    editingItem?.fixed &&
-    document.getElementById("editAll").checked
-){
-    await updateFixedGroup(valReceived, remaining);
-
-    closeModal();
-    render();
-    return;
-}
-
-    const id = editId || Date.now().toString();
-
-    const item = {
-    fixed: isFixed,
-  id,
-  name: title.value.trim(),
-  value: valTotal,
-
-  receivedValue: valReceived,
-  remainingValue: remaining,
-
-  category: category.value,
-  date: baseDateStr,
-  type: currentType,
-  paid: paid.checked,
-
-  parcel: editingParcelData ? true : false,
-  parcelIndex: editingParcelData ? editingParcelData.parcelIndex : null,
-  parcelTotal: editingParcelData ? editingParcelData.parcelTotal : null,
-  parcelGroupId: editingParcelData ? editingParcelData.parcelGroupId : null
-};
-
-    const newMonthKey = getMonthKeyFromDate(item.date);
-
-    try {
-  const db = firebase.database();
-
-  // Se mudou de mês, remove o lançamento do mês antigo primeiro
-  if (editId && editMonthKey && editMonthKey !== newMonthKey) {
-    await db
-      .ref("finance/meses/" + editMonthKey + "/" + id)
-      .remove();
-  }
-
-  // Salva o lançamento atualizado
-  await db
-    .ref("finance/meses/" + newMonthKey + "/" + id)
-    .set(item);
-
-  closeModal();
-  render();
-
-} catch (error) {
-  console.error("Erro ao salvar lançamento:", error);
-  alert("Erro ao salvar. Verifique sua conexão e tente novamente.");
-}
-
-return;
-  }
-
-/* =========================
-
-   FIXA
-
-========================= */
-
-if(isFixed){
-
-    // Só atualiza se já era uma fixa
-    if(editId && editingItem?.fixed){
-
-        await updateFixedGroup(valReceived, remaining);
-
-        closeModal();
-        render();
+    if (!title.value.trim() || !baseDateStr ||
+        !Number.isFinite(valTotal) || valTotal <= 0) {
+        alert("Informe o nome, a data e um valor válido.");
         return;
-
     }
 
-    // continua o código atual de criar fixa...
-    const groupId = Date.now().toString();
+    if (currentType === "income" && paid.checked) {
+        valReceived = valTotal;
+    }
 
-    const baseDate = new Date(baseDateStr);
+    valReceived = Math.max(0, Math.min(valTotal, valReceived));
 
-    for(let i = 0; i < 12; i++){
+    const remaining = Math.max(0, valTotal - valReceived);
+    const newMonthKey = getMonthKeyFromDate(baseDateStr);
+    const editAll = document.getElementById("editAll").checked;
 
-        const d = new Date(baseDate);
+    function makeDate(dateStr, offset) {
+        const [year, month, day] = dateStr.split("-").map(Number);
+        const target = new Date(year, month - 1 + offset, 1);
+        const lastDay = new Date(
+            target.getFullYear(),
+            target.getMonth() + 1,
+            0
+        ).getDate();
 
-        d.setMonth(d.getMonth() + i);
+        target.setDate(Math.min(day, lastDay));
 
-        const dateStr = d.toISOString().split("T")[0];
+        return [
+            target.getFullYear(),
+            String(target.getMonth() + 1).padStart(2, "0"),
+            String(target.getDate()).padStart(2, "0")
+        ].join("-");
+    }
 
-        const monthKey = getMonthKeyFromDate(dateStr);
-
-        const id = `${groupId}_${i+1}`;
-
-        const item = {
-
+    function makeNormalItem(id) {
+        return {
             id,
             name: title.value.trim(),
             value: valTotal,
-            receivedValue: 0,
-            remainingValue: valTotal,
+            receivedValue: currentType === "income" ? valReceived : 0,
+            remainingValue: currentType === "income" ? remaining : 0,
             category: category.value,
-            date: dateStr,
+            date: baseDateStr,
             type: currentType,
-            paid: false,
-            fixed: true,
+            paid: paid.checked,
             parcel: false,
-            parcelGroupId: groupId,
-            parcelIndex: i + 1,
-            parcelTotal: 12
-
+            fixed: false,
+            parcelIndex: null,
+            parcelTotal: null,
+            parcelGroupId: null
         };
-
-        await firebase.database()
-            .ref("finance/meses/" + monthKey + "/" + id)
-            .set(item);
-
     }
 
-    closeModal();
-    render();
-    return;
-}
+    async function getAllMonths() {
+        const snap = await db.ref("finance/meses").once("value");
+        return snap.val() || {};
+    }
 
-  /* =========================
-     PARCELADO
-  ========================= */
- 
+    async function removeGroupFromCurrent(groupId, startIndex) {
+        if (!groupId) {
+            throw new Error("Não foi possível identificar o grupo.");
+        }
 
-// Converter Fixa -> Parcelado
-if(editingItem?.fixed && isParcel){
+        const months = await getAllMonths();
+        const updates = {};
 
-    await deleteGroup(editingItem.parcelGroupId);
+        Object.keys(months).forEach(month => {
+            Object.keys(months[month] || {}).forEach(id => {
+                const item = months[month][id];
 
-    editId = null;
-    editingItem = null;
-    editingParcelData = null;
+                if (
+                    item.parcelGroupId === groupId &&
+                    Number(item.parcelIndex) >= Number(startIndex)
+                ) {
+                    updates[`finance/meses/${month}/${id}`] = null;
+                }
+            });
+        });
 
-}
+        if (Object.keys(updates).length) {
+            await db.ref().update(updates);
+        }
+    }
 
-// Converter para lançamento normal
-if(
-    (editingItem?.parcel || editingItem?.fixed) &&
-    !isParcel &&
-    !isFixed
-){
+    async function createSeries(fixed) {
+        const ano = Number(baseDateStr.slice(0, 4));
+const mes = Number(baseDateStr.slice(5, 7));
 
-    await deleteGroup(editingItem.parcelGroupId);
+const total = fixed
+    ? (ano + 2) * 12 - (ano * 12 + mes - 1) + 12
+    : Number(parcelCount.value || 0);
 
-    editId = null;
-    editingItem = null;
-    editingParcelData = null;
+        if (!fixed && (!Number.isInteger(total) || total < 2)) {
+            alert("Informe a quantidade de parcelas (mínimo 2).");
+            return false;
+        }
 
-}
+        const groupId = Date.now().toString() +
+            "_" + Math.random().toString(36).slice(2, 7);
 
-alert("CRIANDO NOVO PARCELAMENTO");
+        const updates = {};
 
-  const totalParcels = Number(parcelCount.value || 0);
+        for (let i = 0; i < total; i++) {
+            const dateStr = makeDate(baseDateStr, i);
+            const id = `${groupId}_${i + 1}`;
+            const isFirst = i === 0;
+            const recebido = currentType === "income" && isFirst
+                ? valReceived
+                : 0;
 
-  if(totalParcels < 2){
-    alert("Informe a quantidade de parcelas");
-    return;
-  }
+            const item = {
+                id,
+                name: title.value.trim(),
+                value: valTotal,
+                receivedValue: recebido,
+                remainingValue: currentType === "income"
+                    ? Math.max(0, valTotal - recebido)
+                    : 0,
+                category: category.value,
+                date: dateStr,
+                type: currentType,
+                paid: isFirst ? paid.checked : false,
+                parcel: !fixed,
+                fixed,
+                parcelIndex: i + 1,
+                parcelTotal: total,
+                parcelGroupId: groupId
+            };
 
-  const parcelValue = valTotal;
-  const groupId = Date.now().toString();
-  const baseDate = new Date(baseDateStr);
+            const month = getMonthKeyFromDate(dateStr);
+            updates[`finance/meses/${month}/${id}`] = item;
+        }
 
-  for(let i = 0; i < totalParcels; i++){
-    const d = new Date(baseDate);
-    d.setMonth(d.getMonth() + i);
+        await db.ref().update(updates);
+        return true;
+    }
 
-    const dateStr = d.toISOString().split("T")[0];
-    const monthKey = getMonthKeyFromDate(dateStr);
-    const id = `${groupId}_${i+1}`;
+    try {
+        // 1. Parcela continua parcelada.
+        if (editingItem?.parcel && isParcel) {
+            if (editAll) {
+                await updateParcelGroup(valReceived, remaining);
+            } else {
+                await updateCurrentParcel(valReceived, remaining);
+            }
 
-    const pago = (i === 0) ? paid.checked : false;
+            closeModal();
+            render();
+            return;
+        }
 
-const item = {
+        // 2. Conta fixa continua fixa.
+        if (editingItem?.fixed && isFixed) {
+            if (editAll) {
+                await updateFixedGroup(valReceived, remaining);
+            } else {
+                const item = {
+                    ...editingItem,
+                    name: title.value.trim(),
+                    value: valTotal,
+                    category: category.value,
+                    date: baseDateStr,
+                    type: currentType,
+                    paid: paid.checked,
+                    receivedValue: currentType === "income" ? valReceived : 0,
+                    remainingValue: currentType === "income" ? remaining : 0
+                };
 
-    fixed: false,
-    id,
-    name: title.value.trim(),
-    value: parcelValue,
+                const updates = {};
+                updates[`finance/meses/${editMonthKey}/${editId}`] = null;
+                updates[`finance/meses/${newMonthKey}/${editId}`] = item;
 
-    receivedValue:
-        currentType === "income"
-            ? (pago ? parcelValue : 0)
-            : 0,
+                await db.ref().update(updates);
+            }
 
-    remainingValue:
-        currentType === "income"
-            ? (pago ? 0 : parcelValue)
-            : 0,
+            closeModal();
+            render();
+            return;
+        }
 
-    category: category.value,
-    date: dateStr,
-    type: currentType,
+        
+        // 3. Parcela vira conta fixa:
+        // preserva as parcelas anteriores e recria a série até dezembro
+        // do segundo ano seguinte.
+        if (editingItem?.parcel && isFixed) {
+            const ano = Number(baseDateStr.slice(0, 4));
+            const mes = Number(baseDateStr.slice(5, 7));
 
-    paid: pago,
+            const totalFixas = (ano + 2) * 12 - (ano * 12 + mes - 1) + 12;
 
-    parcel: true,
-    parcelIndex: i + 1,
-    parcelTotal: totalParcels,
-    parcelGroupId: groupId
-};
+            const months = await getAllMonths();
+            const updates = {};
+            const oldGroupId = editingItem.parcelGroupId;
+            const startIndex = Number(editingItem.parcelIndex);
 
-    firebase
-      .database()
-      .ref("finance/meses/" + monthKey + "/" + id)
-      .set(item);
-  }
+            // Remove apenas a parcela atual e as futuras do grupo antigo.
+            Object.keys(months).forEach(month => {
+                Object.keys(months[month] || {}).forEach(id => {
+                    const item = months[month][id];
 
-  closeModal();
-  render();
+                    if (
+                        item.parcelGroupId === oldGroupId &&
+                        Number(item.parcelIndex) >= startIndex
+                    ) {
+                        updates[`finance/meses/${month}/${id}`] = null;
+                    }
+                });
+            });
+
+            const newGroupId = Date.now().toString() +
+                "_" + Math.random().toString(36).slice(2, 7);
+
+            // Cria a conta fixa mensal até dezembro do segundo ano seguinte.
+            for (let i = 0; i < totalFixas; i++) {
+                const dateStr = makeDate(baseDateStr, i);
+                const id = `${newGroupId}_${i + 1}`;
+                const isCurrent = i === 0;
+
+                const recebido = isCurrent
+                    ? valReceived
+                    : 0;
+
+                const item = {
+                    id,
+                    name: title.value.trim(),
+                    value: valTotal,
+                    category: category.value,
+                    date: dateStr,
+                    type: currentType,
+                    paid: isCurrent ? paid.checked : false,
+                    receivedValue: currentType === "income" ? recebido : 0,
+                    remainingValue: currentType === "income"
+                        ? Math.max(0, valTotal - recebido)
+                        : 0,
+                    fixed: true,
+                    parcel: false,
+                    parcelIndex: i + 1,
+                    parcelTotal: totalFixas,
+                    parcelGroupId: newGroupId
+                };
+
+                const monthKey = getMonthKeyFromDate(dateStr);
+                updates[`finance/meses/${monthKey}/${id}`] = item;
+            }
+
+            await db.ref().update(updates);
+
+            closeModal();
+            render();
+            return;
+        }
+
+
+        
+        // 4. Conta fixa vira parcelamento:
+        // preserva o histórico anterior e cria exatamente a quantidade escolhida.
+        if (editingItem?.fixed && isParcel) {
+            const total = Number(parcelCount.value || 0);
+
+            if (!Number.isInteger(total) || total < 2) {
+                alert("Informe a quantidade de parcelas (mínimo 2).");
+                return;
+            }
+
+            const months = await getAllMonths();
+            const oldGroupId = editingItem.parcelGroupId;
+            const startIndex = Number(editingItem.parcelIndex);
+            const oldItems = [];
+
+            // Localiza a conta atual e as contas fixas futuras.
+            Object.keys(months).forEach(month => {
+                Object.keys(months[month] || {}).forEach(id => {
+                    const item = months[month][id];
+
+                    if (
+                        item.parcelGroupId === oldGroupId &&
+                        item.fixed &&
+                        Number(item.parcelIndex) >= startIndex
+                    ) {
+                        oldItems.push({
+                            month,
+                            id,
+                            item
+                        });
+                    }
+                });
+            });
+
+            oldItems.sort(
+                (a, b) =>
+                    Number(a.item.parcelIndex) -
+                    Number(b.item.parcelIndex)
+            );
+
+            if (!oldItems.length) {
+                alert("Não encontrei a conta fixa atual e as futuras.");
+                return;
+            }
+
+            const newGroupId = Date.now().toString() +
+                "_" + Math.random().toString(36).slice(2, 7);
+
+            const updates = {};
+
+            // Remove todas as contas fixas atuais e futuras antigas.
+            // As contas anteriores à selecionada ficam intactas.
+            oldItems.forEach(({ month, id }) => {
+                updates[`finance/meses/${month}/${id}`] = null;
+            });
+
+            // Cria somente a quantidade escolhida, por exemplo, 3 parcelas.
+            for (let i = 0; i < total; i++) {
+                const old = oldItems[i]?.item;
+                const dateStr = makeDate(baseDateStr, i);
+                const id = `${newGroupId}_${i + 1}`;
+                const isCurrent = i === 0;
+
+                const recebido = isCurrent
+                    ? valReceived
+                    : Number(old?.receivedValue || 0);
+
+                const item = {
+                    id,
+                    name: title.value.trim(),
+                    value: valTotal,
+                    category: category.value,
+                    date: dateStr,
+                    type: currentType,
+
+                    paid: isCurrent
+                        ? paid.checked
+                        : Boolean(old?.paid),
+
+                    receivedValue: currentType === "income"
+                        ? recebido
+                        : 0,
+
+                    remainingValue: currentType === "income"
+                        ? Math.max(0, valTotal - recebido)
+                        : 0,
+
+                    fixed: false,
+                    parcel: true,
+                    parcelIndex: i + 1,
+                    parcelTotal: total,
+                    parcelGroupId: newGroupId
+                };
+
+                const monthKey = getMonthKeyFromDate(dateStr);
+
+                updates[`finance/meses/${monthKey}/${id}`] = item;
+            }
+
+            // Salva as exclusões e as novas parcelas na mesma operação.
+            await db.ref().update(updates);
+
+            closeModal();
+            render();
+            return;
+        }
+
+
+        // 5. Parcelado/fixo vira lançamento normal:
+        // preserva o histórico anterior e substitui o trecho atual/futuro.
+        if (
+            (editingItem?.parcel || editingItem?.fixed) &&
+            !isParcel &&
+            !isFixed
+        ) {
+            await removeGroupFromCurrent(
+                editingItem.parcelGroupId,
+                editingItem.parcelIndex
+            );
+
+            const id = Date.now().toString() +
+                "_" + Math.random().toString(36).slice(2, 7);
+
+            await db.ref(
+                `finance/meses/${newMonthKey}/${id}`
+            ).set(makeNormalItem(id));
+
+            closeModal();
+            render();
+            return;
+        }
+
+        // 6. Normal vira parcelado/fixo.
+        if (
+            !editingItem?.parcel &&
+            !editingItem?.fixed &&
+            (isParcel || isFixed)
+        ) {
+            const ok = await createSeries(isFixed);
+            if (!ok) return;
+
+            if (editId && editMonthKey) {
+                await db.ref(
+                    `finance/meses/${editMonthKey}/${editId}`
+                ).remove();
+            }
+
+            closeModal();
+            render();
+            return;
+        }
+
+        // 7. Cria ou edita lançamento normal.
+        if (!isParcel && !isFixed) {
+            const id = editId || Date.now().toString();
+            const item = makeNormalItem(id);
+            const updates = {};
+
+            if (editId && editMonthKey && editMonthKey !== newMonthKey) {
+                updates[`finance/meses/${editMonthKey}/${editId}`] = null;
+            }
+
+            updates[`finance/meses/${newMonthKey}/${id}`] = item;
+
+            await db.ref().update(updates);
+
+            closeModal();
+            render();
+            return;
+        }
+
+        // 8. Novo parcelamento ou nova conta fixa.
+        const ok = await createSeries(isFixed);
+        if (!ok) return;
+
+        closeModal();
+        render();
+
+    } catch (error) {
+        console.error("Erro ao salvar lançamento:", error);
+        alert("Não foi possível salvar. Verifique a conexão e tente novamente.");
+    }
 }
 
 async function updateCurrentParcel(valReceived, remaining){
