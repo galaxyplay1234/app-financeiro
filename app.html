@@ -1236,14 +1236,78 @@ const total = fixed
             return;
         }
 
-        // 3. Parcela vira conta fixa: preserva as anteriores.
+        
+        // 3. Parcela vira conta fixa:
+        // preserva as parcelas anteriores e recria a série até dezembro
+        // do segundo ano seguinte.
         if (editingItem?.parcel && isFixed) {
-            await convertParcelToFixed(valReceived, remaining);
+            const ano = Number(baseDateStr.slice(0, 4));
+            const mes = Number(baseDateStr.slice(5, 7));
+
+            const totalFixas = (ano + 2) * 12 - (ano * 12 + mes - 1) + 12;
+
+            const months = await getAllMonths();
+            const updates = {};
+            const oldGroupId = editingItem.parcelGroupId;
+            const startIndex = Number(editingItem.parcelIndex);
+
+            // Remove apenas a parcela atual e as futuras do grupo antigo.
+            Object.keys(months).forEach(month => {
+                Object.keys(months[month] || {}).forEach(id => {
+                    const item = months[month][id];
+
+                    if (
+                        item.parcelGroupId === oldGroupId &&
+                        Number(item.parcelIndex) >= startIndex
+                    ) {
+                        updates[`finance/meses/${month}/${id}`] = null;
+                    }
+                });
+            });
+
+            const newGroupId = Date.now().toString() +
+                "_" + Math.random().toString(36).slice(2, 7);
+
+            // Cria a conta fixa mensal até dezembro do segundo ano seguinte.
+            for (let i = 0; i < totalFixas; i++) {
+                const dateStr = makeDate(baseDateStr, i);
+                const id = `${newGroupId}_${i + 1}`;
+                const isCurrent = i === 0;
+
+                const recebido = isCurrent
+                    ? valReceived
+                    : 0;
+
+                const item = {
+                    id,
+                    name: title.value.trim(),
+                    value: valTotal,
+                    category: category.value,
+                    date: dateStr,
+                    type: currentType,
+                    paid: isCurrent ? paid.checked : false,
+                    receivedValue: currentType === "income" ? recebido : 0,
+                    remainingValue: currentType === "income"
+                        ? Math.max(0, valTotal - recebido)
+                        : 0,
+                    fixed: true,
+                    parcel: false,
+                    parcelIndex: i + 1,
+                    parcelTotal: totalFixas,
+                    parcelGroupId: newGroupId
+                };
+
+                const monthKey = getMonthKeyFromDate(dateStr);
+                updates[`finance/meses/${monthKey}/${id}`] = item;
+            }
+
+            await db.ref().update(updates);
 
             closeModal();
             render();
             return;
         }
+
 
         
         // 4. Conta fixa vira parcelamento:
