@@ -10,18 +10,27 @@
 *{box-sizing:border-box;font-family:Arial,sans-serif}
 body{margin:0;background:#f4f6f8}
 
-/* TOPO */
 .top-fixed{position:sticky;top:0;z-index:10;background:#f4f6f8}
 header{background:#1976d2;color:#fff;padding:12px}
 .header-row{display:flex;justify-content:space-between;align-items:center}
 header h2{margin:0;font-size:18px}
 
+.header-actions{display:flex;align-items:center;gap:10px}
+
 .icon-btn{
   background:none;border:none;color:#fff;
-  font-size:22px;cursor:pointer
+  font-size:22px;cursor:pointer;padding:3px
 }
 
-/* MESES */
+.icon-btn:active,.month-btn:active{opacity:.65}
+
+.mode-btn{
+  background:rgba(255,255,255,.15);
+  color:#fff;border:1px solid rgba(255,255,255,.45);
+  border-radius:7px;padding:6px 9px;
+  font-size:13px;font-weight:bold;cursor:pointer
+}
+
 .month-tabs{
   display:flex;justify-content:center;align-items:center;
   gap:14px;margin-top:6px
@@ -32,33 +41,62 @@ header h2{margin:0;font-size:18px}
 /* LISTA */
 .list{padding:10px}
 
-/* CARD */
+/* CARDS MENSAIS */
 .report-card{
   background:#fff;border-radius:10px;padding:12px;
   margin-bottom:10px;box-shadow:0 2px 6px rgba(0,0,0,.1);
   cursor:pointer
 }
-.report-top{display:flex;justify-content:space-between}
+.report-top{
+  display:flex;justify-content:space-between;align-items:flex-start
+}
 .report-name{font-weight:bold}
 .report-total{font-size:16px;font-weight:bold}
 .report-percent{font-size:12px;color:#666}
-
-.report-top{
-  display:flex;
-  justify-content:space-between;
-  align-items:flex-start;
-}
-
-.report-top > div:last-child{
-  text-align:right;
-}
+.report-top>div:last-child{text-align:right}
 
 /* DETALHES */
-.details{margin-top:10px;border-top:1px solid #eee;padding-top:8px;display:none}
-.detail-item{display:flex;justify-content:space-between;margin-bottom:6px}
-.detail-left{font-size:13px}
-.detail-date{font-size:12px;color:#777}
-.detail-value{font-size:13px;color:#c62828}
+.details{
+  margin-top:10px;border-top:1px solid #eee;
+  padding-top:8px;display:none
+}
+.detail-item{
+  display:flex;justify-content:space-between;
+  align-items:center;gap:10px;margin-bottom:8px
+}
+.detail-left{font-size:13px;overflow-wrap:anywhere}
+.detail-date{font-size:12px;color:#777;margin-top:2px}
+.detail-value{font-size:13px;color:#c62828;white-space:nowrap}
+
+/* MODO ANUAL */
+.year-card{padding:14px}
+.year-name{font-size:16px;font-weight:bold}
+.year-balance{font-size:19px;font-weight:bold}
+.positive{color:#2e7d32}
+.negative{color:#c62828}
+.neutral{color:#666}
+
+.year-summary{
+  display:flex;justify-content:space-between;
+  gap:8px;margin-top:8px;font-size:12px;color:#666
+}
+.year-summary span{white-space:nowrap}
+
+.balance-bar{
+  display:flex;width:100%;height:8px;
+  margin-top:10px;border-radius:10px;
+  overflow:hidden;background:#eee
+}
+.bar-income{height:100%;background:#2e7d32}
+.bar-expense{height:100%;background:#c62828}
+
+.year-details-title{
+  font-size:13px;font-weight:bold;margin-bottom:8px
+}
+.detail-income{color:#2e7d32}
+.empty{
+  text-align:center;color:#666;padding:20px 10px
+}
 </style>
 </head>
 
@@ -68,23 +106,26 @@ header h2{margin:0;font-size:18px}
   <header>
     <div class="header-row">
       <h2>📊 Relatórios</h2>
-      <button class="icon-btn" onclick="window.location.href='index.html'">💰</button>
+
+      <div class="header-actions">
+        <button class="mode-btn" id="modeBtn"
+          onclick="toggleMode()">📅 Anual</button>
+
+        <button class="icon-btn"
+          onclick="window.location.href='index.html'">💰</button>
+      </div>
     </div>
 
     <div class="month-tabs">
-      <button class="month-btn" onclick="changeMonth(-1)">&#10094;</button>
+      <button class="month-btn" onclick="changePeriod(-1)">&#10094;</button>
       <span id="monthLabel"></span>
-      <button class="month-btn" onclick="changeMonth(1)">&#10095;</button>
+      <button class="month-btn" onclick="changePeriod(1)">&#10095;</button>
     </div>
   </header>
 </div>
 
 <section class="list" id="list"></section>
 
-
-
-
-<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
@@ -99,125 +140,341 @@ const firebaseConfig = {
   messagingSenderId: "249966609723",
   appId: "1:249966609723:web:12339b100df393031ea31e"
 };
-firebase.initializeApp(firebaseConfig);
 
-/* ================= UTIL ================= */
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
+
+/* ================= ESTADO ================= */
 let currentMonth = new Date();
+currentMonth.setDate(1);
+
+let annualMode = false;
 let openIndex = null;
+let cachedMonths = {};
 
 const monthLabel = document.getElementById("monthLabel");
+const listContainer = document.getElementById("list");
+
+const months = [
+  "Janeiro","Fevereiro","Março","Abril",
+  "Maio","Junho","Julho","Agosto",
+  "Setembro","Outubro","Novembro","Dezembro"
+];
+
+function money(value){
+  return Number(value || 0).toLocaleString("pt-BR",{
+    style:"currency",
+    currency:"BRL"
+  });
+}
+
+function monthKey(year,month){
+  return `${year}-${String(month+1).padStart(2,"0")}`;
+}
+
+function formatDate(date){
+  if(!date) return "";
+  const parts = date.split("-");
+  return `${parts[2]}/${parts[1]}`;
+}
 
 function updateMonthLabel(){
-  const meses=["Janeiro","Fevereiro","Março","Abril","Maio","Junho",
-               "Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
-  monthLabel.innerText =
-    `${meses[currentMonth.getMonth()]} ${currentMonth.getFullYear()}`;
+  if(annualMode){
+    monthLabel.innerText = currentMonth.getFullYear();
+    document.getElementById("modeBtn").innerText = "📅 Mensal";
+  }else{
+    monthLabel.innerText =
+      `${months[currentMonth.getMonth()]} ${currentMonth.getFullYear()}`;
+
+    document.getElementById("modeBtn").innerText = "📅 Anual";
+  }
 }
 
-function getMonthKey(){
-  return `${currentMonth.getFullYear()}-${String(currentMonth.getMonth()+1).padStart(2,"0")}`;
-}
-
-function formatDate(d){
-  const [y,m,day]=d.split("-");
-  return `${day}/${m}`;
-}
-
-function monthRef(){
-  return firebase.database().ref("finance/meses/" + getMonthKey());
-}
-
-/* ================= MÊS ================= */
-function changeMonth(step){
-  currentMonth = new Date(
-    currentMonth.getFullYear(),
-    currentMonth.getMonth() + step,
-    1 // 👈 força dia 1
-  );
-
+/* ================= NAVEGAÇÃO ================= */
+function toggleMode(){
+  annualMode = !annualMode;
+  openIndex = null;
   updateMonthLabel();
   render();
 }
 
-/* ================= RENDER ================= */
-function render(){
-  const container=document.getElementById("list");
-  container.innerHTML="";
+function changePeriod(step){
+  if(annualMode){
+    currentMonth = new Date(
+      currentMonth.getFullYear()+step,
+      currentMonth.getMonth(),
+      1
+    );
+  }else{
+    currentMonth = new Date(
+      currentMonth.getFullYear(),
+      currentMonth.getMonth()+step,
+      1
+    );
+  }
 
-  monthRef().once("value", snap=>{
-    const data = snap.val() || {};
-    const list = Object.values(data);
+  openIndex = null;
+  updateMonthLabel();
+  render();
+}
 
-    const despesas = list.filter(i=>i.type==="expense");
+/* ================= DADOS ================= */
+function getTransactions(data){
+  return Object.values(data || {}).filter(item =>
+    item && typeof item === "object" &&
+    (item.type === "income" || item.type === "expense")
+  );
+}
 
-    if(despesas.length===0){
-      container.innerHTML =
-        "<p style='text-align:center;color:#666'>Sem despesas neste mês</p>";
-      return;
+function totals(items){
+  let income = 0;
+  let expense = 0;
+
+  items.forEach(item=>{
+    const value = Number(item.value) || 0;
+
+    if(item.type === "income"){
+      income += value;
+    }else if(item.type === "expense"){
+      expense += value;
     }
-
-    const totalGeral = despesas.reduce((s,i)=>s+i.value,0);
-
-    const grouped = {};
-    despesas.forEach(i=>{
-      if(!grouped[i.category]) grouped[i.category]=[];
-      grouped[i.category].push(i);
-    });
-
-    const categorias = Object.keys(grouped).map(cat=>{
-  const total = grouped[cat].reduce((s,i)=>s+i.value,0);
-
-  const itemsOrdenados = grouped[cat]
-    .sort((a,b)=>new Date(a.date) - new Date(b.date)); // 👈 MENOR → MAIOR
+  });
 
   return {
-    name: cat,
-    total,
-    percent: Math.round((total/totalGeral)*100),
-    items: itemsOrdenados
+    income,
+    expense,
+    balance: income-expense
   };
-});
+}
 
-    categorias
-      .sort((a,b)=>b.percent-a.percent)
-      .forEach((cat,idx)=>{
-        const card=document.createElement("div");
-        card.className="report-card";
+/* ================= RENDER PRINCIPAL ================= */
+async function render(){
+  listContainer.innerHTML =
+    "<p class='empty'>Carregando relatório...</p>";
 
-        card.innerHTML=`
-          <div class="report-top">
-            <div class="report-name">${cat.name}</div>
+  const year = currentMonth.getFullYear();
+
+  try{
+    if(annualMode){
+      const snapshot = await firebase.database()
+        .ref("finance/meses")
+        .once("value");
+
+      const allMonths = snapshot.val() || {};
+      cachedMonths = {};
+
+      for(let m=0;m<12;m++){
+        const key = monthKey(year,m);
+        cachedMonths[key] = getTransactions(allMonths[key] || {});
+      }
+
+      renderAnnual(year);
+    }else{
+      const key = monthKey(year,currentMonth.getMonth());
+
+      const snapshot = await firebase.database()
+        .ref("finance/meses/"+key)
+        .once("value");
+
+      renderMonthly(snapshot.val() || {});
+    }
+  }catch(error){
+    console.error("Erro ao carregar relatório:",error);
+    listContainer.innerHTML =
+      "<p class='empty'>Não foi possível carregar os dados. Verifique sua conexão.</p>";
+  }
+}
+
+/* ================= RELATÓRIO MENSAL ================= */
+function renderMonthly(data){
+  listContainer.innerHTML = "";
+
+  const items = getTransactions(data);
+  const expenses = items.filter(i=>i.type==="expense");
+
+  if(expenses.length===0){
+    listContainer.innerHTML =
+      "<p class='empty'>Sem despesas neste mês</p>";
+    return;
+  }
+
+  const totalExpenses = expenses.reduce(
+    (sum,item)=>sum+(Number(item.value)||0),0
+  );
+
+  const grouped = {};
+
+  expenses.forEach(item=>{
+    const category = item.category || "Geral";
+
+    if(!grouped[category]) grouped[category]=[];
+    grouped[category].push(item);
+  });
+
+  const categories = Object.keys(grouped).map(category=>{
+    const categoryItems = grouped[category].sort(
+      (a,b)=>new Date(a.date)-new Date(b.date)
+    );
+
+    const total = categoryItems.reduce(
+      (sum,item)=>sum+(Number(item.value)||0),0
+    );
+
+    return {
+      name:category,
+      total,
+      percent:totalExpenses ? Math.round(total/totalExpenses*100):0,
+      items:categoryItems
+    };
+  });
+
+  categories.sort((a,b)=>b.total-a.total);
+
+  categories.forEach((category,index)=>{
+    const card = document.createElement("div");
+    card.className = "report-card";
+
+    card.innerHTML = `
+      <div class="report-top">
+        <div class="report-name">${escapeHTML(category.name)}</div>
+        <div>
+          <div class="report-total">${money(category.total)}</div>
+          <div class="report-percent">${category.percent}%</div>
+        </div>
+      </div>
+
+      <div class="details"
+        ${openIndex===index ? "style='display:block'" : ""}>
+        ${category.items.map(item=>`
+          <div class="detail-item">
             <div>
-              <div class="report-total">
-                R$ ${cat.total.toLocaleString("pt-BR",{minimumFractionDigits:2})}
-              </div>
-              <div class="report-percent">${cat.percent}%</div>
+              <div class="detail-left">${escapeHTML(item.name || "Lançamento")}</div>
+              <div class="detail-date">${formatDate(item.date)}</div>
+            </div>
+            <div class="detail-value">
+              ${money(-(Number(item.value)||0))}
             </div>
           </div>
+        `).join("")}
+      </div>
+    `;
 
-          <div class="details" ${openIndex===idx?"style='display:block'":""}>
-            ${cat.items.map(i=>`
-              <div class="detail-item">
-                <div>
-                  <div class="detail-left">${i.name}</div>
-                  <div class="detail-date">${formatDate(i.date)}</div>
-                </div>
-                <div class="detail-value">
-                  R$ -${i.value.toLocaleString("pt-BR",{minimumFractionDigits:2})}
-                </div>
-              </div>
-            `).join("")}
-          </div>
-        `;
+    card.onclick=()=>{
+      openIndex = openIndex===index ? null:index;
+      renderMonthly(data);
+    };
 
-        card.onclick=()=>{
-          openIndex = openIndex===idx ? null : idx;
-          render();
-        };
-
-        container.appendChild(card);
-      });
+    listContainer.appendChild(card);
   });
+}
+
+/* ================= RELATÓRIO ANUAL ================= */
+function renderAnnual(year){
+  listContainer.innerHTML = "";
+
+  let hasTransactions = false;
+
+  for(let m=0;m<12;m++){
+    const key = monthKey(year,m);
+    const items = cachedMonths[key] || [];
+    const result = totals(items);
+
+    if(items.length) hasTransactions = true;
+
+    const totalForBar = result.income+result.expense;
+    const incomePercent = totalForBar
+      ? result.income/totalForBar*100
+      : 0;
+    const expensePercent = totalForBar
+      ? result.expense/totalForBar*100
+      : 0;
+
+    const balanceClass =
+      result.balance>0 ? "positive" :
+      result.balance<0 ? "negative" : "neutral";
+
+    const card = document.createElement("div");
+    card.className = "report-card year-card";
+
+    card.innerHTML = `
+      <div class="report-top">
+        <div class="year-name">${months[m]}</div>
+
+        <div>
+          <div class="year-balance ${balanceClass}">
+            ${money(result.balance)}
+          </div>
+        </div>
+      </div>
+
+      <div class="year-summary">
+  <span class="detail-income">${money(result.income)}</span>
+  <span style="color:#c62828">${money(result.expense)}</span>
+</div>
+
+      <div class="balance-bar" aria-label="Proporção de receitas e despesas">
+        <div class="bar-income" style="width:${incomePercent}%"></div>
+        <div class="bar-expense" style="width:${expensePercent}%"></div>
+      </div>
+
+      <div class="details"
+        ${openIndex===m ? "style='display:block'" : ""}>
+        <div class="year-details-title">Lançamentos de ${months[m]}</div>
+
+        ${
+          items.length
+          ? [...items].sort((a,b)=>
+              (a.date||"").localeCompare(b.date||"")
+            ).map(item=>{
+              const isIncome = item.type==="income";
+              return `
+                <div class="detail-item">
+                  <div>
+                    <div class="detail-left">
+                      ${escapeHTML(item.name || "Lançamento")}
+                    </div>
+                    <div class="detail-date">
+                      ${formatDate(item.date)} ·
+                      ${escapeHTML(item.category || "Geral")}
+                    </div>
+                  </div>
+                  <div class="detail-value ${isIncome ? "detail-income":""}">
+                    ${isIncome?"+":"−"} ${money(item.value)}
+                  </div>
+                </div>
+              `;
+            }).join("")
+          : "<div class='detail-left'>Nenhum lançamento neste mês.</div>"
+        }
+      </div>
+    `;
+
+    card.onclick=()=>{
+      openIndex = openIndex===m ? null:m;
+      renderAnnual(year);
+    };
+
+    listContainer.appendChild(card);
+  }
+
+  if(!hasTransactions){
+    const message = document.createElement("p");
+    message.className = "empty";
+    message.innerText = "Nenhum lançamento encontrado neste ano.";
+    listContainer.prepend(message);
+  }
+}
+
+/* ================= SEGURANÇA HTML ================= */
+function escapeHTML(value){
+  return String(value).replace(/[&<>"']/g,char=>({
+    "&":"&amp;",
+    "<":"&lt;",
+    ">":"&gt;",
+    '"':"&quot;",
+    "'":"&#39;"
+  })[char]);
 }
 
 /* ================= INIT ================= */
@@ -226,12 +483,10 @@ render();
 </script>
 
 <script>
-if ("serviceWorker" in navigator) {
+if("serviceWorker" in navigator){
   navigator.serviceWorker.register("sw.js");
 }
 </script>
-
-
 
 </body>
 </html>
