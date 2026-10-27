@@ -129,6 +129,14 @@ header h2{margin:0;font-size:18px}
   text-overflow:ellipsis;
 }
 
+.annual-total-value{
+  font-size:clamp(11px,3.2vw,18px);
+  font-weight:bold;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
 .annual-income{
   color:#2e7d32;
 }
@@ -434,21 +442,31 @@ function renderAnnual(year){
   const summary = document.createElement("div");
   summary.className = "annual-totals";
 
+  
   summary.innerHTML = `
     <div class="annual-total-card">
-      <div class="annual-total-label">Receitas no ano</div>
+      <div class="annual-total-label">Receitas</div>
       <div class="annual-total-value annual-income">
         ${money(annualIncome)}
       </div>
     </div>
 
     <div class="annual-total-card">
-      <div class="annual-total-label">Despesas no ano</div>
+      <div class="annual-total-label">Despesas</div>
       <div class="annual-total-value annual-expense">
         ${money(annualExpense)}
       </div>
     </div>
+
+    <div class="annual-total-card">
+      <div class="annual-total-label">Saldo</div>
+      <div class="annual-total-value"
+           style="color:${annualIncome - annualExpense >= 0 ? '#2e7d32' : '#c62828'}">
+        ${money(annualIncome - annualExpense)}
+      </div>
+    </div>
   `;
+
 
   listContainer.appendChild(summary);
 
