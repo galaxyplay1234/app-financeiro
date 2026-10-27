@@ -97,6 +97,55 @@ header h2{margin:0;font-size:18px}
 .empty{
   text-align:center;color:#666;padding:20px 10px
 }
+
+
+/* RESUMO ANUAL */
+.annual-totals{
+  display:flex;
+  gap:10px;
+  margin-bottom:10px;
+}
+
+.annual-total-card{
+  flex:1;
+  min-width:0;
+  background:#fff;
+  border-radius:10px;
+  padding:12px;
+  box-shadow:0 2px 6px rgba(0,0,0,.1);
+}
+
+.annual-total-label{
+  font-size:13px;
+  color:#666;
+  margin-bottom:6px;
+}
+
+.annual-total-value{
+  font-size:clamp(14px,4vw,18px);
+  font-weight:bold;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.annual-total-value{
+  font-size:clamp(11px,3.2vw,18px);
+  font-weight:bold;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.annual-income{
+  color:#2e7d32;
+}
+
+.annual-expense{
+  color:#c62828;
+}
+
+
 </style>
 </head>
 
@@ -370,10 +419,57 @@ function renderMonthly(data){
 }
 
 /* ================= RELATÓRIO ANUAL ================= */
+
 function renderAnnual(year){
   listContainer.innerHTML = "";
 
   let hasTransactions = false;
+
+  // Soma todas as receitas e despesas do ano selecionado
+  let annualIncome = 0;
+  let annualExpense = 0;
+
+  for(let m = 0; m < 12; m++){
+    const key = monthKey(year, m);
+    const items = cachedMonths[key] || [];
+    const result = totals(items);
+
+    annualIncome += result.income;
+    annualExpense += result.expense;
+  }
+
+  // Cards de resumo anual
+  const summary = document.createElement("div");
+  summary.className = "annual-totals";
+
+  
+  summary.innerHTML = `
+    <div class="annual-total-card">
+      <div class="annual-total-label">Receitas</div>
+      <div class="annual-total-value annual-income">
+        ${money(annualIncome)}
+      </div>
+    </div>
+
+    <div class="annual-total-card">
+      <div class="annual-total-label">Despesas</div>
+      <div class="annual-total-value annual-expense">
+        ${money(annualExpense)}
+      </div>
+    </div>
+
+    <div class="annual-total-card">
+      <div class="annual-total-label">Saldo</div>
+      <div class="annual-total-value"
+           style="color:${annualIncome - annualExpense >= 0 ? '#2e7d32' : '#c62828'}">
+        ${money(annualIncome - annualExpense)}
+      </div>
+    </div>
+  `;
+
+
+  listContainer.appendChild(summary);
+
 
   for(let m=0;m<12;m++){
     const key = monthKey(year,m);
